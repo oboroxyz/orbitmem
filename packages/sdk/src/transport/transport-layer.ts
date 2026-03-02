@@ -1,15 +1,14 @@
-import type {
-  ITransportLayer,
-  SignedRequest,
-  VerificationResult,
-  WalletAddress,
-  ChainFamily,
-  SignatureAlgorithm,
-} from '../types.js';
+import type { ChainFamily, ITransportLayer, SignatureAlgorithm, WalletAddress } from "../types.js";
 
 interface TransportConfig {
-  signer: (payload: Uint8Array) => Promise<{ signature: Uint8Array; algorithm: SignatureAlgorithm }>;
-  verifier?: (payload: Uint8Array, signature: Uint8Array, algorithm: SignatureAlgorithm) => Promise<boolean>;
+  signer: (
+    payload: Uint8Array,
+  ) => Promise<{ signature: Uint8Array; algorithm: SignatureAlgorithm }>;
+  verifier?: (
+    payload: Uint8Array,
+    signature: Uint8Array,
+    algorithm: SignatureAlgorithm,
+  ) => Promise<boolean>;
   signerAddress: WalletAddress;
   family: ChainFamily;
   nonceTTL?: number; // ms, default 5 min
@@ -28,12 +27,22 @@ export function createTransportLayer(config: TransportConfig): ITransportLayer {
     }
   }
 
-  async function computePayload(method: string, url: string, timestamp: number, nonce: string, body?: unknown): Promise<Uint8Array> {
+  async function computePayload(
+    method: string,
+    url: string,
+    timestamp: number,
+    nonce: string,
+    body?: unknown,
+  ): Promise<Uint8Array> {
     const bodyHash = body
-      ? new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(body))))
+      ? new Uint8Array(
+          await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(body))),
+        )
       : new Uint8Array(0);
     const payload = new TextEncoder().encode(
-      `${method}\n${url}\n${timestamp}\n${nonce}\n${Array.from(bodyHash).map(b => b.toString(16).padStart(2, '0')).join('')}`
+      `${method}\n${url}\n${timestamp}\n${nonce}\n${Array.from(bodyHash)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("")}`,
     );
     return payload;
   }
@@ -42,22 +51,30 @@ export function createTransportLayer(config: TransportConfig): ITransportLayer {
     async createSignedRequest(request) {
       const timestamp = Date.now();
       const nonce = crypto.randomUUID();
-      const payload = await computePayload(request.method, request.url, timestamp, nonce, request.body);
+      const payload = await computePayload(
+        request.method,
+        request.url,
+        timestamp,
+        nonce,
+        request.body,
+      );
       const { signature, algorithm } = await config.signer(payload);
 
       const headers: Record<string, string> = {
         ...request.headers,
-        'X-OrbitMem-Signer': config.signerAddress as string,
-        'X-OrbitMem-Family': config.family,
-        'X-OrbitMem-Algorithm': algorithm,
-        'X-OrbitMem-Timestamp': String(timestamp),
-        'X-OrbitMem-Nonce': nonce,
-        'X-OrbitMem-Signature': Array.from(signature).map(b => b.toString(16).padStart(2, '0')).join(''),
+        "X-OrbitMem-Signer": config.signerAddress as string,
+        "X-OrbitMem-Family": config.family,
+        "X-OrbitMem-Algorithm": algorithm,
+        "X-OrbitMem-Timestamp": String(timestamp),
+        "X-OrbitMem-Nonce": nonce,
+        "X-OrbitMem-Signature": Array.from(signature)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join(""),
       };
 
       return {
         url: request.url,
-        method: request.method ?? 'GET',
+        method: request.method ?? "GET",
         headers,
         body: request.body,
         proof: {
@@ -89,7 +106,13 @@ export function createTransportLayer(config: TransportConfig): ITransportLayer {
 
       // Signature verification
       if (config.verifier) {
-        const payload = await computePayload(request.method, request.url, proof.timestamp, proof.nonce, request.body);
+        const payload = await computePayload(
+          request.method,
+          request.url,
+          proof.timestamp,
+          proof.nonce,
+          request.body,
+        );
         const valid = await config.verifier(payload, proof.signature, proof.algorithm);
         if (valid) {
           nonceCache.set(proof.nonce, Date.now());
@@ -105,7 +128,7 @@ export function createTransportLayer(config: TransportConfig): ITransportLayer {
     async fetch(url, init) {
       const signed = await this.createSignedRequest({
         url,
-        method: (init?.method as any) ?? 'GET',
+        method: (init?.method as any) ?? "GET",
         headers: init?.headers,
         body: init?.body,
       });

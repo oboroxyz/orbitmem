@@ -1,7 +1,7 @@
-import type { AESEncryptedData, AESKeySource } from '../types.js';
+import type { AESEncryptedData, AESKeySource } from "../types.js";
 
 export interface AESConfig {
-  kdf: 'hkdf-sha256' | 'pbkdf2-sha256';
+  kdf: "hkdf-sha256" | "pbkdf2-sha256";
   iterations?: number;
 }
 
@@ -13,46 +13,39 @@ export class AESEngine {
   }
 
   async deriveKey(source: AESKeySource, walletSignature?: Uint8Array): Promise<CryptoKey> {
-    if (source.type === 'raw') {
-      return crypto.subtle.importKey(
-        'raw',
-        source.key,
-        { name: 'AES-GCM' },
-        false,
-        ['encrypt', 'decrypt']
-      );
+    if (source.type === "raw") {
+      return crypto.subtle.importKey("raw", source.key, { name: "AES-GCM" }, false, [
+        "encrypt",
+        "decrypt",
+      ]);
     }
 
-    if (source.type === 'wallet-signature') {
-      if (!walletSignature) throw new Error('walletSignature required for wallet-signature source');
-      const ikm = await crypto.subtle.importKey(
-        'raw',
-        walletSignature,
-        'HKDF',
-        false,
-        ['deriveKey']
-      );
+    if (source.type === "wallet-signature") {
+      if (!walletSignature) throw new Error("walletSignature required for wallet-signature source");
+      const ikm = await crypto.subtle.importKey("raw", walletSignature, "HKDF", false, [
+        "deriveKey",
+      ]);
       const salt = crypto.getRandomValues(new Uint8Array(32));
-      const info = new TextEncoder().encode('orbitmem-aes-256-gcm');
+      const info = new TextEncoder().encode("orbitmem-aes-256-gcm");
       return crypto.subtle.deriveKey(
-        { name: 'HKDF', hash: 'SHA-256', salt, info },
+        { name: "HKDF", hash: "SHA-256", salt, info },
         ikm,
-        { name: 'AES-GCM', length: 256 },
+        { name: "AES-GCM", length: 256 },
         false,
-        ['encrypt', 'decrypt']
+        ["encrypt", "decrypt"],
       );
     }
 
-    if (source.type === 'password') {
+    if (source.type === "password") {
       const enc = new TextEncoder().encode(source.password);
-      const ikm = await crypto.subtle.importKey('raw', enc, 'PBKDF2', false, ['deriveKey']);
+      const ikm = await crypto.subtle.importKey("raw", enc, "PBKDF2", false, ["deriveKey"]);
       const salt = crypto.getRandomValues(new Uint8Array(32));
       return crypto.subtle.deriveKey(
-        { name: 'PBKDF2', hash: 'SHA-256', salt, iterations: this.config.iterations ?? 100000 },
+        { name: "PBKDF2", hash: "SHA-256", salt, iterations: this.config.iterations ?? 100000 },
         ikm,
-        { name: 'AES-GCM', length: 256 },
+        { name: "AES-GCM", length: 256 },
         false,
-        ['encrypt', 'decrypt']
+        ["encrypt", "decrypt"],
       );
     }
 
@@ -62,9 +55,9 @@ export class AESEngine {
   async encrypt(data: Uint8Array, key: CryptoKey): Promise<AESEncryptedData> {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ciphertextWithTag = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv, tagLength: 128 },
+      { name: "AES-GCM", iv, tagLength: 128 },
       key,
-      data
+      data,
     );
     // AES-GCM appends the 16-byte auth tag to the ciphertext
     const raw = new Uint8Array(ciphertextWithTag);
@@ -72,14 +65,14 @@ export class AESEngine {
     const authTag = raw.slice(raw.length - 16);
 
     return {
-      engine: 'aes',
+      engine: "aes",
       ciphertext,
       iv,
       authTag,
       keyDerivation: {
-        source: 'wallet-signature',
+        source: "wallet-signature",
         salt: new Uint8Array(32), // placeholder — real salt from deriveKey
-        kdf: this.config.kdf === 'hkdf-sha256' ? 'hkdf-sha256' : 'pbkdf2-sha256',
+        kdf: this.config.kdf === "hkdf-sha256" ? "hkdf-sha256" : "pbkdf2-sha256",
       },
     };
   }
@@ -91,9 +84,9 @@ export class AESEngine {
     combined.set(encrypted.authTag, encrypted.ciphertext.length);
 
     const plaintext = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: encrypted.iv, tagLength: 128 },
+      { name: "AES-GCM", iv: encrypted.iv, tagLength: 128 },
       key,
-      combined
+      combined,
     );
     return new Uint8Array(plaintext);
   }

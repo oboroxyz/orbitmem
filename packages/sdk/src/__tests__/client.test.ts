@@ -1,16 +1,16 @@
-import { describe, test, expect } from 'bun:test';
-import { createOrbitMem } from '../client.js';
+import { describe, expect, test } from "bun:test";
+import { createOrbitMem } from "../client.js";
 
-describe('createOrbitMem', () => {
-  test('initializes all layers', async () => {
+describe("createOrbitMem", () => {
+  test("initializes all layers", async () => {
     const orbitmem = await createOrbitMem({
-      identity: { chains: ['evm'] },
-      encryption: { defaultEngine: 'aes', aes: { kdf: 'hkdf-sha256' } },
+      identity: { chains: ["evm"] },
+      encryption: { defaultEngine: "aes", aes: { kdf: "hkdf-sha256" } },
       discovery: {
-        agentRegistry: '0xAGENT' as any,
-        dataRegistry: '0xDATA' as any,
-        reputationRegistry: '0xREP' as any,
-        registryChain: 'base',
+        agentRegistry: "0xAGENT" as any,
+        dataRegistry: "0xDATA" as any,
+        reputationRegistry: "0xREP" as any,
+        registryChain: "base",
       },
     });
 

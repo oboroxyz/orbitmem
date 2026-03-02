@@ -1,17 +1,11 @@
 import type {
-  IIdentityLayer,
   IdentityConfig,
-  WalletConnection,
+  IIdentityLayer,
   SessionKey,
-  SessionPermission,
-  ChainFamily,
   SignatureAlgorithm,
-  Chain,
-  EvmWalletAdapter,
-  SolanaWalletAdapter,
-  EvmAddress,
-} from '../types.js';
-import { deriveSessionKey } from './session.js';
+  WalletConnection,
+} from "../types.js";
+import { deriveSessionKey } from "./session.js";
 
 export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
   let connection: WalletConnection | null = null;
@@ -20,7 +14,9 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
   const listeners: Set<(conn: WalletConnection | null) => void> = new Set();
 
   // Store signer function set by external wallet adapters
-  let signFn: ((message: string) => Promise<{ signature: Uint8Array; algorithm: SignatureAlgorithm }>) | null = null;
+  let signFn:
+    | ((message: string) => Promise<{ signature: Uint8Array; algorithm: SignatureAlgorithm }>)
+    | null = null;
 
   return {
     async connect(opts) {
@@ -28,12 +24,12 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
       // For now, this is a hook point — external code sets the connection
       throw new Error(
         `connect(${opts.method}) requires a wallet adapter. ` +
-        'Use setConnection() for testing or integrate a wallet provider.'
+          "Use setConnection() for testing or integrate a wallet provider.",
       );
     },
 
     async createPasskey() {
-      throw new Error('Passkey creation requires browser WebAuthn API');
+      throw new Error("Passkey creation requires browser WebAuthn API");
     },
 
     async disconnect() {
@@ -44,13 +40,13 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
     },
 
     async signChallenge(message) {
-      if (!signFn) throw new Error('No signer available — connect a wallet first');
+      if (!signFn) throw new Error("No signer available — connect a wallet first");
       return signFn(message);
     },
 
     async createSessionKey(permissions, opts) {
-      if (!connection) throw new Error('No wallet connected');
-      if (!signFn) throw new Error('No signer available');
+      if (!connection) throw new Error("No wallet connected");
+      if (!signFn) throw new Error("No signer available");
 
       const challenge = `OrbitMem Authentication\nTimestamp: ${Date.now()}\nNonce: ${crypto.randomUUID()}`;
       const { signature } = await signFn(challenge);

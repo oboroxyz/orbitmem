@@ -1,13 +1,13 @@
 import type {
-  LitEncryptedData,
-  LitAccessCondition,
-  LitEvmCondition,
-  EvmChain,
   EvmAddress,
-} from '../types.js';
+  EvmChain,
+  LitAccessCondition,
+  LitEncryptedData,
+  LitEvmCondition,
+} from "../types.js";
 
 export interface LitConfig {
-  network: 'datil-dev' | 'datil-test' | 'datil';
+  network: "datil-dev" | "datil-test" | "datil";
   debug?: boolean;
 }
 
@@ -22,12 +22,12 @@ export class LitEngine {
   /** Lazy-initialize the Lit client (heavy import) */
   async getClient(): Promise<any> {
     if (this.client) return this.client;
-    const { LitNodeClient } = await import('@lit-protocol/lit-node-client');
-    const { LIT_NETWORK } = await import('@lit-protocol/constants');
+    const { LitNodeClient } = await import("@lit-protocol/lit-node-client");
+    const { LIT_NETWORK } = await import("@lit-protocol/constants");
     const networkMap: Record<string, string> = {
-      'datil-dev': LIT_NETWORK.DatilDev,
-      'datil-test': LIT_NETWORK.DatilTest,
-      'datil': LIT_NETWORK.Datil,
+      "datil-dev": LIT_NETWORK.DatilDev,
+      "datil-test": LIT_NETWORK.DatilTest,
+      datil: LIT_NETWORK.Datil,
     };
     this.client = new LitNodeClient({
       litNetwork: networkMap[this.config.network],
@@ -40,54 +40,51 @@ export class LitEngine {
   async encrypt(
     data: Uint8Array,
     accessConditions: LitAccessCondition[],
-    chain: string = 'ethereum'
+    chain: string = "ethereum",
   ): Promise<LitEncryptedData> {
     const client = await this.getClient();
-    const { encryptUint8Array } = await import('@lit-protocol/encryption');
+    const { encryptUint8Array } = await import("@lit-protocol/encryption");
     const { ciphertext, dataToEncryptHash } = await encryptUint8Array(
       { accessControlConditions: accessConditions as any, dataToEncrypt: data },
-      client
+      client,
     );
     return {
-      engine: 'lit',
-      ciphertext: typeof ciphertext === 'string'
-        ? new TextEncoder().encode(ciphertext)
-        : ciphertext,
+      engine: "lit",
+      ciphertext:
+        typeof ciphertext === "string" ? new TextEncoder().encode(ciphertext) : ciphertext,
       dataToEncryptHash,
       accessControlConditions: accessConditions,
       chain: chain as any,
     };
   }
 
-  async decrypt(
-    encrypted: LitEncryptedData,
-    sessionSigs: any
-  ): Promise<Uint8Array> {
+  async decrypt(encrypted: LitEncryptedData, sessionSigs: any): Promise<Uint8Array> {
     const client = await this.getClient();
-    const { decryptToUint8Array } = await import('@lit-protocol/encryption');
+    const { decryptToUint8Array } = await import("@lit-protocol/encryption");
     return decryptToUint8Array(
       {
         accessControlConditions: encrypted.accessControlConditions as any,
         chain: encrypted.chain as string,
-        ciphertext: typeof encrypted.ciphertext === 'string'
-          ? encrypted.ciphertext
-          : new TextDecoder().decode(encrypted.ciphertext),
+        ciphertext:
+          typeof encrypted.ciphertext === "string"
+            ? encrypted.ciphertext
+            : new TextDecoder().decode(encrypted.ciphertext),
         dataToEncryptHash: encrypted.dataToEncryptHash,
         sessionSigs,
       },
-      client
+      client,
     );
   }
 
   createAddressCondition(address: string, chain: EvmChain): LitEvmCondition {
     return {
-      conditionType: 'evmBasic',
-      contractAddress: '' as EvmAddress,
-      standardContractType: '',
+      conditionType: "evmBasic",
+      contractAddress: "" as EvmAddress,
+      standardContractType: "",
       chain,
-      method: '',
-      parameters: [':userAddress'],
-      returnValueTest: { comparator: '=', value: address },
+      method: "",
+      parameters: [":userAddress"],
+      returnValueTest: { comparator: "=", value: address },
     };
   }
 
@@ -97,13 +94,13 @@ export class LitEngine {
     chain: EvmChain;
   }): LitEvmCondition {
     return {
-      conditionType: 'evmContract',
+      conditionType: "evmContract",
       contractAddress: opts.registryAddress as EvmAddress,
-      standardContractType: '',
+      standardContractType: "",
       chain: opts.chain,
-      method: 'getScore',
-      parameters: [':userAddress'],
-      returnValueTest: { comparator: '>=', value: String(opts.minScore) },
+      method: "getScore",
+      parameters: [":userAddress"],
+      returnValueTest: { comparator: ">=", value: String(opts.minScore) },
     };
   }
 

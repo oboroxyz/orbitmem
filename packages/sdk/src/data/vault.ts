@@ -1,18 +1,15 @@
 import type {
+  ChainFamily,
+  EncryptionEngine,
   IDataLayer,
   VaultEntry,
   VaultPath,
   Visibility,
-  EncryptionEngine,
-  LitAccessCondition,
-  AESKeySource,
-  SyncStatus,
   WalletAddress,
-  ChainFamily,
-} from '../types.js';
+} from "../types.js";
 
 function normalizePath(path: VaultPath): string {
-  return Array.isArray(path) ? path.join('/') : path;
+  return Array.isArray(path) ? path.join("/") : path;
 }
 
 export async function createVault(
@@ -21,23 +18,31 @@ export async function createVault(
     dbName?: string;
     author?: WalletAddress;
     authorChain?: ChainFamily;
-  }
+  },
 ): Promise<IDataLayer & { close: () => Promise<void>; db: any }> {
-  const db = await orbitdb.open(config.dbName ?? 'orbitmem-vault', { type: 'nested' });
+  const db = await orbitdb.open(config.dbName ?? "orbitmem-vault", { type: "nested" });
 
   // Metadata store: path -> { visibility, encrypted, encryptionEngine, author, authorChain, timestamp }
-  const metaDb = await orbitdb.open((config.dbName ?? 'orbitmem-vault') + '-meta', { type: 'nested' });
+  const metaDb = await orbitdb.open(`${config.dbName ?? "orbitmem-vault"}-meta`, {
+    type: "nested",
+  });
 
-  function makeEntry<T>(path: string, value: T, visibility: Visibility, encrypted: boolean, engine?: EncryptionEngine): VaultEntry<T> {
+  function makeEntry<T>(
+    _path: string,
+    value: T,
+    visibility: Visibility,
+    encrypted: boolean,
+    engine?: EncryptionEngine,
+  ): VaultEntry<T> {
     return {
       value,
       visibility,
-      author: config.author ?? ('0x0' as WalletAddress),
-      authorChain: config.authorChain ?? 'evm',
+      author: config.author ?? ("0x0" as WalletAddress),
+      authorChain: config.authorChain ?? "evm",
       timestamp: Date.now(),
       encrypted,
       encryptionEngine: engine,
-      hash: '',
+      hash: "",
     };
   }
 
@@ -46,9 +51,9 @@ export async function createVault(
 
     async put(path, value, opts) {
       const key = normalizePath(path);
-      const visibility = opts?.visibility ?? 'private';
-      const encrypted = visibility !== 'public';
-      const engine = encrypted ? (opts?.engine ?? 'aes') : null;
+      const visibility = opts?.visibility ?? "private";
+      const encrypted = visibility !== "public";
+      const engine = encrypted ? (opts?.engine ?? "aes") : null;
 
       // TODO: Wire encryption for private/shared — for now store raw value
       const hash = await db.put(key, value);
@@ -60,15 +65,15 @@ export async function createVault(
     },
 
     async insert(obj, opts) {
-      const visibility = opts?.visibility ?? 'private';
+      const visibility = opts?.visibility ?? "private";
       const prefix = opts?.prefix;
 
       // Flatten the object and put each leaf
-      const flatten = (o: any, parentKey: string = ''): [string, any][] => {
+      const flatten = (o: any, parentKey: string = ""): [string, any][] => {
         const entries: [string, any][] = [];
         for (const [k, v] of Object.entries(o)) {
           const newKey = parentKey ? `${parentKey}/${k}` : k;
-          if (v && typeof v === 'object' && !Array.isArray(v)) {
+          if (v && typeof v === "object" && !Array.isArray(v)) {
             entries.push(...flatten(v, newKey));
           } else {
             entries.push([newKey, v]);
@@ -77,10 +82,14 @@ export async function createVault(
         return entries;
       };
 
-      const leaves = flatten(obj, prefix ?? '');
+      const leaves = flatten(obj, prefix ?? "");
       for (const [key, value] of leaves) {
         await db.put(key, value);
-        await metaDb.put(key, { visibility, encrypted: visibility !== 'public', timestamp: Date.now() });
+        await metaDb.put(key, {
+          visibility,
+          encrypted: visibility !== "public",
+          timestamp: Date.now(),
+        });
       }
     },
 
@@ -90,8 +99,8 @@ export async function createVault(
       if (value === undefined) return null;
 
       const meta = await metaDb.get(key);
-      const visibility = meta?.visibility ?? 'private';
-      return makeEntry(key, value, visibility, visibility !== 'public');
+      const visibility = meta?.visibility ?? "private";
+      return makeEntry(key, value, visibility, visibility !== "public");
     },
 
     async del(path) {
@@ -102,9 +111,9 @@ export async function createVault(
 
     async keys(prefix?) {
       const all = await db.all();
-      const flatten = (o: any, parentKey: string = ''): string[] => {
+      const flatten = (o: any, parentKey: string = ""): string[] => {
         const keys: string[] = [];
-        if (o && typeof o === 'object' && !Array.isArray(o)) {
+        if (o && typeof o === "object" && !Array.isArray(o)) {
           for (const [k, v] of Object.entries(o)) {
             const newKey = parentKey ? `${parentKey}/${k}` : k;
             keys.push(...flatten(v, newKey));
@@ -115,7 +124,7 @@ export async function createVault(
         return keys;
       };
       const allKeys = flatten(all);
-      if (prefix) return allKeys.filter(k => k.startsWith(prefix));
+      if (prefix) return allKeys.filter((k) => k.startsWith(prefix));
       return allKeys;
     },
 
@@ -126,9 +135,9 @@ export async function createVault(
     async query(filter) {
       const allData = await db.all();
       const results: VaultEntry[] = [];
-      const flatten = (o: any, parentKey: string = ''): [string, any][] => {
+      const flatten = (o: any, parentKey: string = ""): [string, any][] => {
         const entries: [string, any][] = [];
-        if (o && typeof o === 'object' && !Array.isArray(o)) {
+        if (o && typeof o === "object" && !Array.isArray(o)) {
           for (const [k, v] of Object.entries(o)) {
             const newKey = parentKey ? `${parentKey}/${k}` : k;
             entries.push(...flatten(v, newKey));
@@ -144,26 +153,38 @@ export async function createVault(
         const meta = await metaDb.get(key);
         if (filter.visibility && meta?.visibility !== filter.visibility) continue;
         if (filter.since && (meta?.timestamp ?? 0) < filter.since) continue;
-        results.push(makeEntry(key, value, meta?.visibility ?? 'private', meta?.encrypted ?? true));
+        results.push(makeEntry(key, value, meta?.visibility ?? "private", meta?.encrypted ?? true));
         if (filter.limit && results.length >= filter.limit) break;
       }
       return results;
     },
 
     async sync() {
-      return { syncing: false, pendingPush: 0, pendingPull: 0, lastSynced: Date.now(), connectedPeers: 0 };
+      return {
+        syncing: false,
+        pendingPush: 0,
+        pendingPull: 0,
+        lastSynced: Date.now(),
+        connectedPeers: 0,
+      };
     },
 
     getSyncStatus() {
-      return { syncing: false, pendingPush: 0, pendingPull: 0, lastSynced: null, connectedPeers: 0 };
+      return {
+        syncing: false,
+        pendingPush: 0,
+        pendingPull: 0,
+        lastSynced: null,
+        connectedPeers: 0,
+      };
     },
 
     onChange(callback) {
       const handler = (entry: any) => {
-        callback({ type: 'put', path: entry?.payload?.key ?? '', entry: undefined });
+        callback({ type: "put", path: entry?.payload?.key ?? "", entry: undefined });
       };
-      db.events.on('update', handler);
-      return () => db.events.off('update', handler);
+      db.events.on("update", handler);
+      return () => db.events.off("update", handler);
     },
 
     async exportSnapshot() {
