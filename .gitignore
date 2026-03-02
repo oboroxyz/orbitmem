@@ -62,6 +62,10 @@ broadcast/
 out/
 forge-cache/
 
+# OrbitDB test data
+.test-orbitdb/
+orbitdb/
+
 # Editor
 .vscode/
 .idea/
