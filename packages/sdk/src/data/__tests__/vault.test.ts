@@ -1,7 +1,15 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { createOrbitDBInstance, createVault } from "../index.js";
 
-describe("DataLayer — Vault", () => {
+// Skip if native OrbitDB dependencies (node-datachannel) are unavailable (e.g. CI)
+let orbitdbAvailable = true;
+try {
+  require.resolve("@ipshipyard/node-datachannel");
+} catch {
+  orbitdbAvailable = false;
+}
+
+describe.skipIf(!orbitdbAvailable)("DataLayer — Vault", () => {
   let vault: Awaited<ReturnType<typeof createVault>>;
   let cleanup: () => Promise<void>;
 

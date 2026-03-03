@@ -1,7 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import { createOrbitMem } from "../client.js";
 
-describe("createOrbitMem", () => {
+// Skip if native OrbitDB dependencies (node-datachannel) are unavailable (e.g. CI)
+let orbitdbAvailable = true;
+try {
+  require.resolve("@ipshipyard/node-datachannel");
+} catch {
+  orbitdbAvailable = false;
+}
+
+describe.skipIf(!orbitdbAvailable)("createOrbitMem", () => {
   test("initializes all layers", async () => {
     const orbitmem = await createOrbitMem({
       identity: { chains: ["evm"] },
