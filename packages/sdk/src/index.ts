@@ -1,6 +1,6 @@
 export { createOrbitMem } from "./client.js";
 export { createOrbitDBInstance, createVault } from "./data/index.js";
-export { createDiscoveryLayer, MockRegistry } from "./discovery/index.js";
+export { createDiscoveryLayer, MockRegistry, OnChainRegistry } from "./discovery/index.js";
 // Layer-level exports for advanced usage
 export { createEncryptionLayer } from "./encryption/index.js";
 export { createIdentityLayer } from "./identity/index.js";

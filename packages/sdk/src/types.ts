@@ -877,6 +877,10 @@ export interface DiscoveryConfig {
   minAgentReputation?: number;
   /** Minimum data quality score for agent consumption (0-100, optional) */
   minDataScore?: number;
+  /** viem public client for on-chain reads (enables on-chain mode when provided) */
+  publicClient?: import("viem").PublicClient;
+  /** viem wallet client for on-chain writes (register, rate, revoke) */
+  walletClient?: import("viem").WalletClient;
 }
 
 // ── Data Registry Types (ERC-8004 applied to data sources) ──

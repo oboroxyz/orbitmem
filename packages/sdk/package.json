@@ -30,6 +30,7 @@
     "@lit-protocol/constants": "^7.0.0",
     "@lit-protocol/auth-helpers": "^7.0.0",
     "@storacha/client": "^1.0.0",
+    "@orbitmem/contracts": "workspace:*",
     "viem": "^2.0.0",
     "@solana/web3.js": "^1.95.0"
   },
