@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and bidirectional trust. It's a Bun monorepo with three packages:
+OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust. It's a Bun monorepo with three packages and one app:
 
 - `@orbitmem/sdk` — Core SDK with six composable layers (identity, encryption, data, transport, discovery, persistence) plus an agent adapter
 - `@orbitmem/relay` — Hono HTTP server with ERC-8128 auth middleware, vault/discovery/snapshot routes
 - `@orbitmem/contracts` — Foundry/Solidity smart contracts implementing ERC-8004 for Data — on-chain data discovery & reputation
+- `@orbitmem/web` — React dashboard (Vite + TanStack Router + wagmi + Tailwind) deployed via Cloudflare Workers
 
 ## Commands
 
@@ -20,7 +21,9 @@ bun run lint:fix         # Lint autofix (biome check --write .)
 bun run format           # Format (biome format --write .)
 bun run typecheck        # Typecheck all packages (tsc --noEmit)
 bun run build            # Build all packages
+bun run dev              # Start relay + web concurrently
 bun run dev:relay        # Start relay server with hot reload
+bun run dev:web          # Start web dashboard with hot reload
 ```
 
 Run a single test file:
@@ -70,6 +73,14 @@ All layers implement `I*` interfaces defined in `types.ts`.
 - `middleware/erc8128.ts` — ERC-8128 signed request verification (extracts `X-OrbitMem-*` headers, checks timestamp ±30s, nonce replay)
 - `routes/` — `health.ts`, `vault.ts`, `data.ts`, `snapshots.ts`
 - `services/orbitdb-peer.ts` — OrbitDB peer service for relay
+
+### Web App Structure (`apps/web/`)
+
+- React + Vite + TanStack Router + Tailwind CSS
+- `app/routes/` — file-based routing (landing, dashboard, vault, trust, settings)
+- `app/components/` — shared UI components (TrustGraph, DataScore, VaultExplorer, etc.)
+- wagmi + viem for wallet connection and on-chain interactions
+- Deployed via Cloudflare Workers (wrangler)
 
 ### Contracts Structure (`packages/contracts/`)
 
