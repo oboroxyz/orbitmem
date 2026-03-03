@@ -1,6 +1,6 @@
 # OrbitMem
 
-Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and bidirectional trust.
+Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust.
 
 ## Architecture
 
@@ -26,6 +26,18 @@ Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identit
 │  Hono server · ERC-8128 middleware           │
 │  Vault routes · Discovery routes · Snapshots │
 └──────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────┐
+│  @orbitmem/web                               │
+│  React dashboard · TanStack Router · wagmi   │
+│  Data explorer · Vault manager · Trust graph │
+└──────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────┐
+│  @orbitmem/contracts                         │
+│  DataRegistry (ERC-721) · FeedbackRegistry   │
+│  ERC-8004 for Data — on-chain reputation     │
+└──────────────────────────────────────────────┘
 ```
 
 ## Quick Start
@@ -35,10 +47,23 @@ Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identit
 bun install
 
 # Run tests
-bun test
+bun run test
 
-# Start relay server
-bun run dev:relay
+# Start relay + web
+bun run dev
+
+# Or start individually
+bun run dev:relay     # Relay server (localhost:3000)
+bun run dev:web       # Web (localhost:3001)
+```
+
+### Contract commands
+
+```bash
+cd packages/contracts
+forge build              # Compile contracts
+forge test -vvv          # Run all contract tests
+forge fmt                # Format Solidity
 ```
 
 ## SDK Usage
@@ -47,26 +72,22 @@ bun run dev:relay
 import { createOrbitMem } from '@orbitmem/sdk';
 
 const orbit = await createOrbitMem({
-  wallet: {
-    address: '0xYourAddress',
-    family: 'evm',
-    sign: async (payload) => ({
-      signature: await wallet.signMessage(payload),
-      algorithm: 'ecdsa-secp256k1',
-    }),
-  },
+  identity: { chains: ['evm'] },
   encryption: { defaultEngine: 'aes' },
-  relay: { url: 'http://localhost:3000' },
+  discovery: {
+    dataRegistry: '0xDATA_REGISTRY',
+    reputationRegistry: '0xFEEDBACK_REGISTRY',
+    registryChain: 'base',
+  },
 });
 
 // Write data to vault
-await orbit.data.put('travel/dietary', { vegan: true }, {
+await orbit.vault.put('travel/dietary', { vegan: true }, {
   visibility: 'public',
-  encrypted: false,
 });
 
 // Read data
-const prefs = await orbit.data.get('travel/dietary');
+const prefs = await orbit.vault.get('travel/dietary');
 ```
 
 ## Agent Adapter
@@ -74,15 +95,15 @@ const prefs = await orbit.data.get('travel/dietary');
 ```typescript
 import { createOrbitMemAgentAdapter } from '@orbitmem/sdk/agent';
 
-const agent = createOrbitMemAgentAdapter({
-  orbit,
-  agentId: 'booking-agent-001',
-});
+const agent = createOrbitMemAgentAdapter({ orbit });
 
 // Full lifecycle: discover → evaluate → fetch → decrypt → rate
 const datasets = await agent.discoverData({ schema: 'orbitmem:dietary:v1' });
 const score = await agent.evaluateData(datasets[0].dataId);
-const data = await agent.fetchUserData({ dataId: datasets[0].dataId, userAddress: '0x...' });
+const data = await agent.fetchUserData({
+  dataId: datasets[0].dataId,
+  userAddress: '0x...',
+});
 await agent.rateData(datasets[0].dataId, 95);
 ```
 
@@ -90,20 +111,24 @@ await agent.rateData(datasets[0].dataId, 95);
 
 | Package | Description |
 |---------|-------------|
-| `@orbitmem/sdk` | Core SDK — encryption, vault, identity, transport, discovery, persistence |
+| `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, agent adapter |
 | `@orbitmem/relay` | Hono relay server — vault routes, discovery, snapshots, ERC-8128 auth |
+| `@orbitmem/contracts` | Solidity contracts — DataRegistry (ERC-721), FeedbackRegistry (reputation) |
+| `@orbitmem/web` | React dashboard — data explorer, vault manager, trust graph, wallet connection |
 
 ## Tech Stack
 
 - **Runtime:** Bun
 - **Data:** OrbitDB + @orbitdb/nested-db (CRDT P2P)
-- **Encryption:** AES-256-GCM (Web Crypto) + Lit Protocol v7
+- **Encryption:** AES-256-GCM (Web Crypto), Lit Protocol
 - **Transport:** ERC-8128 signed HTTP requests
 - **Discovery:** ERC-8004 for Data — on-chain data discovery & reputation
 - **Persistence:** Storacha (Filecoin/IPFS)
-- **Server:** Hono
-- **Identity:** EVM + Solana multi-chain
+- **Contracts:** Solidity 0.8.28, Foundry, OpenZeppelin v5
+- **Relay Server:** Hono (on fly.io)
+- **Web:** React 19, TanStack Router, Tailwind CSS v4, wagmi + viem (on cloudflare worker)
+- **Identity:** EVM, Solana multi-chain
 
 ## License
 
-MIT
+[MIT](LICENSE)
