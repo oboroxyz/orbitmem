@@ -156,7 +156,7 @@ export async function createVault(
         results.push(makeEntry(key, value, meta?.visibility ?? "private", meta?.encrypted ?? true));
         if (filter.limit && results.length >= filter.limit) break;
       }
-      return results;
+      return results as any;
     },
 
     async sync() {

@@ -6,14 +6,14 @@ interface PersistenceConfig {
   author?: WalletAddress;
 }
 
-export function createPersistenceLayer(config: PersistenceConfig): IPersistenceLayer & {
-  archive(opts?: {
-    data?: Uint8Array;
-    entryCount?: number;
-    label?: string;
-    pinToFilecoin?: boolean;
-  }): Promise<Snapshot>;
-} {
+interface ArchiveOptions {
+  data?: Uint8Array;
+  entryCount?: number;
+  label?: string;
+  pinToFilecoin?: boolean;
+}
+
+export function createPersistenceLayer(config: PersistenceConfig): IPersistenceLayer {
   // In-memory store for mock mode
   const store = new Map<string, { data: Uint8Array; snapshot: Snapshot }>();
 
@@ -30,15 +30,15 @@ export function createPersistenceLayer(config: PersistenceConfig): IPersistenceL
 
   if (config.mock) {
     return {
-      async archive(opts) {
-        const data = opts?.data ?? new Uint8Array(0);
+      async archive(opts: ArchiveOptions = {}) {
+        const data = opts.data ?? new Uint8Array(0);
         const cid = generateCID();
         const snapshot: Snapshot = {
           cid,
           size: data.length,
           archivedAt: Date.now(),
           author: config.author ?? ("0x0" as WalletAddress),
-          entryCount: opts?.entryCount ?? 0,
+          entryCount: opts.entryCount ?? 0,
           encrypted: true,
           filecoinStatus: "pending",
         };
@@ -79,12 +79,12 @@ export function createPersistenceLayer(config: PersistenceConfig): IPersistenceL
 
   // Real Storacha implementation (lazy-loaded)
   return {
-    async archive(opts) {
+    async archive(opts: ArchiveOptions = {}) {
       const { Client } = await import("@storacha/client");
-      const client = await Client.create();
+      const client = await (Client as any).create();
       // Note: real usage requires authentication setup
-      const data = opts?.data ?? new Uint8Array(0);
-      const blob = new Blob([data]);
+      const data = opts.data ?? new Uint8Array(0);
+      const blob = new Blob([data as BlobPart]);
       const cid = await client.uploadFile(blob as any);
 
       const snapshot: Snapshot = {
@@ -92,7 +92,7 @@ export function createPersistenceLayer(config: PersistenceConfig): IPersistenceL
         size: data.length,
         archivedAt: Date.now(),
         author: config.author ?? ("0x0" as WalletAddress),
-        entryCount: opts?.entryCount ?? 0,
+        entryCount: opts.entryCount ?? 0,
         encrypted: true,
         filecoinStatus: "pending",
       };
@@ -108,7 +108,7 @@ export function createPersistenceLayer(config: PersistenceConfig): IPersistenceL
     },
 
     async restore(cid) {
-      const _data = await this.retrieve(cid);
+      await this.retrieve(cid);
       return { merged: 0, conflicts: 0 };
     },
 

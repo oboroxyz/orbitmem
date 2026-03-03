@@ -31,14 +31,14 @@ describe("TransportLayer", () => {
     const transport = createTransportLayer({
       signer: async (payload: Uint8Array) => {
         // Simple "sign" = hash of payload (for testing)
-        const hash = await crypto.subtle.digest("SHA-256", payload);
+        const hash = await crypto.subtle.digest("SHA-256", payload as BufferSource);
         return {
           signature: new Uint8Array(hash),
           algorithm: "ecdsa-secp256k1" as const,
         };
       },
       verifier: async (payload: Uint8Array, signature: Uint8Array) => {
-        const hash = await crypto.subtle.digest("SHA-256", payload);
+        const hash = await crypto.subtle.digest("SHA-256", payload as BufferSource);
         const expected = new Uint8Array(hash);
         return signature.length === expected.length && signature.every((b, i) => b === expected[i]);
       },

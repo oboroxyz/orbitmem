@@ -30,7 +30,7 @@ export class LitEngine {
       datil: LIT_NETWORK.Datil,
     };
     this.client = new LitNodeClient({
-      litNetwork: networkMap[this.config.network],
+      litNetwork: networkMap[this.config.network] as any,
       debug: this.config.debug ?? false,
     });
     await this.client.connect();

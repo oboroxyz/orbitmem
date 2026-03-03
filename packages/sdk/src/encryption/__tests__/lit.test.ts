@@ -1,21 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { LitAccessCondition } from "../../types.js";
 import { LitEngine } from "../lit.js";
-
-const _testConditions: LitAccessCondition[] = [
-  {
-    conditionType: "evmBasic",
-    contractAddress: "",
-    standardContractType: "",
-    chain: "base",
-    method: "",
-    parameters: [":userAddress"],
-    returnValueTest: {
-      comparator: "=",
-      value: "0x1234567890abcdef1234567890abcdef12345678",
-    },
-  },
-];
 
 describe("LitEngine", () => {
   test("creates access conditions correctly", () => {

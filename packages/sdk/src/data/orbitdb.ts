@@ -12,7 +12,10 @@ import { createLibp2p } from "libp2p";
 // Register the Nested database type (must happen before createOrbitDB)
 useDatabaseType(Nested);
 
-export async function createOrbitDBInstance(opts: { directory?: string; listenAddrs?: string[] }) {
+export async function createOrbitDBInstance(opts: {
+  directory?: string;
+  listenAddrs?: string[];
+}): Promise<{ orbitdb: any; ipfs: any; libp2p: any; cleanup: () => Promise<void> }> {
   const blockstore = new LevelBlockstore(opts.directory ?? "./orbitdb/blocks");
 
   const libp2p = await createLibp2p({

@@ -14,17 +14,24 @@ export class AESEngine {
 
   async deriveKey(source: AESKeySource, walletSignature?: Uint8Array): Promise<CryptoKey> {
     if (source.type === "raw") {
-      return crypto.subtle.importKey("raw", source.key, { name: "AES-GCM" }, false, [
-        "encrypt",
-        "decrypt",
-      ]);
+      return crypto.subtle.importKey(
+        "raw",
+        source.key as BufferSource,
+        { name: "AES-GCM" },
+        false,
+        ["encrypt", "decrypt"],
+      );
     }
 
     if (source.type === "wallet-signature") {
       if (!walletSignature) throw new Error("walletSignature required for wallet-signature source");
-      const ikm = await crypto.subtle.importKey("raw", walletSignature, "HKDF", false, [
-        "deriveKey",
-      ]);
+      const ikm = await crypto.subtle.importKey(
+        "raw",
+        walletSignature as BufferSource,
+        "HKDF",
+        false,
+        ["deriveKey"],
+      );
       const salt = crypto.getRandomValues(new Uint8Array(32));
       const info = new TextEncoder().encode("orbitmem-aes-256-gcm");
       return crypto.subtle.deriveKey(
@@ -55,9 +62,9 @@ export class AESEngine {
   async encrypt(data: Uint8Array, key: CryptoKey): Promise<AESEncryptedData> {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ciphertextWithTag = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv, tagLength: 128 },
+      { name: "AES-GCM", iv: iv as BufferSource, tagLength: 128 },
       key,
-      data,
+      data as BufferSource,
     );
     // AES-GCM appends the 16-byte auth tag to the ciphertext
     const raw = new Uint8Array(ciphertextWithTag);
@@ -84,7 +91,7 @@ export class AESEngine {
     combined.set(encrypted.authTag, encrypted.ciphertext.length);
 
     const plaintext = await crypto.subtle.decrypt(
-      { name: "AES-GCM", iv: encrypted.iv, tagLength: 128 },
+      { name: "AES-GCM", iv: encrypted.iv as BufferSource, tagLength: 128 },
       key,
       combined,
     );

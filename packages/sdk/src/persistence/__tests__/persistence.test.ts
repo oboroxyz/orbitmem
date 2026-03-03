@@ -9,7 +9,7 @@ describe("PersistenceLayer (mock)", () => {
   });
 
   test("archive creates a snapshot", async () => {
-    const snapshot = await layer.archive({
+    const snapshot = await (layer.archive as any)({
       data: new TextEncoder().encode('{"test": true}'),
       entryCount: 1,
     });
