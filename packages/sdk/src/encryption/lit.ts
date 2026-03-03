@@ -41,11 +41,8 @@ export class LitEngine {
   async getSessionSigs(authSig: LitAuthSig, chain: string): Promise<any> {
     const client = await this.getClient();
     const { LitAbility } = await import("@lit-protocol/constants");
-    const {
-      LitAccessControlConditionResource,
-      createSiweMessageWithRecaps,
-      generateAuthSig,
-    } = await import("@lit-protocol/auth-helpers");
+    const { LitAccessControlConditionResource, createSiweMessageWithRecaps, generateAuthSig } =
+      await import("@lit-protocol/auth-helpers");
 
     const litResource = new LitAccessControlConditionResource("*");
 
