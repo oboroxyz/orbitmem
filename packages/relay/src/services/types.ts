@@ -1,0 +1,53 @@
+export interface VaultEntry {
+  value: unknown;
+  visibility: string;
+}
+
+export interface IVaultService {
+  getPublicKeys(address: string, prefix?: string): Promise<string[]>;
+  getPublic(address: string, key: string): Promise<VaultEntry | null>;
+  getEncrypted(vaultAddress: string, path: string): Promise<VaultEntry | null>;
+  seed(
+    address: string,
+    entries: { key: string; value: unknown; visibility: string }[],
+  ): Promise<number>;
+  sync(address: string): Promise<{ status: string; timestamp: number }>;
+}
+
+export interface SnapshotMeta {
+  cid: string;
+  size: number;
+  archivedAt: number;
+  signer: string;
+  entryCount: number;
+  encrypted: boolean;
+}
+
+export interface ISnapshotService {
+  list(signer: string): Promise<SnapshotMeta[]>;
+  archive(signer: string, data?: string, entryCount?: number): Promise<SnapshotMeta>;
+}
+
+export interface IDiscoveryService {
+  search(query: {
+    schema?: string;
+    tags?: string[];
+    verifiedOnly?: boolean;
+    minQuality?: number;
+  }): Promise<unknown[]>;
+  getScore(dataId: number): Promise<unknown>;
+  rate(dataId: number, feedback: Record<string, unknown>): Promise<void>;
+  register(opts: {
+    key: string;
+    name: string;
+    description: string;
+    schema?: string;
+    tags: string[];
+  }): Promise<unknown>;
+}
+
+export interface RelayServices {
+  vault: IVaultService;
+  snapshot: ISnapshotService;
+  discovery: IDiscoveryService;
+}
