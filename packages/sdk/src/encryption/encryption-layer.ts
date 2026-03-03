@@ -5,6 +5,7 @@ import type {
   EncryptLitOptions,
   IEncryptionLayer,
   LitAccessCondition,
+  LitEncryptedData,
 } from "../types.js";
 import { AESEngine } from "./aes.js";
 import { LitEngine } from "./lit.js";
@@ -59,8 +60,8 @@ export function createEncryptionLayer(config: EncryptionConfig): IEncryptionLaye
       }
       if (encrypted.engine === "lit") {
         if (!lit) throw new Error("Lit Protocol not configured");
-        // sessionSigs must be provided via opts — this is handled by the identity layer
-        throw new Error("Lit decryption requires sessionSigs — use identity layer");
+        if (!opts?.authSig) throw new Error("Lit decryption requires authSig in DecryptOptions");
+        return lit.decrypt(encrypted as LitEncryptedData, opts.authSig);
       }
       throw new Error(`Unknown engine: ${(encrypted as any).engine}`);
     },

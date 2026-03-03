@@ -41,4 +41,39 @@ describe("EncryptionLayer", () => {
     const result = await layer.canDecrypt(encrypted);
     expect(result).toBe(true);
   });
+
+  test("Lit decrypt throws clear error without authSig", async () => {
+    const litLayer = createEncryptionLayer({
+      defaultEngine: "lit",
+      aes: { kdf: "hkdf-sha256" },
+      lit: { network: "cayenne" },
+    });
+
+    const fakeLitBlob = {
+      engine: "lit" as const,
+      ciphertext: new Uint8Array([1, 2, 3]),
+      dataToEncryptHash: "abc",
+      accessControlConditions: [],
+      chain: "base" as const,
+    };
+
+    await expect(litLayer.decrypt(fakeLitBlob)).rejects.toThrow(/authSig/);
+  });
+
+  test("Lit decrypt without lit config throws", async () => {
+    const noLitLayer = createEncryptionLayer({
+      defaultEngine: "aes",
+      aes: { kdf: "hkdf-sha256" },
+    });
+
+    const fakeLitBlob = {
+      engine: "lit" as const,
+      ciphertext: new Uint8Array([1, 2, 3]),
+      dataToEncryptHash: "abc",
+      accessControlConditions: [],
+      chain: "base" as const,
+    };
+
+    await expect(noLitLayer.decrypt(fakeLitBlob)).rejects.toThrow(/Lit Protocol not configured/);
+  });
 });
