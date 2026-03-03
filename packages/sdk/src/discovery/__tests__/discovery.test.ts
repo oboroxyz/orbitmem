@@ -45,5 +45,4 @@ describe("DiscoveryLayer (mock)", () => {
     expect(score.quality).toBeGreaterThan(0);
     expect(score.totalFeedback).toBe(1);
   });
-
 });

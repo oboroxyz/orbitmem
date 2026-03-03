@@ -171,5 +171,4 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     expect(freshScore.totalValue).toBe(60);
     expect(freshScore.count).toBe(1);
   });
-
 });

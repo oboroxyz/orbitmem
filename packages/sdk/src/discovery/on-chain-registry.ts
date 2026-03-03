@@ -1,11 +1,7 @@
 import { DataRegistryAbi, FeedbackRegistryAbi } from "@orbitmem/contracts";
 import type { Address, Log, PublicClient, WalletClient } from "viem";
 import { parseEventLogs } from "viem";
-import type {
-  DataRegistration,
-  DataScore,
-  WalletAddress,
-} from "../types.js";
+import type { DataRegistration, DataScore, WalletAddress } from "../types.js";
 
 export interface OnChainRegistryConfig {
   publicClient: PublicClient;
