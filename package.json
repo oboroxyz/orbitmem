@@ -6,6 +6,8 @@
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '*' test",
     "dev:relay": "bun run --filter @orbitmem/relay dev",
+    "build:contracts": "bun run --filter @orbitmem/contracts build",
+    "test:contracts": "bun run --filter @orbitmem/contracts test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",

@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and bidirectional trust. It's a Bun monorepo with two packages:
+OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and bidirectional trust. It's a Bun monorepo with three packages:
 
 - `@orbitmem/sdk` — Core SDK with six composable layers (identity, encryption, data, transport, discovery, persistence) plus an agent adapter
 - `@orbitmem/relay` — Hono HTTP server with ERC-8128 auth middleware, vault/discovery/snapshot routes
+- `@orbitmem/contracts` — Foundry/Solidity smart contracts implementing on-chain registries for agents, data, and reputation
 
 ## Commands
 
@@ -30,6 +31,18 @@ bun test packages/sdk/src/encryption/__tests__/aes.test.ts
 Run tests for one package:
 ```bash
 bun test --filter @orbitmem/sdk
+```
+
+### Contracts Commands
+
+```bash
+cd packages/contracts
+forge build              # Compile contracts
+forge test -vvv          # Run all contract tests (verbose)
+forge test --gas-report  # Run tests with gas reporting
+forge fmt                # Format Solidity files
+forge fmt --check        # Check Solidity formatting
+forge script script/Deploy.s.sol --broadcast --rpc-url <RPC_URL> --private-key <KEY>  # Deploy
 ```
 
 ## Architecture
@@ -57,6 +70,22 @@ All layers implement `I*` interfaces defined in `types.ts`.
 - `middleware/erc8128.ts` — ERC-8128 signed request verification (extracts `X-OrbitMem-*` headers, checks timestamp ±30s, nonce replay)
 - `routes/` — `health.ts`, `vault.ts`, `data.ts`, `snapshots.ts`
 - `services/orbitdb-peer.ts` — OrbitDB peer service for relay
+
+### Contracts Structure (`packages/contracts/`)
+
+Three Solidity 0.8.28 contracts implementing the ERC-8004 on-chain registry system:
+
+| Contract | Token | Purpose |
+|----------|-------|---------|
+| `AgentRegistry` | ERC-721 "OMA" | AI agent identity NFTs with wallet binding and active/inactive toggle |
+| `DataRegistry` | ERC-721 "OMD" | Data/memory entry NFTs with active/inactive toggle |
+| `FeedbackRegistry` | (no token) | Registry-agnostic reputation ledger — works against any ERC-721 registry |
+
+`FeedbackRegistry` is the most complex: it accepts any ERC-721 registry address as a parameter, enabling the same contract to score both agents and data. Scores are tracked globally and per-tag (e.g. `"accurate"`, `"reliable"`), with `feedbackURI` + `feedbackHash` fields for anchoring off-chain data on-chain.
+
+- `script/Deploy.s.sol` — Foundry deploy script for all three contracts
+- Tests in `test/*.t.sol` using `forge-std/Test.sol` with `vm.prank()` and `makeAddr()` cheatcodes
+- Dependencies: OpenZeppelin Contracts v5 (ERC721URIStorage), forge-std
 
 ### ERC-8128 Transport Auth
 

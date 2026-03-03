@@ -61,6 +61,7 @@ deployments/
 broadcast/
 out/
 forge-cache/
+packages/contracts/lib/
 
 # OrbitDB test data
 .test-orbitdb/
