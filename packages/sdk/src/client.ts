@@ -79,6 +79,28 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
       } catch {
         // Key derivation is best-effort — vault works without it for public data
       }
+
+      // Generate Lit authSig for decrypting Lit-encrypted vault entries
+      if (encryption.lit && result.family === "evm") {
+        try {
+          const message = "OrbitMem Lit Auth";
+          const { signature } = await identity.signChallenge(message);
+          const sig =
+            "0x" +
+            Array.from(new Uint8Array(signature))
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join("");
+          vault.setAuthSig({
+            sig,
+            derivedVia: "web3.eth.personal.sign",
+            signedMessage: message,
+            address: result.address as string,
+          });
+        } catch {
+          // Lit auth is best-effort — vault works without it for public/AES data
+        }
+      }
+
       return result;
     },
 
