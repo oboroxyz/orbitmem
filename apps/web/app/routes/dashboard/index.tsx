@@ -1,211 +1,133 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { searchData } from "../../lib/api";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "../../components/ConnectButton";
+import { getPublicVaultEntry, getPublicVaultKeys } from "../../lib/api";
 
 export const Route = createFileRoute("/dashboard/")({
-  component: DashboardPage,
+  component: MyDataPage,
 });
 
-// Mock time-series data for charts
-const activityData = [
-  { date: "Mon", entries: 12, feedback: 8 },
-  { date: "Tue", entries: 19, feedback: 14 },
-  { date: "Wed", entries: 15, feedback: 11 },
-  { date: "Thu", entries: 22, feedback: 18 },
-  { date: "Fri", entries: 28, feedback: 24 },
-  { date: "Sat", entries: 16, feedback: 10 },
-  { date: "Sun", entries: 20, feedback: 15 },
-];
+function MyDataPage() {
+  const { address, isConnected } = useAccount();
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-const qualityDistribution = [
-  { range: "0-20", count: 2, color: "#ef4444" },
-  { range: "21-40", count: 5, color: "#f97316" },
-  { range: "41-60", count: 12, color: "#eab308" },
-  { range: "61-80", count: 28, color: "#22c55e" },
-  { range: "81-100", count: 18, color: "#10b981" },
-];
-
-const topTags = [
-  { tag: "accurate", count: 142 },
-  { tag: "complete", count: 98 },
-  { tag: "fresh", count: 76 },
-  { tag: "reliable", count: 64 },
-  { tag: "verified", count: 51 },
-];
-
-function DashboardPage() {
-  const { data: dataResult } = useQuery({
-    queryKey: ["dataSearch", "dashboard"],
-    queryFn: () => searchData(),
+  const { data: keysResult, isLoading } = useQuery({
+    queryKey: ["vaultKeys", address],
+    queryFn: () => getPublicVaultKeys(address!),
+    enabled: isConnected && !!address,
   });
 
-  const totalData = dataResult?.count ?? 0;
+  const { data: entryResult } = useQuery({
+    queryKey: ["vaultEntry", address, selectedKey],
+    queryFn: () => getPublicVaultEntry(address!, selectedKey!),
+    enabled: isConnected && !!address && !!selectedKey,
+  });
+
+  if (!isConnected) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <div className="w-16 h-16 rounded-full bg-orbit-700 flex items-center justify-center">
+          <svg
+            className="w-8 h-8 text-orbit-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            role="img"
+            aria-label="Key icon"
+          >
+            <title>Wallet connection required</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
+            />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold text-orbit-50">Connect Your Wallet</h1>
+        <p className="text-orbit-400 text-center max-w-md">
+          Connect your wallet to browse vault entries, manage keys, and view snapshots.
+        </p>
+        <ConnectButton />
+      </div>
+    );
+  }
+
+  const keys = keysResult?.keys ?? [];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-orbit-50 mb-1">Dashboard</h1>
-        <p className="text-orbit-400 text-sm">Network-wide metrics and data quality overview</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-orbit-50 mb-1">My Data</h1>
+          <p className="text-orbit-400 text-sm">
+            Vault keys for <span className="font-mono">{address?.slice(0, 10)}...</span>
+          </p>
+        </div>
+        <ConnectButton />
       </div>
 
-      {/* Metric cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <MetricCard label="Data Entries" value={String(totalData || "—")} />
-        <MetricCard label="Feedback Submitted" value="—" />
-        <MetricCard label="Avg Quality" value="—" />
-        <MetricCard label="Active Vaults" value="—" />
-      </div>
-
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Activity chart */}
-        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
-          <h2 className="text-sm font-medium text-orbit-300 mb-4">Weekly Activity</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={activityData}>
-              <defs>
-                <linearGradient id="entryGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="feedbackGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
-              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1f2937",
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  color: "#f3f4f6",
-                  fontSize: "12px",
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="entries"
-                stroke="#8b5cf6"
-                fill="url(#entryGrad)"
-                strokeWidth={2}
-              />
-              <Area
-                type="monotone"
-                dataKey="feedback"
-                stroke="#14b8a6"
-                fill="url(#feedbackGrad)"
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-          <div className="flex items-center gap-6 mt-3 text-xs text-orbit-400">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]" />
-              New entries
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#14b8a6]" />
-              Feedback
-            </span>
+      {isLoading ? (
+        <div className="text-center text-orbit-400 py-12">Loading vault keys...</div>
+      ) : keys.length === 0 ? (
+        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-8 text-center text-orbit-400">
+          No public vault keys found. Seed data via the relay to see entries here.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Key list */}
+          <div className="lg:col-span-1 bg-orbit-800 rounded-xl border border-orbit-700 overflow-hidden">
+            <div className="px-4 py-3 border-b border-orbit-700">
+              <h3 className="text-sm font-medium text-orbit-300">Keys ({keys.length})</h3>
+            </div>
+            <div className="divide-y divide-orbit-700/50 max-h-96 overflow-y-auto">
+              {keys.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelectedKey(key)}
+                  className={`w-full text-left px-4 py-3 text-sm font-mono transition-colors ${
+                    selectedKey === key
+                      ? "bg-accent-500/10 text-accent-300"
+                      : "text-orbit-200 hover:bg-orbit-700/50"
+                  }`}
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Quality distribution */}
-        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
-          <h2 className="text-sm font-medium text-orbit-300 mb-4">Quality Score Distribution</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={qualityDistribution}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="range" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
-              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#1f2937",
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  color: "#f3f4f6",
-                  fontSize: "12px",
-                }}
-              />
-              <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                {qualityDistribution.map((entry) => (
-                  <Cell key={entry.range} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top tags */}
-        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
-          <h2 className="text-sm font-medium text-orbit-300 mb-4">Top Feedback Tags</h2>
-          <div className="space-y-3">
-            {topTags.map((t) => (
-              <div key={t.tag} className="flex items-center gap-3">
-                <span className="text-sm text-orbit-200 w-20 font-mono">{t.tag}</span>
-                <div className="flex-1 h-2 bg-orbit-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent-500 rounded-full"
-                    style={{ width: `${(t.count / topTags[0].count) * 100}%` }}
-                  />
+          {/* Entry detail */}
+          <div className="lg:col-span-2 bg-orbit-800 rounded-xl border border-orbit-700 p-6">
+            {selectedKey && entryResult ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-orbit-50">{entryResult.key}</h3>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${
+                      entryResult.visibility === "public"
+                        ? "bg-trust-high/20 text-trust-high"
+                        : "bg-trust-mid/20 text-trust-mid"
+                    }`}
+                  >
+                    {entryResult.visibility}
+                  </span>
                 </div>
-                <span className="text-xs text-orbit-400 w-8 text-right">{t.count}</span>
+                <pre className="bg-orbit-900 rounded-lg p-4 text-sm text-orbit-200 overflow-x-auto font-mono">
+                  {typeof entryResult.value === "string"
+                    ? entryResult.value
+                    : JSON.stringify(entryResult.value, null, 2)}
+                </pre>
               </div>
-            ))}
+            ) : (
+              <div className="text-center text-orbit-500 py-12">Select a key to view its value</div>
+            )}
           </div>
         </div>
-
-        {/* Quick links */}
-        <div className="space-y-4">
-          <Link
-            to="/dashboard/vault"
-            className="group bg-orbit-800 rounded-xl border border-orbit-700 p-5 hover:border-accent-500/50 transition-colors block"
-          >
-            <h3 className="text-base font-semibold text-orbit-50 group-hover:text-accent-300 transition-colors mb-1">
-              My Data
-            </h3>
-            <p className="text-orbit-400 text-sm">
-              Connect your wallet to browse vault keys and entries
-            </p>
-          </Link>
-          <Link
-            to="/dashboard/snapshots"
-            className="group bg-orbit-800 rounded-xl border border-orbit-700 p-5 hover:border-accent-500/50 transition-colors block"
-          >
-            <h3 className="text-base font-semibold text-orbit-50 group-hover:text-accent-300 transition-colors mb-1">
-              Snapshots
-            </h3>
-            <p className="text-orbit-400 text-sm">View and create vault archive snapshots</p>
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MetricCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-5">
-      <p className="text-xs text-orbit-400 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-accent-300">{value}</p>
+      )}
     </div>
   );
 }

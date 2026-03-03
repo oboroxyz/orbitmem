@@ -10,15 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MetricsIndexRouteImport } from './routes/metrics/index'
 import { Route as DataIndexRouteImport } from './routes/data/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as MetricsSnapshotsRouteImport } from './routes/metrics/snapshots'
 import { Route as DataDataIdRouteImport } from './routes/data/$dataId'
-import { Route as DashboardVaultRouteImport } from './routes/dashboard/vault'
-import { Route as DashboardSnapshotsRouteImport } from './routes/dashboard/snapshots'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetricsIndexRoute = MetricsIndexRouteImport.update({
+  id: '/metrics/',
+  path: '/metrics/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataIndexRoute = DataIndexRouteImport.update({
@@ -31,81 +36,76 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetricsSnapshotsRoute = MetricsSnapshotsRouteImport.update({
+  id: '/metrics/snapshots',
+  path: '/metrics/snapshots',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DataDataIdRoute = DataDataIdRouteImport.update({
   id: '/data/$dataId',
   path: '/data/$dataId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardVaultRoute = DashboardVaultRouteImport.update({
-  id: '/dashboard/vault',
-  path: '/dashboard/vault',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardSnapshotsRoute = DashboardSnapshotsRouteImport.update({
-  id: '/dashboard/snapshots',
-  path: '/dashboard/snapshots',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard/snapshots': typeof DashboardSnapshotsRoute
-  '/dashboard/vault': typeof DashboardVaultRoute
   '/data/$dataId': typeof DataDataIdRoute
+  '/metrics/snapshots': typeof MetricsSnapshotsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/data/': typeof DataIndexRoute
+  '/metrics/': typeof MetricsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard/snapshots': typeof DashboardSnapshotsRoute
-  '/dashboard/vault': typeof DashboardVaultRoute
   '/data/$dataId': typeof DataDataIdRoute
+  '/metrics/snapshots': typeof MetricsSnapshotsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/data': typeof DataIndexRoute
+  '/metrics': typeof MetricsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard/snapshots': typeof DashboardSnapshotsRoute
-  '/dashboard/vault': typeof DashboardVaultRoute
   '/data/$dataId': typeof DataDataIdRoute
+  '/metrics/snapshots': typeof MetricsSnapshotsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/data/': typeof DataIndexRoute
+  '/metrics/': typeof MetricsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/dashboard/snapshots'
-    | '/dashboard/vault'
     | '/data/$dataId'
+    | '/metrics/snapshots'
     | '/dashboard/'
     | '/data/'
+    | '/metrics/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/dashboard/snapshots'
-    | '/dashboard/vault'
     | '/data/$dataId'
+    | '/metrics/snapshots'
     | '/dashboard'
     | '/data'
+    | '/metrics'
   id:
     | '__root__'
     | '/'
-    | '/dashboard/snapshots'
-    | '/dashboard/vault'
     | '/data/$dataId'
+    | '/metrics/snapshots'
     | '/dashboard/'
     | '/data/'
+    | '/metrics/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardSnapshotsRoute: typeof DashboardSnapshotsRoute
-  DashboardVaultRoute: typeof DashboardVaultRoute
   DataDataIdRoute: typeof DataDataIdRoute
+  MetricsSnapshotsRoute: typeof MetricsSnapshotsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DataIndexRoute: typeof DataIndexRoute
+  MetricsIndexRoute: typeof MetricsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metrics/': {
+      id: '/metrics/'
+      path: '/metrics'
+      fullPath: '/metrics/'
+      preLoaderRoute: typeof MetricsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data/': {
@@ -131,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metrics/snapshots': {
+      id: '/metrics/snapshots'
+      path: '/metrics/snapshots'
+      fullPath: '/metrics/snapshots'
+      preLoaderRoute: typeof MetricsSnapshotsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/data/$dataId': {
       id: '/data/$dataId'
       path: '/data/$dataId'
@@ -138,30 +152,16 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DataDataIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/vault': {
-      id: '/dashboard/vault'
-      path: '/dashboard/vault'
-      fullPath: '/dashboard/vault'
-      preLoaderRoute: typeof DashboardVaultRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/snapshots': {
-      id: '/dashboard/snapshots'
-      path: '/dashboard/snapshots'
-      fullPath: '/dashboard/snapshots'
-      preLoaderRoute: typeof DashboardSnapshotsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardSnapshotsRoute: DashboardSnapshotsRoute,
-  DashboardVaultRoute: DashboardVaultRoute,
   DataDataIdRoute: DataDataIdRoute,
+  MetricsSnapshotsRoute: MetricsSnapshotsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DataIndexRoute: DataIndexRoute,
+  MetricsIndexRoute: MetricsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

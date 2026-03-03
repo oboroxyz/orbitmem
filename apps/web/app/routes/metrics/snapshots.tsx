@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { archiveSnapshot, listSnapshots } from "../../lib/api";
 import { createErc8128Headers } from "../../lib/erc8128";
 
-export const Route = createFileRoute("/dashboard/snapshots")({
+export const Route = createFileRoute("/metrics/snapshots")({
   component: SnapshotsPage,
 });
 
@@ -45,8 +45,8 @@ function SnapshotsPage() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-orbit-400">
-        <Link to="/dashboard" className="hover:text-orbit-200 transition-colors">
-          Dashboard
+        <Link to="/metrics" className="hover:text-orbit-200 transition-colors">
+          Metrics
         </Link>
         <span>/</span>
         <span className="text-orbit-200">Snapshots</span>
