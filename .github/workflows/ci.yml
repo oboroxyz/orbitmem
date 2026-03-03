@@ -13,6 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
       - run: bunx biome check .
 
@@ -22,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
       - run: bun test
 
@@ -48,5 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
