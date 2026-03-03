@@ -25,6 +25,23 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun test
 
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: foundry-rs/foundry-toolchain@v1
+      - working-directory: packages/contracts
+        run: forge install
+      - working-directory: packages/contracts
+        run: forge build
+      - working-directory: packages/contracts
+        run: forge test -vvv
+      - working-directory: packages/contracts
+        run: forge fmt --check
+
   typecheck:
     name: Typecheck
     runs-on: ubuntu-latest
