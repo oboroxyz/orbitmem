@@ -182,6 +182,46 @@ describe("Vault Encryption", () => {
     expect(result).toBeNull();
   });
 
+  test("setAuthSig enables Lit auto-decryption in get()", async () => {
+    const mockEncryptionLayer = {
+      encrypt: async (_data: any, opts: any) => ({
+        engine: "lit" as const,
+        ciphertext: new TextEncoder().encode("encrypted"),
+        dataToEncryptHash: "hash123",
+        accessControlConditions: opts.accessConditions ?? [],
+        chain: "base" as const,
+      }),
+      decrypt: async (_encrypted: any, opts: any) => {
+        if (!opts?.authSig) throw new Error("No authSig");
+        return new TextEncoder().encode(JSON.stringify("decrypted-value"));
+      },
+    };
+
+    const vault = await createVault(createMockOrbitDB(), {
+      encryptionLayer: mockEncryptionLayer as any,
+    });
+
+    const authSig = {
+      sig: "0xsig",
+      derivedVia: "web3.eth.personal.sign",
+      signedMessage: "test",
+      address: "0xABCD",
+    };
+    vault.setAuthSig(authSig);
+
+    // Put with Lit encryption
+    await vault.put("shared/secret", "my-data", {
+      visibility: "shared",
+      engine: "lit",
+      accessConditions: [],
+    });
+
+    // get() should auto-decrypt using stored authSig
+    const entry = await vault.get("shared/secret");
+    expect(entry).not.toBeNull();
+    expect(entry!.value).toBe("decrypted-value");
+  });
+
   test("query auto-decrypts private entries", async () => {
     const aes = new AESEngine({ kdf: "hkdf-sha256" });
     const key = await deriveTestKey(aes);

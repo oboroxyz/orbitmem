@@ -5,6 +5,7 @@ import type {
   EncryptionEngine,
   IDataLayer,
   IEncryptionLayer,
+  LitAuthSig,
   VaultEntry,
   VaultPath,
   Visibility,
@@ -32,7 +33,12 @@ export async function createVault(
     encryptionLayer?: IEncryptionLayer;
   },
 ): Promise<
-  IDataLayer & { close: () => Promise<void>; db: any; setDefaultKey: (key: CryptoKey) => void }
+  IDataLayer & {
+    close: () => Promise<void>;
+    db: any;
+    setDefaultKey: (key: CryptoKey) => void;
+    setAuthSig: (authSig: LitAuthSig) => void;
+  }
 > {
   const db = await orbitdb.open(config.dbName ?? "orbitmem-vault", { type: "nested" });
 
@@ -43,6 +49,7 @@ export async function createVault(
 
   // Default AES key for private data — set via setDefaultKey() after wallet connect
   let defaultKey: CryptoKey | undefined;
+  let litAuthSig: LitAuthSig | undefined;
 
   function makeEntry<T>(
     _path: string,
@@ -123,7 +130,16 @@ export async function createVault(
       }
     }
 
-    // shared+aes (no internal key) or lit (needs sessionSigs) — return encrypted blob
+    if (encrypted.engine === "lit" && config.encryptionLayer && litAuthSig) {
+      try {
+        const decrypted = await config.encryptionLayer.decrypt(encrypted, { authSig: litAuthSig });
+        return JSON.parse(new TextDecoder().decode(decrypted));
+      } catch {
+        return rawValue;
+      }
+    }
+
+    // shared+aes (no internal key) or lit (no authSig) — return encrypted blob
     return rawValue;
   }
 
@@ -131,11 +147,16 @@ export async function createVault(
     close: () => Promise<void>;
     db: any;
     setDefaultKey: (key: CryptoKey) => void;
+    setAuthSig: (authSig: LitAuthSig) => void;
   } = {
     db,
 
     setDefaultKey(key: CryptoKey) {
       defaultKey = key;
+    },
+
+    setAuthSig(authSig: LitAuthSig) {
+      litAuthSig = authSig;
     },
 
     async put(path, value, opts) {
