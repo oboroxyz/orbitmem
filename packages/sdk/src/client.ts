@@ -24,6 +24,8 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
   });
   const vault = await createVault(orbitdb, {
     dbName: config.vault?.dbName,
+    aesEngine: encryption.aes,
+    encryptionLayer: encryption,
   });
 
   // Initialize transport layer with a placeholder signer
@@ -65,7 +67,19 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
     discovery,
 
     async connect(opts) {
-      return identity.connect(opts);
+      const result = await identity.connect(opts);
+      // Derive a deterministic AES key from the wallet signature for vault encryption
+      try {
+        const { signature } = await identity.signChallenge("OrbitMem Vault Key v1");
+        const hash = new Uint8Array(
+          await crypto.subtle.digest("SHA-256", new Uint8Array(signature)),
+        );
+        const key = await encryption.aes.deriveKey({ type: "raw", key: hash });
+        vault.setDefaultKey(key);
+      } catch {
+        // Key derivation is best-effort — vault works without it for public data
+      }
+      return result;
     },
 
     async disconnect() {

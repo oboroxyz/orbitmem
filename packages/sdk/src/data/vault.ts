@@ -1,12 +1,20 @@
+import type { AESEngine } from "../encryption/aes.js";
 import type {
+  AESEncryptedData,
   ChainFamily,
   EncryptionEngine,
   IDataLayer,
+  IEncryptionLayer,
   VaultEntry,
   VaultPath,
   Visibility,
   WalletAddress,
 } from "../types.js";
+import {
+  deserializeEncrypted,
+  isSerializedEncrypted,
+  serializeEncrypted,
+} from "./serialization.js";
 
 function normalizePath(path: VaultPath): string {
   return Array.isArray(path) ? path.join("/") : path;
@@ -18,14 +26,23 @@ export async function createVault(
     dbName?: string;
     author?: WalletAddress;
     authorChain?: ChainFamily;
+    /** AES engine for private/shared encryption */
+    aesEngine?: AESEngine;
+    /** Encryption layer for Lit Protocol operations */
+    encryptionLayer?: IEncryptionLayer;
   },
-): Promise<IDataLayer & { close: () => Promise<void>; db: any }> {
+): Promise<
+  IDataLayer & { close: () => Promise<void>; db: any; setDefaultKey: (key: CryptoKey) => void }
+> {
   const db = await orbitdb.open(config.dbName ?? "orbitmem-vault", { type: "nested" });
 
   // Metadata store: path -> { visibility, encrypted, encryptionEngine, author, authorChain, timestamp }
   const metaDb = await orbitdb.open(`${config.dbName ?? "orbitmem-vault"}-meta`, {
     type: "nested",
   });
+
+  // Default AES key for private data — set via setDefaultKey() after wallet connect
+  let defaultKey: CryptoKey | undefined;
 
   function makeEntry<T>(
     _path: string,
@@ -46,8 +63,80 @@ export async function createVault(
     };
   }
 
-  return {
+  /** Encrypt a value for storage. Returns the serialized blob or the raw value (public). */
+  async function encryptValue(
+    value: unknown,
+    visibility: Visibility,
+    engine: EncryptionEngine | null,
+    opts?: any,
+  ): Promise<unknown> {
+    if (visibility === "public" || !engine) return value;
+
+    const plaintext = new TextEncoder().encode(JSON.stringify(value));
+
+    if (engine === "aes") {
+      if (!config.aesEngine)
+        throw new Error("AES engine not configured — pass aesEngine to createVault");
+      let cryptoKey: CryptoKey | undefined;
+      if (visibility === "private") {
+        cryptoKey = defaultKey;
+        if (!cryptoKey) throw new Error("No default key — call setDefaultKey() or connect() first");
+      } else if (visibility === "shared" && opts?.sharedKeySource) {
+        cryptoKey = await config.aesEngine.deriveKey(opts.sharedKeySource);
+      }
+      if (!cryptoKey) throw new Error("No encryption key available");
+      const encrypted = await config.aesEngine.encrypt(plaintext, cryptoKey);
+      return serializeEncrypted(encrypted);
+    }
+
+    if (engine === "lit") {
+      if (!config.encryptionLayer) throw new Error("Encryption layer not configured for Lit");
+      if (!opts?.accessConditions) throw new Error("accessConditions required for Lit encryption");
+      const encrypted = await config.encryptionLayer.encrypt(plaintext, {
+        engine: "lit",
+        accessConditions: opts.accessConditions,
+      });
+      return serializeEncrypted(encrypted);
+    }
+
+    return value;
+  }
+
+  /** Attempt auto-decryption of a stored value. Returns the decrypted value or the raw value. */
+  async function tryDecrypt(rawValue: unknown, meta: any): Promise<unknown> {
+    if (!meta?.encrypted || !isSerializedEncrypted(rawValue)) return rawValue;
+
+    const encrypted = deserializeEncrypted(rawValue);
+
+    if (
+      encrypted.engine === "aes" &&
+      config.aesEngine &&
+      meta.visibility === "private" &&
+      defaultKey
+    ) {
+      try {
+        const decrypted = await config.aesEngine.decrypt(encrypted as AESEncryptedData, defaultKey);
+        return JSON.parse(new TextDecoder().decode(decrypted));
+      } catch {
+        // Decryption failed — return raw blob
+        return rawValue;
+      }
+    }
+
+    // shared+aes (no internal key) or lit (needs sessionSigs) — return encrypted blob
+    return rawValue;
+  }
+
+  const vaultImpl: IDataLayer & {
+    close: () => Promise<void>;
+    db: any;
+    setDefaultKey: (key: CryptoKey) => void;
+  } = {
     db,
+
+    setDefaultKey(key: CryptoKey) {
+      defaultKey = key;
+    },
 
     async put(path, value, opts) {
       const key = normalizePath(path);
@@ -55,8 +144,8 @@ export async function createVault(
       const encrypted = visibility !== "public";
       const engine = encrypted ? (opts?.engine ?? "aes") : null;
 
-      // TODO: Wire encryption for private/shared — for now store raw value
-      const hash = await db.put(key, value);
+      const storedValue = await encryptValue(value, visibility, engine, opts);
+      const hash = await db.put(key, storedValue);
       const meta: Record<string, any> = { visibility, encrypted, timestamp: Date.now() };
       if (engine) meta.encryptionEngine = engine;
       await metaDb.put(key, meta);
@@ -83,24 +172,27 @@ export async function createVault(
       };
 
       const leaves = flatten(obj, prefix ?? "");
-      for (const [key, value] of leaves) {
-        await db.put(key, value);
-        await metaDb.put(key, {
-          visibility,
-          encrypted: visibility !== "public",
-          timestamp: Date.now(),
-        });
+      for (const [leafKey, leafValue] of leaves) {
+        await vaultImpl.put(leafKey, leafValue, { visibility, engine: opts?.engine as any });
       }
     },
 
-    async get(path) {
+    async get<T = unknown>(path: VaultPath): Promise<VaultEntry<T> | null> {
       const key = normalizePath(path);
-      const value = await db.get(key);
-      if (value === undefined) return null;
+      const rawValue = await db.get(key);
+      if (rawValue === undefined) return null;
 
       const meta = await metaDb.get(key);
       const visibility = meta?.visibility ?? "private";
-      return makeEntry(key, value, visibility, visibility !== "public");
+      const encEngine = meta?.encryptionEngine;
+      const value = await tryDecrypt(rawValue, meta);
+      return makeEntry(
+        key,
+        value,
+        visibility,
+        meta?.encrypted ?? visibility !== "public",
+        encEngine,
+      ) as VaultEntry<T>;
     },
 
     async del(path) {
@@ -113,7 +205,7 @@ export async function createVault(
       const all = await db.all();
       const flatten = (o: any, parentKey: string = ""): string[] => {
         const keys: string[] = [];
-        if (o && typeof o === "object" && !Array.isArray(o)) {
+        if (o && typeof o === "object" && !Array.isArray(o) && !isSerializedEncrypted(o)) {
           for (const [k, v] of Object.entries(o)) {
             const newKey = parentKey ? `${parentKey}/${k}` : k;
             keys.push(...flatten(v, newKey));
@@ -137,7 +229,7 @@ export async function createVault(
       const results: VaultEntry[] = [];
       const flatten = (o: any, parentKey: string = ""): [string, any][] => {
         const entries: [string, any][] = [];
-        if (o && typeof o === "object" && !Array.isArray(o)) {
+        if (o && typeof o === "object" && !Array.isArray(o) && !isSerializedEncrypted(o)) {
           for (const [k, v] of Object.entries(o)) {
             const newKey = parentKey ? `${parentKey}/${k}` : k;
             entries.push(...flatten(v, newKey));
@@ -153,7 +245,10 @@ export async function createVault(
         const meta = await metaDb.get(key);
         if (filter.visibility && meta?.visibility !== filter.visibility) continue;
         if (filter.since && (meta?.timestamp ?? 0) < filter.since) continue;
-        results.push(makeEntry(key, value, meta?.visibility ?? "private", meta?.encrypted ?? true));
+        const resolved = await tryDecrypt(value, meta);
+        results.push(
+          makeEntry(key, resolved, meta?.visibility ?? "private", meta?.encrypted ?? true),
+        );
         if (filter.limit && results.length >= filter.limit) break;
       }
       return results as any;
@@ -204,4 +299,6 @@ export async function createVault(
       await metaDb.close();
     },
   };
+
+  return vaultImpl;
 }
