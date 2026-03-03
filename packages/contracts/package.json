@@ -2,8 +2,13 @@
   "name": "@orbitmem/contracts",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./abi/index.ts",
+    "./abi/*": "./abi/*"
+  },
   "scripts": {
-    "build": "forge build",
+    "build": "forge build && bash scripts/generate-abi.sh",
     "test": "forge test -vvv",
     "test:gas": "forge test --gas-report",
     "fmt": "forge fmt",
