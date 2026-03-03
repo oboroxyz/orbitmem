@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { HiOutlineArrowRight } from "react-icons/hi";
@@ -10,20 +9,12 @@ import {
   PiShieldCheck,
 } from "react-icons/pi";
 import { DEMO_TRUST_EDGES, DEMO_TRUST_NODES, TrustGraph } from "../components/TrustGraph";
-import { searchData } from "../lib/api";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
 function HomePage() {
-  const { data: dataResult } = useQuery({
-    queryKey: ["dataSearch", "all"],
-    queryFn: () => searchData(),
-  });
-
-  const totalData = dataResult?.count ?? 0;
-
   return (
     <div className="space-y-24">
       {/* ── Hero ── */}
@@ -57,12 +48,6 @@ function HomePage() {
             Dashboard
           </Link>
         </div>
-      </section>
-
-      {/* ── Stats bar ── */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <StatCard label="Data Entries" value={String(totalData)} />
-        <StatCard label="Feedback Submitted" value="-" />
       </section>
 
       {/* ── Three pillars ── */}
@@ -173,15 +158,6 @@ function HomePage() {
 }
 
 // ── Sub-components ──
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6 text-center">
-      <p className="text-3xl font-bold text-accent-300 mb-1">{value}</p>
-      <p className="text-sm text-orbit-400">{label}</p>
-    </div>
-  );
-}
 
 function PillarCard({
   icon,

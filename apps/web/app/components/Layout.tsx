@@ -6,6 +6,7 @@ import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 const navLinks = [
   { to: "/data", label: "Explore" },
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/dashboard/vault", label: "My Data" },
 ] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
