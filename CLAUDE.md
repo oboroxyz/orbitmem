@@ -109,3 +109,5 @@ Signed HTTP requests use headers: `X-OrbitMem-Signer`, `-Family`, `-Algorithm`, 
 - **Test files** live in `src/**/__tests__/*.test.ts` using `bun:test` (`describe`, `test`, `expect`)
 - **Integration tests** in relay use Hono's `app.request()` without starting an HTTP server
 - **SDK exports** three entry points: `.` (main), `./agent`, `./types`
+- **Solidity** uses `forge fmt` (4-space indent, 100-char line width), optimizer enabled with 200 runs
+- **Contract tests** in `test/*.t.sol` follow Foundry conventions (`test_` prefix, `setUp()`, `vm.expectRevert`)
