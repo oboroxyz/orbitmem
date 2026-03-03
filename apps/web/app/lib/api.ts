@@ -68,6 +68,19 @@ export function getDataScore(dataId: number) {
   return fetchJSON<DataScore>(`/data/${dataId}/score`);
 }
 
+export interface DataStats {
+  totalEntries: number;
+  totalFeedback: number;
+  avgQuality: number;
+  qualityDistribution: { range: string; count: number }[];
+  topTags: { tag: string; count: number }[];
+  activity: { date: string; entries: number; feedback: number }[];
+}
+
+export function getDataStats() {
+  return fetchJSON<DataStats>("/data/stats");
+}
+
 // ── Vault (public reads) ──
 
 export function getPublicVaultKeys(address: string, prefix?: string) {
