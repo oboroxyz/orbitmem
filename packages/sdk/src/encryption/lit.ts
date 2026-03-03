@@ -2,6 +2,7 @@ import type {
   EvmAddress,
   EvmChain,
   LitAccessCondition,
+  LitAuthSig,
   LitEncryptedData,
   LitEvmCondition,
 } from "../types.js";
@@ -37,6 +38,46 @@ export class LitEngine {
     return this.client;
   }
 
+  async getSessionSigs(authSig: LitAuthSig, chain: string): Promise<any> {
+    const client = await this.getClient();
+    const { LitAbility } = await import("@lit-protocol/constants");
+    const {
+      LitAccessControlConditionResource,
+      createSiweMessageWithRecaps,
+      generateAuthSig,
+    } = await import("@lit-protocol/auth-helpers");
+
+    const litResource = new LitAccessControlConditionResource("*");
+
+    return client.getSessionSigs({
+      chain,
+      resourceAbilityRequests: [
+        { resource: litResource, ability: LitAbility.AccessControlConditionDecryption },
+      ],
+      authNeededCallback: async (params: {
+        uri?: string;
+        expiration?: string;
+        resourceAbilityRequests?: any[];
+      }) => {
+        const toSign = await createSiweMessageWithRecaps({
+          uri: params.uri!,
+          expiration: params.expiration!,
+          resources: params.resourceAbilityRequests!,
+          walletAddress: authSig.address,
+          nonce: await client.getLatestBlockhash(),
+          litNodeClient: client,
+        });
+        return generateAuthSig({
+          signer: {
+            signMessage: async () => authSig.sig,
+            getAddress: async () => authSig.address,
+          } as any,
+          toSign,
+        });
+      },
+    });
+  }
+
   async encrypt(
     data: Uint8Array,
     accessConditions: LitAccessCondition[],
@@ -58,7 +99,17 @@ export class LitEngine {
     };
   }
 
-  async decrypt(encrypted: LitEncryptedData, sessionSigs: any): Promise<Uint8Array> {
+  async decrypt(encrypted: LitEncryptedData, sessionSigsOrAuthSig: any): Promise<Uint8Array> {
+    let sessionSigs = sessionSigsOrAuthSig;
+
+    // If an authSig object is passed, resolve it to sessionSigs
+    if (sessionSigsOrAuthSig?.sig && sessionSigsOrAuthSig?.address) {
+      sessionSigs = await this.getSessionSigs(
+        sessionSigsOrAuthSig as LitAuthSig,
+        encrypted.chain as string,
+      );
+    }
+
     const client = await this.getClient();
     const { decryptToUint8Array } = await import("@lit-protocol/encryption");
     return decryptToUint8Array(
