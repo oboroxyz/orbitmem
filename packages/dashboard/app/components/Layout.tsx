@@ -4,7 +4,7 @@ import { FiGithub } from "react-icons/fi";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 
 const navLinks = [
-  { to: "/data", label: "Explorer" },
+  { to: "/data", label: "Explore" },
   { to: "/dashboard", label: "Dashboard" },
 ] as const;
 

@@ -20,14 +20,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       {
         name: "description",
         content:
-          "Encrypted P2P vaults, bidirectional trust, and multi-chain identity for the agentic web.",
+          "Encrypted P2P vaults, verifiable data quality, and multi-chain identity for the agentic web.",
       },
       { property: "og:type", content: "website" },
       { property: "og:title", content: "OrbitMem — Sovereign Data Layer for AI Agents" },
       {
         property: "og:description",
         content:
-          "Encrypted vaults, bidirectional trust, and multi-chain identity for the agentic web.",
+          "Encrypted vaults, verifiable data quality, and multi-chain identity for the agentic web.",
       },
       { property: "og:site_name", content: "OrbitMem" },
       { name: "twitter:card", content: "summary_large_image" },

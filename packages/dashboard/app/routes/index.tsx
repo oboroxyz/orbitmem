@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { HiOutlineArrowRight } from "react-icons/hi";
 import {
   PiArrowsLeftRight,
-  PiDatabaseDuotone,
   PiFingerprint,
   PiLockKey,
   PiPlugsConnected,
@@ -35,13 +34,13 @@ function HomePage() {
         <h1 className="text-4xl sm:text-6xl font-bold text-orbit-50 mb-6 leading-tight">
           Encrypted Vaults.
           <br />
-          Bidirectional Trust.
+          Verifiable Quality.
           <br />
           <span className="text-accent-300">Agent-Native.</span>
         </h1>
         <p className="text-lg text-orbit-300 max-w-2xl mx-auto mb-10">
-          OrbitMem gives AI agents sovereign, encrypted memory with on-chain reputation — so users
-          stay in control and agents earn trust through verifiable quality.
+          OrbitMem gives AI agents sovereign, encrypted memory with on-chain quality scoring — so
+          high-quality data rises to the top and trust is earned through verifiable feedback.
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link
@@ -83,8 +82,8 @@ function HomePage() {
           />
           <PillarCard
             icon={<PiArrowsLeftRight className="text-3xl text-accent-300" />}
-            title="Bidirectional Trust"
-            description="Users rate agents. Agents rate data. On-chain feedback registries create a verifiable quality loop via ERC-8004."
+            title="Data Quality"
+            description="On-chain feedback registries score data entries by accuracy, completeness, and freshness — creating a verifiable quality layer via ERC-8004."
           />
           <PillarCard
             icon={<PiFingerprint className="text-3xl text-accent-300" />}
@@ -98,24 +97,24 @@ function HomePage() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold text-orbit-50 mb-4">
-            Visualize the Trust Graph
+            Visualize the Quality Graph
           </h2>
           <p className="text-orbit-300 mb-6">
-            OrbitMem's bidirectional trust model creates a live graph between users, agents, and
-            data — color-coded by reputation score. High-trust paths emerge naturally as feedback
-            accumulates on-chain.
+            Users and AI agents both rate data entries on-chain — building a live quality graph
+            color-coded by feedback score. High-quality data rises naturally as feedback
+            accumulates.
           </p>
           <div className="space-y-3">
             <TrustLegendItem
               color="#8b5cf6"
               label="Users"
-              description="rate agents they interact with"
+              description="human wallets rating data"
             />
-            <TrustLegendItem color="#3b82f6" label="Agents" description="rate data they consume" />
+            <TrustLegendItem color="#3b82f6" label="Agents" description="AI wallets rating data" />
             <TrustLegendItem
               color="#14b8a6"
               label="Data"
-              description="earns quality scores from agents"
+              description="earns quality scores from both"
             />
           </div>
         </div>
@@ -131,17 +130,17 @@ function HomePage() {
           <StepCard
             step="1"
             title="Connect & Store"
-            description="Connect your wallet, create an encrypted vault, and store agent memory with granular visibility controls."
+            description="Connect your wallet, create an encrypted vault, and store data with granular visibility controls."
           />
           <StepCard
             step="2"
             title="Discover & Consume"
-            description="Agents discover data via the registry, check quality scores, and consume entries that meet their trust thresholds."
+            description="Browse the data registry, check quality scores, and consume entries that meet your trust thresholds."
           />
           <StepCard
             step="3"
-            title="Rate & Build Trust"
-            description="Submit on-chain feedback. Reputation compounds over time — reliable agents and high-quality data rise to the top."
+            title="Rate & Build Quality"
+            description="Submit on-chain feedback. Quality scores compound over time — high-quality data rises to the top."
           />
         </div>
       </section>
@@ -158,8 +157,8 @@ function HomePage() {
           <StandardCard
             icon={<PiShieldCheck className="text-2xl text-trust-high" />}
             title="ERC-8004"
-            subtitle="Agent & Data Trust Registry"
-            description="On-chain NFT registries for agent identity, data entries, and registry-agnostic feedback with per-tag scoring."
+            subtitle="Data Trust Registry"
+            description="On-chain NFT registries for data entries and registry-agnostic feedback with per-tag scoring."
           />
           <StandardCard
             icon={<PiPlugsConnected className="text-2xl text-trust-high" />}
@@ -168,22 +167,6 @@ function HomePage() {
             description="Multi-chain signed request envelopes with timestamp verification, nonce replay protection, and session keys."
           />
         </div>
-      </section>
-
-      {/* ── Explore CTA ── */}
-      <section>
-        <Link
-          to="/data"
-          className="group bg-orbit-800 rounded-xl border border-orbit-700 p-6 hover:border-accent-500/50 transition-colors block"
-        >
-          <h2 className="text-xl font-semibold text-orbit-50 group-hover:text-accent-300 transition-colors mb-2 flex items-center gap-2">
-            <PiDatabaseDuotone className="text-2xl" />
-            Data Registry
-          </h2>
-          <p className="text-orbit-300 text-sm">
-            Explore data entries with quality scores, tags, and verification status.
-          </p>
-        </Link>
       </section>
     </div>
   );
