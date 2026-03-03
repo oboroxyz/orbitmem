@@ -1,6 +1,14 @@
 import type { MiddlewareHandler } from "hono";
 import { verifyMessage } from "viem";
 
+export type ERC8128Env = {
+  Variables: {
+    signer: string;
+    signerFamily: string;
+    signerAlgorithm: string;
+  };
+};
+
 const nonceCache = new Map<string, number>();
 const NONCE_TTL = 5 * 60 * 1000; // 5 min
 const TIMESTAMP_TOLERANCE = 30 * 1000; // ±30s
@@ -52,7 +60,7 @@ export function erc8128(opts?: {
   verify?: "evm";
   verifier?: (payload: Uint8Array, signature: Uint8Array, algorithm: string) => Promise<boolean>;
   required?: boolean;
-}): MiddlewareHandler {
+}): MiddlewareHandler<ERC8128Env> {
   const required = opts?.required ?? true;
 
   return async (c, next) => {

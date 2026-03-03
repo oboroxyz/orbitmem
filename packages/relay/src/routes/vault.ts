@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { erc8128 } from "../middleware/erc8128.js";
+import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 
 // In-memory vault store for the relay (mirrors OrbitDB data)
 // In production, this would be backed by the OrbitDB peer service
@@ -12,7 +12,7 @@ function getOrCreateVault(address: string) {
   return vaultStore.get(address)!;
 }
 
-export const vaultRoutes = new Hono();
+export const vaultRoutes = new Hono<ERC8128Env>();
 
 // List public keys — must be before the wildcard route
 vaultRoutes.get("/vault/public/:address/keys", async (c) => {

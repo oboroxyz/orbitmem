@@ -1,13 +1,13 @@
-import { MockRegistry } from "@orbitmem/sdk";
+import { MockRegistry } from "@orbitmem/sdk/discovery";
 import { Hono } from "hono";
-import { erc8128 } from "../middleware/erc8128.js";
+import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 
 // Shared mock registry instance for the relay
 const registry = new MockRegistry();
 
 export { registry };
 
-export const dataRoutes = new Hono();
+export const dataRoutes = new Hono<ERC8128Env>();
 
 // Search data registrations
 dataRoutes.get("/data/search", async (c) => {
@@ -44,7 +44,7 @@ dataRoutes.post("/data/:dataId/feedback", erc8128(), async (c) => {
   }>();
 
   registry.rateData(dataId, {
-    clientAddress: c.get("signer") as any,
+    clientAddress: c.get("signer"),
     value: body.value,
     valueDecimals: 0,
     tag1: body.tag1,

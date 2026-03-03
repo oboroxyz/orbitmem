@@ -7,6 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./agent": "./src/agent/index.ts",
+    "./discovery": "./src/discovery/index.ts",
+    "./transport": "./src/transport/index.ts",
     "./types": "./src/types.ts"
   },
   "scripts": {

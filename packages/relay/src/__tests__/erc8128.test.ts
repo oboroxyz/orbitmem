@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
 import { privateKeyToAccount } from "viem/accounts";
-import { erc8128 } from "../middleware/erc8128.js";
+import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 
 describe("ERC-8128 Middleware", () => {
   function createTestApp(opts?: Parameters<typeof erc8128>[0]) {
-    const app = new Hono();
+    const app = new Hono<ERC8128Env>();
     app.use("/protected/*", erc8128(opts));
     app.get("/protected/test", (c) => {
       return c.json({ signer: c.get("signer"), family: c.get("signerFamily") });

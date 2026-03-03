@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { erc8128 } from "../middleware/erc8128.js";
+import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 
 // In-memory snapshot store (mock Storacha)
 const snapshotStore = new Map<
@@ -15,11 +15,11 @@ const snapshotStore = new Map<
   }
 >();
 
-export const snapshotRoutes = new Hono();
+export const snapshotRoutes = new Hono<ERC8128Env>();
 
 // List snapshots for the signer — requires ERC-8128
 snapshotRoutes.get("/snapshots", erc8128(), async (c) => {
-  const signer = c.get("signer") as string;
+  const signer = c.get("signer");
   const snapshots = Array.from(snapshotStore.values())
     .filter((s) => s.signer === signer)
     .map(({ data: _, ...rest }) => rest);
@@ -29,8 +29,12 @@ snapshotRoutes.get("/snapshots", erc8128(), async (c) => {
 
 // Trigger archival — requires ERC-8128
 snapshotRoutes.post("/snapshots/archive", erc8128(), async (c) => {
-  const signer = c.get("signer") as string;
-  const body = await c.req.json<{ data?: string; entryCount?: number }>().catch(() => ({}));
+  const signer = c.get("signer");
+  const body = await c.req
+    .json<{ data?: string; entryCount?: number }>()
+    .catch(
+      () => ({ data: undefined, entryCount: undefined }) as { data?: string; entryCount?: number },
+    );
 
   const data = body.data ? new TextEncoder().encode(body.data) : new TextEncoder().encode("{}");
 
