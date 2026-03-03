@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { createOrbitMem } from "../client.js";
 
 // Skip if native OrbitDB dependencies (node-datachannel) are unavailable (e.g. CI)
 let orbitdbAvailable = true;
@@ -11,6 +10,7 @@ try {
 
 describe.skipIf(!orbitdbAvailable)("createOrbitMem", () => {
   test("initializes all layers", async () => {
+    const { createOrbitMem } = await import("../client.js");
     const orbitmem = await createOrbitMem({
       identity: { chains: ["evm"] },
       encryption: { defaultEngine: "aes", aes: { kdf: "hkdf-sha256" } },

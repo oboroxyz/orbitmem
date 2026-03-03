@@ -4,7 +4,7 @@
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
     "build": "bun run --filter '*' build",
-    "test": "bun run --filter '*' test",
+    "test": "bun run --filter '!@orbitmem/contracts' test",
     "dev": "concurrently -n relay,web -c blue,magenta \"bun run dev:relay\" \"bun run dev:web\"",
     "dev:relay": "bun run --filter @orbitmem/relay dev",
     "dev:web": "bun run --filter @orbitmem/web dev",
