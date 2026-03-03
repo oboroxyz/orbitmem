@@ -685,10 +685,20 @@ export interface EncryptAESOptions {
   keySource: AESKeySource;
 }
 
+/** Lit Protocol auth signature — proves wallet ownership to Lit nodes */
+export interface LitAuthSig {
+  sig: string;
+  derivedVia: string;
+  signedMessage: string;
+  address: string;
+}
+
 /** Options for decryption (engine auto-detected from blob) */
 export interface DecryptOptions {
   /** For AES: provide key source if not cached */
   keySource?: AESKeySource;
+  /** For Lit: wallet auth signature used to obtain sessionSigs */
+  authSig?: LitAuthSig;
 }
 
 // ────────────────────────────────────────────────────────────
