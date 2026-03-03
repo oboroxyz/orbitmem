@@ -7,7 +7,7 @@ import { createSnapshotRoutes } from "./routes/snapshots.js";
 import { createVaultRoutes } from "./routes/vault.js";
 import { createServices } from "./services/index.js";
 
-const services = createServices(process.env.RELAY_MODE);
+const services = await createServices(process.env.RELAY_MODE);
 
 export const app = new Hono().basePath("/v1");
 

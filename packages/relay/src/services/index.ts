@@ -1,3 +1,4 @@
+import type { Chain } from "viem";
 import { LiveVaultService } from "./live-vault.js";
 import { MockDiscoveryService } from "./mock-discovery.js";
 import { MockSnapshotService } from "./mock-snapshot.js";
@@ -7,12 +8,33 @@ import type { RelayServices } from "./types.js";
 export { getOrbitDBPeer, stopOrbitDBPeer } from "./orbitdb-peer.js";
 export type { IDiscoveryService, ISnapshotService, IVaultService, RelayServices } from "./types.js";
 
-export function createServices(mode?: string): RelayServices {
+function getChain(chainId?: string): Chain {
+  // Lazy-resolve chain definitions to avoid importing all chains at startup
+  const id = Number(chainId || "8453");
+  return { id, name: `chain-${id}` } as Chain;
+}
+
+export async function createServices(mode?: string): Promise<RelayServices> {
   if (mode === "live") {
+    const { createPublicClient, createWalletClient, http } = await import("viem");
+    const { privateKeyToAccount } = await import("viem/accounts");
+    const { LiveDiscoveryService } = await import("./live-discovery.js");
+
+    const chain = getChain(process.env.CHAIN_ID);
+    const transport = http(process.env.RPC_URL);
+    const publicClient = createPublicClient({ chain, transport });
+    const account = privateKeyToAccount(process.env.RELAY_PRIVATE_KEY as `0x${string}`);
+    const walletClient = createWalletClient({ chain, transport, account });
+
     return {
       vault: new LiveVaultService(),
       snapshot: new MockSnapshotService(),
-      discovery: new MockDiscoveryService(),
+      discovery: new LiveDiscoveryService({
+        publicClient,
+        walletClient,
+        dataRegistry: process.env.DATA_REGISTRY_ADDRESS as `0x${string}`,
+        feedbackRegistry: process.env.FEEDBACK_REGISTRY_ADDRESS as `0x${string}`,
+      }),
     };
   }
   return {

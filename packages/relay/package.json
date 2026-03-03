@@ -18,6 +18,7 @@
     "@libp2p/tcp": "^10.0.0",
     "@orbitdb/core": "^3.0.2",
     "@orbitdb/nested-db": "^2.0.4",
+    "@orbitmem/contracts": "workspace:*",
     "@orbitmem/sdk": "workspace:*",
     "@storacha/client": "^1.0.0",
     "blockstore-level": "^2.0.0",
