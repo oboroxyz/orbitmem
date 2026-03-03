@@ -14,8 +14,24 @@ function getChain(chainId?: string): Chain {
   return { id, name: `chain-${id}` } as Chain;
 }
 
+const LIVE_ENV_VARS = [
+  "RPC_URL",
+  "RELAY_PRIVATE_KEY",
+  "DATA_REGISTRY_ADDRESS",
+  "FEEDBACK_REGISTRY_ADDRESS",
+  "STORACHA_SPACE_DID",
+] as const;
+
+function validateLiveEnv(): void {
+  const missing = LIVE_ENV_VARS.filter((v) => !process.env[v]);
+  if (missing.length > 0) {
+    throw new Error(`RELAY_MODE=live requires env vars: ${missing.join(", ")}`);
+  }
+}
+
 export async function createServices(mode?: string): Promise<RelayServices> {
   if (mode === "live") {
+    validateLiveEnv();
     const { createPublicClient, createWalletClient, http } = await import("viem");
     const { privateKeyToAccount } = await import("viem/accounts");
     const { LiveDiscoveryService } = await import("./live-discovery.js");
