@@ -33,9 +33,11 @@
     "includes": [
       "packages/**/*.ts",
       "packages/**/*.tsx",
+      "apps/**/*.ts",
+      "apps/**/*.tsx",
       "!!packages/contracts",
-      "!!packages/dashboard/dist",
-      "!!packages/dashboard/app/routeTree.gen.ts",
+      "!!apps/web/dist",
+      "!!apps/web/app/routeTree.gen.ts",
       "!!**/node_modules",
       "!!**/dist",
       "!!**/orbitdb",
