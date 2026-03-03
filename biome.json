@@ -32,7 +32,10 @@
   "files": {
     "includes": [
       "packages/**/*.ts",
-      "!!packages/contracts/**",
+      "packages/**/*.tsx",
+      "!!packages/contracts",
+      "!!packages/dashboard/dist",
+      "!!packages/dashboard/app/routeTree.gen.ts",
       "!!**/node_modules",
       "!!**/dist",
       "!!**/orbitdb",

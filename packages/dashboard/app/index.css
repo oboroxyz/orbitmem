@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-orbit-900: #0a0a1a;
+  --color-orbit-800: #12122a;
+  --color-orbit-700: #1a1a3e;
+  --color-orbit-600: #2a2a5e;
+  --color-orbit-500: #4a4a8e;
+  --color-orbit-400: #6a6abe;
+  --color-orbit-300: #8a8aee;
+  --color-orbit-200: #b0b0ff;
+  --color-orbit-100: #d0d0ff;
+  --color-orbit-50: #eeeeff;
+
+  --color-accent-500: #7c3aed;
+  --color-accent-400: #8b5cf6;
+  --color-accent-300: #a78bfa;
+
+  --color-trust-high: #22c55e;
+  --color-trust-mid: #eab308;
+  --color-trust-low: #ef4444;
+}
+
+body {
+  @apply bg-orbit-900 text-orbit-50 antialiased;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}

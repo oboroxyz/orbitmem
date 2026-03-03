@@ -5,7 +5,9 @@
   "scripts": {
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '*' test",
+    "dev": "concurrently -n relay,dash -c blue,magenta \"bun run dev:relay\" \"bun run dev:dashboard\"",
     "dev:relay": "bun run --filter @orbitmem/relay dev",
+    "dev:dashboard": "bun run --filter @orbitmem/dashboard dev",
     "build:contracts": "bun run --filter @orbitmem/contracts build",
     "test:contracts": "bun run --filter @orbitmem/contracts test",
     "lint": "biome check .",
@@ -14,6 +16,7 @@
     "typecheck": "bun run --filter '*' typecheck"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.4"
+    "@biomejs/biome": "^2.4.4",
+    "concurrently": "^9.2.1"
   }
 }

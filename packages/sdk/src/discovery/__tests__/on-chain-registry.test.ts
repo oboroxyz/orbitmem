@@ -1,14 +1,4 @@
-import { describe, expect, test, beforeAll } from "bun:test";
-import {
-  createPublicClient,
-  createWalletClient,
-  http,
-  type Address,
-  type PublicClient,
-  type WalletClient,
-} from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { foundry } from "viem/chains";
+import { beforeAll, describe, expect, test } from "bun:test";
 import {
   AgentRegistryAbi,
   AgentRegistryBytecode,
@@ -17,6 +7,16 @@ import {
   FeedbackRegistryAbi,
   FeedbackRegistryBytecode,
 } from "@orbitmem/contracts";
+import {
+  type Address,
+  createPublicClient,
+  createWalletClient,
+  http,
+  type PublicClient,
+  type WalletClient,
+} from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { foundry } from "viem/chains";
 import { OnChainRegistry } from "../on-chain-registry.js";
 
 // Skip all tests if Anvil is not running
@@ -141,7 +141,13 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     });
 
     const result = await bobRegistry.rateAgent(
-      agentId, 85, 0, "reliable", "", "", "0x0000000000000000000000000000000000000000000000000000000000000000",
+      agentId,
+      85,
+      0,
+      "reliable",
+      "",
+      "",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
     );
     expect(result.txHash).toMatch(/^0x/);
 
@@ -172,7 +178,13 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     });
 
     await bobRegistry.rateData(
-      dataId, 90, 0, "accurate", "", "", "0x0000000000000000000000000000000000000000000000000000000000000000",
+      dataId,
+      90,
+      0,
+      "accurate",
+      "",
+      "",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
     );
 
     const score = await aliceRegistry.getDataScore(dataId);
@@ -200,10 +212,22 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     });
 
     await bobRegistry.rateData(
-      dataId, 80, 0, "accurate", "", "", "0x0000000000000000000000000000000000000000000000000000000000000000",
+      dataId,
+      80,
+      0,
+      "accurate",
+      "",
+      "",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
     );
     await bobRegistry.rateData(
-      dataId, 60, 0, "fresh", "", "", "0x0000000000000000000000000000000000000000000000000000000000000000",
+      dataId,
+      60,
+      0,
+      "fresh",
+      "",
+      "",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
     );
 
     const accurateScore = await aliceRegistry.getTagScore(dataRegAddr, dataId, "accurate");
@@ -235,7 +259,13 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     });
 
     await bobRegistry.rateAgent(
-      agentId, 80, 0, "", "", "", "0x0000000000000000000000000000000000000000000000000000000000000000",
+      agentId,
+      80,
+      0,
+      "",
+      "",
+      "",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
     );
 
     let reputation = await aliceRegistry.getAgentReputation(agentId);
@@ -264,7 +294,13 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     // Alice tries to rate her own agent — should revert
     await expect(
       aliceRegistry.rateAgent(
-        agentId, 99, 0, "", "", "", "0x0000000000000000000000000000000000000000000000000000000000000000",
+        agentId,
+        99,
+        0,
+        "",
+        "",
+        "",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
       ),
     ).rejects.toThrow();
   });

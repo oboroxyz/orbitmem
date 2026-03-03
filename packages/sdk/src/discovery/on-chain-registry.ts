@@ -1,10 +1,6 @@
-import type { PublicClient, WalletClient, Address, Log } from "viem";
+import { AgentRegistryAbi, DataRegistryAbi, FeedbackRegistryAbi } from "@orbitmem/contracts";
+import type { Address, Log, PublicClient, WalletClient } from "viem";
 import { parseEventLogs } from "viem";
-import {
-  AgentRegistryAbi,
-  DataRegistryAbi,
-  FeedbackRegistryAbi,
-} from "@orbitmem/contracts";
 import type {
   AgentRegistration,
   AgentReputation,
@@ -201,9 +197,7 @@ export class OnChainRegistry {
     return Number(logs[0].args.dataId);
   }
 
-  async findData(query: {
-    activeOnly?: boolean;
-  }): Promise<DataRegistration[]> {
+  async findData(query: { activeOnly?: boolean }): Promise<DataRegistration[]> {
     const logs = await this.pub.getContractEvents({
       address: this.dataReg,
       abi: DataRegistryAbi,
@@ -331,11 +325,7 @@ export class OnChainRegistry {
     return { txHash: hash, feedbackIndex: logs.length > 0 ? 1 : 0 };
   }
 
-  async revokeFeedback(
-    registryAddr: Address,
-    entityId: number,
-    index: number,
-  ): Promise<string> {
+  async revokeFeedback(registryAddr: Address, entityId: number, index: number): Promise<string> {
     const hash = await this.wallet.writeContract({
       address: this.feedbackReg,
       abi: FeedbackRegistryAbi,
@@ -361,13 +351,8 @@ export class OnChainRegistry {
     return hash;
   }
 
-  async setActive(
-    registryAddr: Address,
-    entityId: number,
-    active: boolean,
-  ): Promise<string> {
-    const abi =
-      registryAddr === this.agentReg ? AgentRegistryAbi : DataRegistryAbi;
+  async setActive(registryAddr: Address, entityId: number, active: boolean): Promise<string> {
+    const abi = registryAddr === this.agentReg ? AgentRegistryAbi : DataRegistryAbi;
     const hash = await this.wallet.writeContract({
       address: registryAddr,
       abi,
