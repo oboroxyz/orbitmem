@@ -19,6 +19,7 @@ export async function createServices(mode?: string): Promise<RelayServices> {
     const { createPublicClient, createWalletClient, http } = await import("viem");
     const { privateKeyToAccount } = await import("viem/accounts");
     const { LiveDiscoveryService } = await import("./live-discovery.js");
+    const { LiveSnapshotService } = await import("./live-snapshot.js");
 
     const chain = getChain(process.env.CHAIN_ID);
     const transport = http(process.env.RPC_URL);
@@ -28,7 +29,7 @@ export async function createServices(mode?: string): Promise<RelayServices> {
 
     return {
       vault: new LiveVaultService(),
-      snapshot: new MockSnapshotService(),
+      snapshot: new LiveSnapshotService({ spaceDID: process.env.STORACHA_SPACE_DID! }),
       discovery: new LiveDiscoveryService({
         publicClient,
         walletClient,
