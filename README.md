@@ -99,7 +99,7 @@ await agent.rateData(datasets[0].dataId, 95);
 - **Data:** OrbitDB + @orbitdb/nested-db (CRDT P2P)
 - **Encryption:** AES-256-GCM (Web Crypto) + Lit Protocol v7
 - **Transport:** ERC-8128 signed HTTP requests
-- **Discovery:** ERC-8004 bidirectional trust (mock registries)
+- **Discovery:** ERC-8004 for Data — on-chain data discovery & reputation
 - **Persistence:** Storacha (Filecoin/IPFS)
 - **Server:** Hono
 - **Identity:** EVM + Solana multi-chain

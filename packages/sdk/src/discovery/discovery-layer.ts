@@ -16,41 +16,11 @@ function createOnChainDiscoveryLayer(config: DiscoveryConfig): IDiscoveryLayer {
   const registry = new OnChainRegistry({
     publicClient: config.publicClient!,
     walletClient: config.walletClient!,
-    agentRegistry: config.agentRegistry as Address,
     dataRegistry: config.dataRegistry as Address,
     feedbackRegistry: config.reputationRegistry as Address,
   });
 
   return {
-    // ── Agent Discovery ──
-
-    async findAgents(query) {
-      return registry.findAgents({
-        keyword: query.keyword,
-        activeOnly: query.activeOnly,
-      });
-    },
-
-    async getAgent(agentId) {
-      return registry.getAgent(agentId);
-    },
-
-    async getAgentReputation(agentId) {
-      return registry.getAgentReputation(agentId);
-    },
-
-    async rateAgent(feedback) {
-      return registry.rateAgent(
-        feedback.agentId,
-        feedback.value,
-        feedback.valueDecimals ?? 0,
-        feedback.tag1 ?? "",
-        feedback.tag2 ?? "",
-        feedback.feedbackURI ?? "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-      );
-    },
-
     // ── Data Discovery ──
 
     async registerData(opts) {
@@ -146,18 +116,6 @@ function createOnChainDiscoveryLayer(config: DiscoveryConfig): IDiscoveryLayer {
 
     // ── Lit Protocol Integration ──
 
-    createAgentReputationCondition(opts) {
-      return {
-        conditionType: "evmContract",
-        contractAddress: config.reputationRegistry,
-        standardContractType: "",
-        chain: config.registryChain,
-        method: "getScore",
-        parameters: [":userAddress"],
-        returnValueTest: { comparator: ">=", value: String(opts.minScore) },
-      };
-    },
-
     createDataQualityCondition(opts) {
       return {
         conditionType: "evmContract",
@@ -179,39 +137,6 @@ function createMockDiscoveryLayer(config: DiscoveryConfig): IDiscoveryLayer {
   let txCounter = 0;
 
   return {
-    // ── Agent Discovery ──
-
-    async findAgents(query) {
-      return registry.findAgents({
-        keyword: query.keyword,
-        minReputation: query.minReputation,
-        activeOnly: query.activeOnly,
-      });
-    },
-
-    async getAgent(agentId) {
-      return registry.getAgent(agentId);
-    },
-
-    async getAgentReputation(agentId) {
-      return registry.getAgentReputation(agentId);
-    },
-
-    async rateAgent(feedback) {
-      registry.rateAgent(feedback.agentId, {
-        clientAddress: "0x0" as any,
-        value: feedback.value,
-        valueDecimals: feedback.valueDecimals ?? 0,
-        tag1: feedback.tag1,
-        tag2: feedback.tag2,
-        endpoint: feedback.endpoint,
-        feedbackURI: feedback.feedbackURI,
-        isRevoked: false,
-      });
-      txCounter++;
-      return { txHash: `0xmock_tx_${txCounter}`, feedbackIndex: txCounter };
-    },
-
     // ── Data Discovery ──
 
     async registerData(opts) {
@@ -301,18 +226,6 @@ function createMockDiscoveryLayer(config: DiscoveryConfig): IDiscoveryLayer {
     },
 
     // ── Lit Protocol Integration ──
-
-    createAgentReputationCondition(opts) {
-      return {
-        conditionType: "evmContract",
-        contractAddress: config.reputationRegistry,
-        standardContractType: "",
-        chain: config.registryChain,
-        method: "getScore",
-        parameters: [":userAddress"],
-        returnValueTest: { comparator: ">=", value: String(opts.minScore) },
-      };
-    },
 
     createDataQualityCondition(opts) {
       return {

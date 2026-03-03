@@ -7,7 +7,6 @@ describe("createOrbitMem", () => {
       identity: { chains: ["evm"] },
       encryption: { defaultEngine: "aes", aes: { kdf: "hkdf-sha256" } },
       discovery: {
-        agentRegistry: "0xAGENT" as any,
         dataRegistry: "0xDATA" as any,
         reputationRegistry: "0xREP" as any,
         registryChain: "base",

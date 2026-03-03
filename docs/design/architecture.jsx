@@ -17,13 +17,13 @@ const L = [
     desc: "Auto-archives encrypted snapshots to Filecoin/IPFS. Storacha never sees plaintext — only encrypted blobs.",
     apis: ["archive(snapshot)", "retrieve(cid)", "pinToFilecoin()"] },
   { id: "trust", name: "Trust & Discovery", tech: "ERC-8004", color: "#448AFF", icon: "◎",
-    desc: "Bidirectional: Users register data as scored on-chain assets (ERC-721). Agents discover & evaluate quality. Both sides rate each other after task completion.",
-    apis: ["registerData(key, tags)", "findAgents(query)", "rateAgent()", "rateData()", "getDataScore()"] },
+    desc: "Users register data as scored on-chain assets (ERC-721). Agents discover & evaluate quality. Agents rate data after consumption.",
+    apis: ["registerData(key, tags)", "findData(query)", "rateData()", "getDataScore()"] },
 ];
 
 const FLOW = [
   { n: "1", label: "Auth", sub: "Porto / EVM / Solana", color: "#00E5FF" },
-  { n: "2", label: "Register & Discover", sub: "Data score + Agent rep", color: "#448AFF" },
+  { n: "2", label: "Register & Discover", sub: "Data score + quality", color: "#448AFF" },
   { n: "3", label: "Write Vault", sub: "Public / Private / Shared", color: "#00E676" },
   { n: "4", label: "Encrypt", sub: "Lit (rep-gated) / AES", color: "#FF6D00" },
   { n: "5", label: "Agent Fetch", sub: "ERC-8128 signed request", color: "#7C4DFF" },
@@ -122,7 +122,7 @@ export default function App() {
             <div style={{ fontFamily: mono, fontSize: 11, color: "rgba(255,255,255,0.4)", lineHeight: 1.9 }}>
               User registers data → Agent discovers & checks DataScore →<br/>
               Agent consumes (quality ≥ threshold) → Agent rates data →<br/>
-              User rates agent → Both reputations update on-chain ↻
+              Data score updates on-chain ↻
             </div>
           </div>
         </main>

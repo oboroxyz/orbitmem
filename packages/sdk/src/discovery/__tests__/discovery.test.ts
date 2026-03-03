@@ -3,7 +3,6 @@ import { createDiscoveryLayer } from "../discovery-layer.js";
 
 describe("DiscoveryLayer (mock)", () => {
   const discovery = createDiscoveryLayer({
-    agentRegistry: "0xAGENT_REG" as any,
     dataRegistry: "0xDATA_REG" as any,
     reputationRegistry: "0xREP_REG" as any,
     registryChain: "base",
@@ -47,15 +46,4 @@ describe("DiscoveryLayer (mock)", () => {
     expect(score.totalFeedback).toBe(1);
   });
 
-  test("findAgents returns empty initially", async () => {
-    const agents = await discovery.findAgents({ keyword: "booking" });
-    expect(agents).toEqual([]);
-  });
-
-  test("createAgentReputationCondition returns Lit condition", () => {
-    const condition = discovery.createAgentReputationCondition({ minScore: 80 });
-    expect(condition.conditionType).toBe("evmContract");
-    expect(condition.returnValueTest.comparator).toBe(">=");
-    expect(condition.returnValueTest.value).toBe("80");
-  });
 });

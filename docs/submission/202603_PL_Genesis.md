@@ -56,35 +56,32 @@ OrbitMem is a sovereign data layer that sits between users and AI agents. Users 
 | **Data Vault**        | OrbitDB Nested (`@orbitdb/nested-db`) | Local-first P2P storage with hierarchical JSON paths           |
 | **Encryption**        | **Lit Protocol** + AES-256-GCM        | Reputation-gated access control, per-path encryption           |
 | **Persistence**       | **Storacha** (Filecoin/IPFS)          | Immutable archival snapshots, disaster recovery                |
-| **Trust & Discovery** | ERC-8004 (ERC-721 + Reputation)       | Bidirectional on-chain trust — agents AND data are scored      |
+| **Trust & Discovery** | ERC-8004 for Data (ERC-721 + Reputation) | On-chain data discovery & reputation — data is a scored asset |
 | **Agent Adapter**     | TypeScript SDK                        | Fetch → decrypt → execute → forget → rate (one-call lifecycle) |
 
 ---
 
-## Key Innovation: Bidirectional Trust via ERC-8004
+## Key Innovation: ERC-8004 for Data
 
-Most agent-trust systems only ask: *"Is this agent reliable?"*
-
-OrbitMem also asks: **"Is this data trustworthy?"**
+Most data systems have no quality signal. OrbitMem asks: **"Is this data trustworthy?"**
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                  On-Chain (Base L2)                      │
 │                                                         │
-│  Agent Registry (ERC-721)    Data Registry (ERC-721)    │
-│  "Is this agent reliable?"   "Is this data accurate?"   │
-│           │                           │                 │
-│           └───────────┬───────────────┘                 │
-│                       ▼                                 │
-│           Reputation Registry (Shared)                  │
-│           giveFeedback(targetId, score, tag)             │
+│  Data Registry (ERC-721)                                │
+│  "Is this data accurate?"                               │
+│           │                                             │
+│           ▼                                             │
+│  Feedback Registry (registry-agnostic)                  │
+│  giveFeedback(targetId, score, tag)                     │
 │                                                         │
-│  User rates agent: ★ 95, tag: "starred"                 │
 │  Agent rates data: ★ 90, tag: "accurate"                │
+│  Agent rates data: ★ 95, tag: "fresh"                   │
 └─────────────────────────────────────────────────────────┘
 ```
 
-This creates a **virtuous cycle**: high-quality data attracts better agents, which produce better outcomes, which earn higher ratings for both sides.
+This creates a **virtuous cycle**: high-quality data attracts more agent consumption, which produces more feedback, which improves data scores.
 
 ---
 
@@ -135,7 +132,7 @@ OrbitDB Nested Vault → Export Snapshot → Already Encrypted → Storacha Uplo
 
 Lit Protocol is OrbitMem's **primary encryption engine for shared data**. It enables:
 
-- **On-chain condition-based decryption** — agents can only decrypt if their ERC-8004 reputation score meets the threshold
+- **On-chain condition-based decryption** — agents can only decrypt if data quality conditions are met
 - **No trusted intermediary** — Lit's distributed key management means no single party holds decryption keys
 - **Dynamic access** — if an agent's reputation drops below threshold, they lose access automatically
 - **Composable conditions** — combine reputation score, token holdings, time windows, and more
@@ -143,9 +140,9 @@ Lit Protocol is OrbitMem's **primary encryption engine for shared data**. It ena
 ```typescript
 // Lit encrypts data with on-chain access conditions
 const accessConditions = [
-  orbitmem.discovery.createAgentReputationCondition({
-    minScore: 80,           // Reputation Registry check
-    minFeedbackCount: 50,   // Anti-sybil: require real usage history
+  orbitmem.discovery.createDataQualityCondition({
+    minQuality: 80,        // Feedback Registry quality check
+    verifiedOnly: true,    // Require verified data sources
   }),
 ];
 ```
@@ -246,7 +243,7 @@ The bidirectional ERC-8004 trust model creates a **new economic primitive**: dat
 - **Full TypeScript SDK type definitions** — `@orbitmem/sdk` with 1600+ lines of typed interfaces covering all 6 layers
 - **Technical specification** — v0.3.0 with contract architecture, sequence diagrams, security model, and API design
 - **Architecture visualization** — Interactive React component showing the full stack
-- **Bidirectional ERC-8004 design** — Novel application of agent reputation standard to data quality scoring
+- **ERC-8004 for Data design** — Novel application of on-chain discovery and reputation to data quality scoring
 - **Nested vault design** — Per-path visibility/encryption using `@orbitdb/nested-db`
 
 ---
@@ -257,7 +254,7 @@ The bidirectional ERC-8004 trust model creates a **new economic primitive**: dat
 
 **For Agents:** You can discover high-quality, verified data sources without building relationships with individual users. On-chain quality scores let you evaluate data before consuming it. The reputation system rewards reliable behavior.
 
-**For the Ecosystem:** A bidirectional trust protocol where data quality and agent reliability are both verifiable on-chain creates a foundation for the agentic web that doesn't require trusting centralized intermediaries.
+**For the Ecosystem:** An on-chain data trust protocol where data quality is verifiable creates a foundation for the agentic web that doesn't require trusting centralized intermediaries.
 
 ---
 

@@ -45,7 +45,6 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
   const discovery = config.discovery
     ? createDiscoveryLayer(config.discovery)
     : createDiscoveryLayer({
-        agentRegistry: "0x0" as any,
         dataRegistry: "0x0" as any,
         reputationRegistry: "0x0" as any,
         registryChain: "base",

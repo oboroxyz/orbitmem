@@ -5,7 +5,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /// @title FeedbackRegistry — ERC-8004 Shared Reputation Ledger
 /// @notice Registry-agnostic feedback system. Callers pass a registry address + entity ID.
-///         Works with both AgentRegistry and DataRegistry (or any ERC-721).
+///         Works with DataRegistry or any ERC-721 registry.
 contract FeedbackRegistry {
     struct FeedbackEntry {
         int128 value;
@@ -52,7 +52,7 @@ contract FeedbackRegistry {
     error FeedbackIndexOutOfBounds();
 
     /// @notice Submit feedback for an entity in a given registry.
-    /// @param registry Address of the ERC-721 registry (AgentRegistry or DataRegistry).
+    /// @param registry Address of the ERC-721 registry (e.g. DataRegistry).
     /// @param entityId Token ID of the entity being rated.
     /// @param value Feedback value (e.g. 0–100 quality score, signed for flexibility).
     /// @param valueDecimals Decimal places for the value.

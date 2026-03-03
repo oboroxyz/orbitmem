@@ -1,69 +1,16 @@
 import type {
-  AgentRegistration,
-  AgentReputation,
   DataFeedbackEntry,
   DataRegistration,
   DataScore,
   DataTag,
-  FeedbackEntry,
   Visibility,
   WalletAddress,
 } from "../types.js";
 
 export class MockRegistry {
-  private agents = new Map<number, AgentRegistration>();
-  private agentFeedback = new Map<number, FeedbackEntry[]>();
   private data = new Map<number, DataRegistration>();
   private dataFeedback = new Map<number, DataFeedbackEntry[]>();
-  private nextAgentId = 1;
   private nextDataId = 1;
-
-  registerAgent(agent: Omit<AgentRegistration, "agentId">): AgentRegistration {
-    const agentId = this.nextAgentId++;
-    const reg = { ...agent, agentId } as AgentRegistration;
-    this.agents.set(agentId, reg);
-    return reg;
-  }
-
-  findAgents(query: {
-    keyword?: string;
-    minReputation?: number;
-    activeOnly?: boolean;
-  }): AgentRegistration[] {
-    let results = Array.from(this.agents.values());
-    if (query.activeOnly) results = results.filter((a) => a.active);
-    if (query.keyword) {
-      const kw = query.keyword.toLowerCase();
-      results = results.filter(
-        (a) => a.name.toLowerCase().includes(kw) || a.description.toLowerCase().includes(kw),
-      );
-    }
-    return results;
-  }
-
-  getAgent(agentId: number): AgentRegistration | null {
-    return this.agents.get(agentId) ?? null;
-  }
-
-  rateAgent(agentId: number, feedback: FeedbackEntry): void {
-    const existing = this.agentFeedback.get(agentId) ?? [];
-    existing.push(feedback);
-    this.agentFeedback.set(agentId, existing);
-  }
-
-  getAgentReputation(agentId: number): AgentReputation {
-    const feedback = this.agentFeedback.get(agentId) ?? [];
-    const total = feedback.reduce((sum, f) => sum + f.value, 0);
-    const score = feedback.length > 0 ? Math.round(total / feedback.length) : 0;
-    return {
-      agentId,
-      score,
-      feedbackCount: feedback.length,
-      tagScores: {},
-      validationCount: 0,
-      validationTypes: [],
-    };
-  }
 
   registerData(opts: {
     key: string;

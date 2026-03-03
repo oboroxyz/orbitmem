@@ -26,7 +26,6 @@ export function createOrbitMemAgentAdapter(config: AgentAdapterConfig): IOrbitMe
 
   const discovery = config.discovery
     ? createDiscoveryLayer({
-        agentRegistry: "0x0" as any,
         dataRegistry: config.discovery.dataRegistry,
         reputationRegistry: config.discovery.reputationRegistry,
         registryChain: config.discovery.registryChain,

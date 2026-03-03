@@ -1,7 +1,7 @@
 # OrbitMem — Technical Specification
 
 **The Sovereign Data Layer for the Agentic Web**
-Version 0.3.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit / AES) · ERC-8004 Bidirectional Trust
+Version 0.3.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit / AES) · ERC-8004 for Data
 
 ---
 
@@ -14,7 +14,7 @@ Version 0.3.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit
 5. [Data Layer — OrbitDB Nested P2P Vault](#5-data-layer)
 6. [Encryption Layer — Lit Protocol + AES-256-GCM](#6-encryption-layer)
 7. [Persistence Layer — Storacha](#7-persistence-layer)
-8. [Discovery Layer — ERC-8004 Trustless Agents](#8-discovery-layer)
+8. [Discovery Layer — ERC-8004 for Data](#8-discovery-layer)
 9. [Agent Integration — OpenClaw Demo](#9-agent-integration)
 10. [Security Model](#10-security-model)
 11. [Relay Node Specification](#11-relay-node)
@@ -31,7 +31,7 @@ OrbitMem is a modular infrastructure toolkit that provides AI agents with **Sove
 - **User Sovereignty:** The user's wallet (or passkey) is the root of trust. Data is encrypted client-side before it leaves the device.
 - **Chain Agnostic:** Supports Porto Passkey Wallets (WebAuthn P256), EVM chains (Ethereum, Base, Arbitrum, Polygon, Optimism), and Solana (mainnet, devnet).
 - **Pluggable Encryption:** Developers choose between Lit Protocol (decentralized conditional access) and AES-256-GCM (fast local encryption) per record.
-- **Bidirectional Trust (ERC-8004):** Both agents AND user data are registered as on-chain scored assets. Users evaluate agent reliability; agents evaluate data quality. All ratings are on-chain and composable.
+- **ERC-8004 for Data:** User data is registered as on-chain scored assets. Agents evaluate data quality. All ratings are on-chain and composable.
 - **Zero Backend:** No centralized server is required. The Relay Node is a thin, stateless proxy for P2P gossip.
 - **Framework Agnostic:** While demonstrated with OpenClaw, OrbitMem works with any agent framework.
 
@@ -82,16 +82,16 @@ OrbitMem is a modular infrastructure toolkit that provides AI agents with **Sove
                                                     │             │
                                           ┌─────────▼──────────┐  │
                                           │  ERC-8004 Registries│  │
-                                          │  Identity ·         │  │
+                                          │  Data ·             │  │
                                           │  Reputation ·       │  │
-                                          │  Validation         │  │
+                                          │  Feedback           │  │
                                           └─────────────────────┘  │
 ```
 
 ### Data Flow Summary
 
 1. User authenticates via Porto Passkey (biometric), EVM wallet, or Solana wallet → session key derived
-2. User discovers agents via ERC-8004 Identity Registry, checks reputation scores
+2. User registers data on-chain via ERC-8004 Data Registry for agent discovery
 3. User writes preferences into local OrbitDB Nested vault (per-path visibility)
 4. Data is encrypted (Lit for reputation-gated access, or AES for local-only)
 5. Encrypted blob syncs to Relay Node via CRDT replication
@@ -521,18 +521,18 @@ Key point: Storacha never sees plaintext. The snapshot is the raw OrbitDB export
 
 ---
 
-## 8. Discovery Layer — ERC-8004 Bidirectional Trust
+## 8. Discovery Layer — ERC-8004 for Data
 
-OrbitMem uses ERC-8004 in a novel **bidirectional** configuration: not only do agents have on-chain identity and reputation (standard ERC-8004), but **user data itself is registered as a scored, discoverable asset**. This allows agents to evaluate data quality before consuming it.
+OrbitMem applies ERC-8004 to **data discovery and reputation**: user data is registered as a scored, discoverable on-chain asset. Agents evaluate data quality before consuming it, and submit quality feedback after consumption.
 
-### Two Registries, One Reputation System
+### Data Registry & Feedback
 
-| Registry           | Entity             | Who Registers       | Who Rates                     | What It Answers             |
-| :----------------- | :----------------- | :------------------ | :---------------------------- | :-------------------------- |
-| **Agent Registry** | AI Agents          | Agent operators     | Users after task completion   | "Is this agent reliable?"   |
-| **Data Registry**  | Vault Data Entries | Users (data owners) | Agents after data consumption | "Is this data trustworthy?" |
+| Registry              | Entity             | Who Registers       | Who Rates                     | What It Answers             |
+| :-------------------- | :----------------- | :------------------ | :---------------------------- | :-------------------------- |
+| **Data Registry**     | Vault Data Entries | Users (data owners) | Agents after data consumption | "Is this data trustworthy?" |
+| **Feedback Registry** | (shared ledger)    | —                   | Anyone (registry-agnostic)    | Aggregated scores per tag   |
 
-Both registries share a single **Reputation Registry** for feedback, using ERC-8004's `giveFeedback()` with different `tag1` values to distinguish agent vs. data feedback.
+The **Feedback Registry** accepts any ERC-721 registry address, enabling flexible scoring. Agents authenticate via ERC-8128 signed HTTP — no on-chain agent identity is required.
 
 ### Data as a First-Class On-Chain Asset
 
@@ -697,18 +697,18 @@ const score = await orbitmem.discovery.getDataScore(myVaultAddr, 'travel/dietary
 console.log(`My data quality: ${score.quality}/100 (${score.totalFeedback} ratings)`);
 ```
 
-### Reputation-Gated Encryption (Both Directions)
+### Reputation-Gated Encryption
 
-**User gates access on agent reputation:**
+**User gates access on data quality conditions:**
 ```typescript
-// Only agents with rep ≥ 80 can decrypt my budget data
+// Only agents meeting quality thresholds can decrypt budget data
 await orbitmem.vault.put('travel/budget', { min: 3000, max: 5000 }, {
   visibility: 'shared',
   engine: 'lit',
   accessConditions: [
-    orbitmem.discovery.createAgentReputationCondition({
-      minScore: 80,
-      minFeedbackCount: 50,
+    orbitmem.discovery.createDataQualityCondition({
+      minQuality: 80,
+      verifiedOnly: true,
     }),
   ],
 });
@@ -745,9 +745,6 @@ if (score.quality < 80 || !score.verified) {
 │         ▲                        │                   │
 │         │                        ▼                   │
 │   Agent rates data ◀── Agent consumes & executes     │
-│         │                        │                   │
-│         │                        ▼                   │
-│         └──── User rates agent ◀─┘                   │
 │                                                       │
 └─────────────────────────────────────────────────────┘
 ```
@@ -798,7 +795,6 @@ User                    OrbitMem Client       ERC-8004        Relay Node        
  │                           │                  │                │                    │
  │◀── Booking Confirmation ──────────────────────────────────────────────────────────│
  │                           │                  │                │                    │
- │── Rate Agent (95) ───────▶│── rateAgent() ──▶│                │                    │
  │                           │                  │◀── rateData(90)────────────────────│
  │                           │                  │                │   (Agent rates data)│
 ```
@@ -841,7 +837,7 @@ const booking = await agent.withUserData(
 | **Accidental public exposure**   | SDK defaults to `private` visibility. Explicit `visibility: 'public'` required.                                                                                             |
 | **Replay attack**                | ERC-8128 nonce + timestamp window (±30s)                                                                                                                                    |
 | **Reputation gaming (ERC-8004)** | Minimum feedback count thresholds. Validation Registry for high-stakes tasks. Sybil resistance via stake requirements.                                                      |
-| **Agent identity spoofing**      | ERC-8004 Identity Registry is ERC-721 — ownership is cryptographically verifiable. Endpoint verification via `.well-known/agent-registration.json`.                         |
+| **Agent identity spoofing**      | ERC-8128 signed HTTP ensures agent identity is cryptographically verifiable. No on-chain agent registry needed — wallet signature is the proof.                              |
 | **Data quality manipulation**    | Data scores are derived from multiple independent agent feedback entries. Outlier detection removes suspicious ratings. Minimum consumption count before score is trusted.  |
 | **Fake data registration**       | Data Registry requires wallet ownership proof. Verification tags (kyc-backed, tee-attestation) require external validation. Schema compliance can be checked automatically. |
 | **Man-in-the-middle**            | All transport is TLS + signed. Signature verification at Relay.                                                                                                             |
@@ -875,8 +871,7 @@ READ   → Agent discovers data path → checks DataScore
                                                     │
                                               Execute → Forget
                                                     │
-RATE   → Bidirectional on-chain feedback
-          ├── User → Agent (via rateAgent)
+RATE   → On-chain data quality feedback
           └── Agent → Data path (via rateData)
                                                     │
 DELETE → vault.del(path) → CRDT tombstone propagates → Snapshot retains history
@@ -963,12 +958,10 @@ const orbitmem = await createOrbitMem({
     autoArchiveInterval: 300000, // 5 min
   },
   discovery: {
-    agentRegistry: '0xAGENT_REGISTRY',
     dataRegistry: '0xDATA_REGISTRY',
     reputationRegistry: '0xREPUTATION_REGISTRY',
     validationRegistry: '0xVALIDATION_REGISTRY',
     registryChain: 'base',
-    minAgentReputation: 70,
     minDataScore: 60,
   },
 });
@@ -980,16 +973,6 @@ console.log(`Connected via FaceID: ${conn.address}`);
 // Or connect via traditional wallet
 // const conn = await orbitmem.connect({ method: 'evm' });
 // const conn = await orbitmem.connect({ method: 'solana' });
-
-// Discover agents via ERC-8004
-const agents = await orbitmem.discovery.findAgents({
-  keyword: 'travel booking',
-  minReputation: 80,
-  activeOnly: true,
-});
-const agent = agents[0]; // Best match
-const rep = await orbitmem.discovery.getReputation(agent.agentId);
-console.log(`Agent ${agent.name}: ${rep.score}/100 (${rep.feedbackCount} reviews)`);
 
 // Store data with per-path visibility (nested-db)
 
@@ -1104,15 +1087,7 @@ const booking = await adapter.withUserData(
 );
 // ✅ plaintext zeroed, data quality feedback submitted on-chain
 
-// Post-task: bidirectional reputation feedback
-// User → Agent
-await orbitmem.discovery.rateAgent({
-  agentId: agent.agentId,
-  value: 95,
-  tag1: 'starred',
-  tag2: 'travel-booking',
-});
-// Agent → Data (auto-submitted if autoRate is set, or manually)
+// Data quality feedback (auto-submitted if autoRate is set, or manually)
 // Already submitted via autoRate in withUserData() above
 ```
 

@@ -244,11 +244,11 @@ export const DEMO_TRUST_NODES: TrustNode[] = [
 ];
 
 export const DEMO_TRUST_EDGES: TrustEdge[] = [
-  // Users rate agents
-  { source: "u1", target: "a1", score: 95 },
-  { source: "u1", target: "a2", score: 70 },
-  { source: "u2", target: "a3", score: 88 },
-  { source: "u2", target: "a1", score: 90 },
+  // Users rate data
+  { source: "u1", target: "d1", score: 90 },
+  { source: "u1", target: "d2", score: 65 },
+  { source: "u2", target: "d3", score: 85 },
+  { source: "u2", target: "d1", score: 88 },
   // Agents rate data
   { source: "a1", target: "d1", score: 92 },
   { source: "a1", target: "d2", score: 60 },

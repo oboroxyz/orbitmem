@@ -7,7 +7,7 @@ ROOT="$SCRIPT_DIR/.."
 OUT="$ROOT/out"
 ABI_DIR="$ROOT/abi"
 
-CONTRACTS=("AgentRegistry" "DataRegistry" "FeedbackRegistry")
+CONTRACTS=("DataRegistry" "FeedbackRegistry")
 
 rm -rf "$ABI_DIR"
 mkdir -p "$ABI_DIR"
@@ -32,7 +32,7 @@ done
 # Generate bytecodes module
 python3 -c "
 import json
-contracts = ['AgentRegistry', 'DataRegistry', 'FeedbackRegistry']
+contracts = ['DataRegistry', 'FeedbackRegistry']
 lines = []
 for name in contracts:
     with open('$OUT/' + name + '.sol/' + name + '.json') as f:

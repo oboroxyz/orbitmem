@@ -1,7 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import {
-  AgentRegistryAbi,
-  AgentRegistryBytecode,
   DataRegistryAbi,
   DataRegistryBytecode,
   FeedbackRegistryAbi,
@@ -45,7 +43,6 @@ const bobAccount = privateKeyToAccount(BOB_KEY);
 let publicClient: PublicClient;
 let aliceWallet: WalletClient;
 let bobWallet: WalletClient;
-let agentRegAddr: Address;
 let dataRegAddr: Address;
 let feedbackRegAddr: Address;
 
@@ -82,12 +79,6 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     });
 
     // Deploy contracts
-    agentRegAddr = await deployContract(
-      aliceWallet,
-      publicClient,
-      AgentRegistryAbi,
-      AgentRegistryBytecode,
-    );
     dataRegAddr = await deployContract(
       aliceWallet,
       publicClient,
@@ -102,65 +93,10 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     );
   });
 
-  test("register agent and read back", async () => {
-    const registry = new OnChainRegistry({
-      publicClient,
-      walletClient: aliceWallet,
-      agentRegistry: agentRegAddr,
-      dataRegistry: dataRegAddr,
-      feedbackRegistry: feedbackRegAddr,
-    });
-
-    const agentId = await registry.registerAgent("ipfs://agent-alice");
-    expect(agentId).toBe(1);
-
-    const agent = await registry.getAgent(agentId);
-    expect(agent).not.toBeNull();
-    expect(agent!.active).toBe(true);
-    expect(agent!.owner.toLowerCase()).toBe(aliceAccount.address.toLowerCase());
-  });
-
-  test("rate agent and get score", async () => {
-    const aliceRegistry = new OnChainRegistry({
-      publicClient,
-      walletClient: aliceWallet,
-      agentRegistry: agentRegAddr,
-      dataRegistry: dataRegAddr,
-      feedbackRegistry: feedbackRegAddr,
-    });
-
-    const agentId = await aliceRegistry.registerAgent("ipfs://agent-2");
-
-    // Bob rates Alice's agent
-    const bobRegistry = new OnChainRegistry({
-      publicClient,
-      walletClient: bobWallet,
-      agentRegistry: agentRegAddr,
-      dataRegistry: dataRegAddr,
-      feedbackRegistry: feedbackRegAddr,
-    });
-
-    const result = await bobRegistry.rateAgent(
-      agentId,
-      85,
-      0,
-      "reliable",
-      "",
-      "",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-    );
-    expect(result.txHash).toMatch(/^0x/);
-
-    const reputation = await aliceRegistry.getAgentReputation(agentId);
-    expect(reputation.score).toBe(85);
-    expect(reputation.feedbackCount).toBe(1);
-  });
-
   test("register data and get score", async () => {
     const aliceRegistry = new OnChainRegistry({
       publicClient,
       walletClient: aliceWallet,
-      agentRegistry: agentRegAddr,
       dataRegistry: dataRegAddr,
       feedbackRegistry: feedbackRegAddr,
     });
@@ -172,7 +108,6 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     const bobRegistry = new OnChainRegistry({
       publicClient,
       walletClient: bobWallet,
-      agentRegistry: agentRegAddr,
       dataRegistry: dataRegAddr,
       feedbackRegistry: feedbackRegAddr,
     });
@@ -196,7 +131,6 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     const aliceRegistry = new OnChainRegistry({
       publicClient,
       walletClient: aliceWallet,
-      agentRegistry: agentRegAddr,
       dataRegistry: dataRegAddr,
       feedbackRegistry: feedbackRegAddr,
     });
@@ -206,7 +140,6 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     const bobRegistry = new OnChainRegistry({
       publicClient,
       walletClient: bobWallet,
-      agentRegistry: agentRegAddr,
       dataRegistry: dataRegAddr,
       feedbackRegistry: feedbackRegAddr,
     });
@@ -239,69 +172,4 @@ describe.skipIf(!ANVIL_AVAILABLE)("OnChainRegistry (Anvil)", () => {
     expect(freshScore.count).toBe(1);
   });
 
-  test("revoke feedback decrements score", async () => {
-    const aliceRegistry = new OnChainRegistry({
-      publicClient,
-      walletClient: aliceWallet,
-      agentRegistry: agentRegAddr,
-      dataRegistry: dataRegAddr,
-      feedbackRegistry: feedbackRegAddr,
-    });
-
-    const agentId = await aliceRegistry.registerAgent("ipfs://agent-revoke");
-
-    const bobRegistry = new OnChainRegistry({
-      publicClient,
-      walletClient: bobWallet,
-      agentRegistry: agentRegAddr,
-      dataRegistry: dataRegAddr,
-      feedbackRegistry: feedbackRegAddr,
-    });
-
-    await bobRegistry.rateAgent(
-      agentId,
-      80,
-      0,
-      "",
-      "",
-      "",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-    );
-
-    let reputation = await aliceRegistry.getAgentReputation(agentId);
-    expect(reputation.score).toBe(80);
-    expect(reputation.feedbackCount).toBe(1);
-
-    // Bob revokes
-    await bobRegistry.revokeFeedback(agentRegAddr, agentId, 0);
-
-    reputation = await aliceRegistry.getAgentReputation(agentId);
-    expect(reputation.score).toBe(0);
-    expect(reputation.feedbackCount).toBe(0);
-  });
-
-  test("self-feedback reverts", async () => {
-    const aliceRegistry = new OnChainRegistry({
-      publicClient,
-      walletClient: aliceWallet,
-      agentRegistry: agentRegAddr,
-      dataRegistry: dataRegAddr,
-      feedbackRegistry: feedbackRegAddr,
-    });
-
-    const agentId = await aliceRegistry.registerAgent("ipfs://agent-self");
-
-    // Alice tries to rate her own agent — should revert
-    await expect(
-      aliceRegistry.rateAgent(
-        agentId,
-        99,
-        0,
-        "",
-        "",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-      ),
-    ).rejects.toThrow();
-  });
 });

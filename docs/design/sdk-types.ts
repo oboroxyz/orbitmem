@@ -1,7 +1,7 @@
 // ════════════════════════════════════════════════════════════
 //  OrbitMem SDK — Type Definitions & Interfaces
 //  The Sovereign Data Layer for the Agentic Web
-//  v0.3.0 — Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption · ERC-8004 Bidirectional Trust
+//  v0.3.0 — Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption · ERC-8004 for Data
 // ════════════════════════════════════════════════════════════
 
 // ────────────────────────────────────────────────────────────
@@ -805,59 +805,8 @@ export interface IPersistenceLayer {
 }
 
 // ────────────────────────────────────────────────────────────
-//  7. DISCOVERY LAYER — ERC-8004 Trustless Agents
+//  7. DISCOVERY LAYER — ERC-8004 for Data
 // ────────────────────────────────────────────────────────────
-
-/** ERC-8004 Agent Registration (on-chain identity) */
-export interface AgentRegistration {
-  /** ERC-721 token ID in the Identity Registry */
-  agentId: number;
-  /** Registry reference: "{namespace}:{chainId}:{registryAddress}" */
-  agentRegistry: string;
-  /** Agent name */
-  name: string;
-  /** Natural language description */
-  description: string;
-  /** Agent image URL */
-  image?: string;
-  /** Service endpoints (A2A, MCP, web, etc.) */
-  services: AgentService[];
-  /** Whether the agent supports x402 payments */
-  x402Support: boolean;
-  /** Whether the agent is currently active */
-  active: boolean;
-  /** Supported trust mechanisms */
-  supportedTrust: ("reputation" | "crypto-economic" | "tee-attestation" | "zkml")[];
-  /** On-chain owner address */
-  owner: EvmAddress;
-  /** Agent wallet for receiving payments */
-  agentWallet?: EvmAddress;
-}
-
-export interface AgentService {
-  /** Service type: "A2A", "MCP", "web", "ENS", "DID", etc. */
-  name: string;
-  /** Service endpoint URL */
-  endpoint: string;
-  /** Protocol version (optional) */
-  version?: string;
-}
-
-/** Reputation score for an agent */
-export interface AgentReputation {
-  /** Agent ID in the registry */
-  agentId: number;
-  /** Aggregated score (0-100) */
-  score: number;
-  /** Total feedback count */
-  feedbackCount: number;
-  /** Breakdown by tag */
-  tagScores: Record<string, { value: number; count: number }>;
-  /** Number of validated tasks */
-  validationCount: number;
-  /** Validation types completed */
-  validationTypes: ("stake-reexecution" | "zkml" | "tee" | "trusted-judge")[];
-}
 
 /** Individual feedback entry */
 export interface FeedbackEntry {
@@ -899,8 +848,6 @@ export interface ValidationRequest {
 
 /** Discovery Layer configuration */
 export interface DiscoveryConfig {
-  /** Agent Identity Registry contract address */
-  agentRegistry: EvmAddress;
   /** Data Identity Registry contract address */
   dataRegistry: EvmAddress;
   /** Shared Reputation Registry contract address */
@@ -909,8 +856,6 @@ export interface DiscoveryConfig {
   validationRegistry?: EvmAddress;
   /** Chain where registries are deployed */
   registryChain: EvmChain;
-  /** Minimum agent reputation score to auto-trust (0-100, optional) */
-  minAgentReputation?: number;
   /** Minimum data quality score for agent consumption (0-100, optional) */
   minDataScore?: number;
 }
@@ -1063,47 +1008,10 @@ export interface DataFeedbackEntry extends FeedbackEntry {
   qualityDimension?: "accuracy" | "completeness" | "freshness" | "schema-compliance" | "usefulness";
 }
 
-// ── Discovery Layer Interface (Bidirectional) ──
+// ── Discovery Layer Interface (ERC-8004 for Data) ──
 
-/** Discovery Layer interface — bidirectional trust protocol */
+/** Discovery Layer interface — on-chain data discovery & reputation */
 export interface IDiscoveryLayer {
-  // ── Agent Discovery (agents as consumers) ──
-
-  /**
-   * Search for agents by query (name, skill, service type).
-   */
-  findAgents(query: {
-    keyword?: string;
-    serviceType?: string;
-    trustType?: string;
-    activeOnly?: boolean;
-    minReputation?: number;
-    limit?: number;
-  }): Promise<AgentRegistration[]>;
-
-  /**
-   * Get a specific agent's registration by ID.
-   */
-  getAgent(agentId: number): Promise<AgentRegistration | null>;
-
-  /**
-   * Get aggregated reputation for an agent.
-   */
-  getAgentReputation(agentId: number): Promise<AgentReputation>;
-
-  /**
-   * Submit feedback about an agent (user → agent).
-   */
-  rateAgent(feedback: {
-    agentId: number;
-    value: number;
-    valueDecimals?: number;
-    tag1?: string;
-    tag2?: string;
-    endpoint?: string;
-    feedbackURI?: string;
-  }): Promise<{ txHash: string; feedbackIndex: number }>;
-
   // ── Data Discovery (data as a scored asset) ──
 
   /**
@@ -1212,19 +1120,8 @@ export interface IDiscoveryLayer {
   // ── Lit Protocol Integration ──
 
   /**
-   * Create a Lit access condition gated on agent reputation.
-   * Users encrypt data that only high-rep agents can decrypt.
-   */
-  createAgentReputationCondition(opts: {
-    minScore: number;
-    tag?: string;
-    minFeedbackCount?: number;
-  }): LitEvmCondition;
-
-  /**
    * Create a Lit access condition gated on data quality score.
    * Agents can require minimum data quality before processing.
-   * (Used in agent-side logic, not encryption.)
    */
   createDataQualityCondition(opts: {
     minQuality: number;
@@ -1247,7 +1144,7 @@ export interface OrbitMemConfig {
   encryption?: EncryptionConfig;
   /** Persistence layer config */
   persistence?: StorachaConfig;
-  /** Discovery layer config (ERC-8004 bidirectional trust) */
+  /** Discovery layer config (ERC-8004 for Data) */
   discovery?: DiscoveryConfig;
   /** Enable debug logging */
   debug?: boolean;
@@ -1548,9 +1445,7 @@ export type OrbitMemEvent =
   | { type: "vault:synced"; status: SyncStatus }
   | { type: "snapshot:archived"; snapshot: Snapshot }
   | { type: "snapshot:restored"; cid: CID; merged: number }
-  | { type: "discovery:agentFound"; agent: AgentRegistration }
   | { type: "discovery:dataRegistered"; data: DataRegistration }
-  | { type: "discovery:agentRated"; agentId: number; txHash: string }
   | { type: "discovery:dataRated"; dataId: number; txHash: string }
   | { type: "discovery:validationComplete"; agentId: number; taskId: string; status: string }
   | { type: "error"; layer: string; error: Error };
