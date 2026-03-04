@@ -74,4 +74,18 @@ describe("Relay Discovery Routes", () => {
     expect(score.totalFeedback).toBe(1);
     expect(score.quality).toBe(90);
   });
+
+  test("GET /v1/data/stats returns aggregate metrics", async () => {
+    const res = await app.request("/v1/data/stats");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.totalEntries).toBeGreaterThanOrEqual(1);
+    expect(typeof body.totalFeedback).toBe("number");
+    expect(typeof body.avgQuality).toBe("number");
+    expect(body.qualityDistribution).toBeArray();
+    expect(body.qualityDistribution).toHaveLength(5);
+    expect(body.topTags).toBeArray();
+    expect(body.activity).toBeArray();
+    expect(body.activity).toHaveLength(7);
+  });
 });

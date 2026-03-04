@@ -12,46 +12,26 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { searchData } from "../../lib/api";
+import { getDataStats } from "../../lib/api";
 
 export const Route = createFileRoute("/metrics/")({
   component: MetricsPage,
 });
 
-// Mock time-series data for charts
-const activityData = [
-  { date: "Mon", entries: 12, feedback: 8 },
-  { date: "Tue", entries: 19, feedback: 14 },
-  { date: "Wed", entries: 15, feedback: 11 },
-  { date: "Thu", entries: 22, feedback: 18 },
-  { date: "Fri", entries: 28, feedback: 24 },
-  { date: "Sat", entries: 16, feedback: 10 },
-  { date: "Sun", entries: 20, feedback: 15 },
-];
-
-const qualityDistribution = [
-  { range: "0-20", count: 2, color: "#ef4444" },
-  { range: "21-40", count: 5, color: "#f97316" },
-  { range: "41-60", count: 12, color: "#eab308" },
-  { range: "61-80", count: 28, color: "#22c55e" },
-  { range: "81-100", count: 18, color: "#10b981" },
-];
-
-const topTags = [
-  { tag: "accurate", count: 142 },
-  { tag: "complete", count: 98 },
-  { tag: "fresh", count: 76 },
-  { tag: "reliable", count: 64 },
-  { tag: "verified", count: 51 },
-];
+const QUALITY_COLORS: Record<string, string> = {
+  "0-20": "#ef4444",
+  "21-40": "#f97316",
+  "41-60": "#eab308",
+  "61-80": "#22c55e",
+  "81-100": "#10b981",
+};
 
 function MetricsPage() {
-  const { data: dataResult } = useQuery({
-    queryKey: ["dataSearch", "dashboard"],
-    queryFn: () => searchData(),
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["dataStats"],
+    queryFn: getDataStats,
+    refetchInterval: 60_000,
   });
-
-  const totalData = dataResult?.count ?? 0;
 
   return (
     <div className="space-y-8">
@@ -62,9 +42,15 @@ function MetricsPage() {
 
       {/* Metric cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <MetricCard label="Data Entries" value={String(totalData || "—")} />
-        <MetricCard label="Feedback Submitted" value="—" />
-        <MetricCard label="Avg Quality" value="—" />
+        <MetricCard
+          label="Data Entries"
+          value={isLoading ? "—" : String(stats?.totalEntries ?? 0)}
+        />
+        <MetricCard
+          label="Feedback Submitted"
+          value={isLoading ? "—" : String(stats?.totalFeedback ?? 0)}
+        />
+        <MetricCard label="Avg Quality" value={isLoading ? "—" : String(stats?.avgQuality ?? 0)} />
         <MetricCard label="Active Vaults" value="—" />
       </div>
 
@@ -74,7 +60,7 @@ function MetricsPage() {
         <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
           <h2 className="text-sm font-medium text-orbit-300 mb-4">Weekly Activity</h2>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={activityData}>
+            <AreaChart data={stats?.activity ?? []}>
               <defs>
                 <linearGradient id="entryGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
@@ -129,7 +115,7 @@ function MetricsPage() {
         <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
           <h2 className="text-sm font-medium text-orbit-300 mb-4">Quality Score Distribution</h2>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={qualityDistribution}>
+            <BarChart data={stats?.qualityDistribution ?? []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="range" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
               <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
@@ -143,8 +129,8 @@ function MetricsPage() {
                 }}
               />
               <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                {qualityDistribution.map((entry) => (
-                  <Cell key={entry.range} fill={entry.color} />
+                {(stats?.qualityDistribution ?? []).map((entry) => (
+                  <Cell key={entry.range} fill={QUALITY_COLORS[entry.range] ?? "#6b7280"} />
                 ))}
               </Bar>
             </BarChart>
@@ -157,20 +143,24 @@ function MetricsPage() {
         {/* Top tags */}
         <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
           <h2 className="text-sm font-medium text-orbit-300 mb-4">Top Feedback Tags</h2>
-          <div className="space-y-3">
-            {topTags.map((t) => (
-              <div key={t.tag} className="flex items-center gap-3">
-                <span className="text-sm text-orbit-200 w-20 font-mono">{t.tag}</span>
-                <div className="flex-1 h-2 bg-orbit-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-accent-500 rounded-full"
-                    style={{ width: `${(t.count / topTags[0].count) * 100}%` }}
-                  />
+          {(stats?.topTags?.length ?? 0) > 0 ? (
+            <div className="space-y-3">
+              {stats!.topTags.map((t) => (
+                <div key={t.tag} className="flex items-center gap-3">
+                  <span className="text-sm text-orbit-200 w-20 font-mono">{t.tag}</span>
+                  <div className="flex-1 h-2 bg-orbit-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-accent-500 rounded-full"
+                      style={{ width: `${(t.count / stats!.topTags[0].count) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-orbit-400 w-8 text-right">{t.count}</span>
                 </div>
-                <span className="text-xs text-orbit-400 w-8 text-right">{t.count}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-orbit-500 text-sm">No feedback tags yet</p>
+          )}
         </div>
 
         {/* Quick links */}

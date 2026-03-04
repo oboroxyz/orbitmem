@@ -28,6 +28,15 @@ export interface ISnapshotService {
   archive(signer: string, data?: string, entryCount?: number): Promise<SnapshotMeta>;
 }
 
+export interface DataStats {
+  totalEntries: number;
+  totalFeedback: number;
+  avgQuality: number;
+  qualityDistribution: { range: string; count: number }[];
+  topTags: { tag: string; count: number }[];
+  activity: { date: string; entries: number; feedback: number }[];
+}
+
 export interface IDiscoveryService {
   search(query: {
     schema?: string;
@@ -44,6 +53,7 @@ export interface IDiscoveryService {
     schema?: string;
     tags: string[];
   }): Promise<unknown>;
+  getStats(): Promise<DataStats>;
 }
 
 export interface RelayServices {

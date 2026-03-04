@@ -5,6 +5,19 @@ import type { IDiscoveryService } from "../services/types.js";
 export function createDataRoutes(discovery: IDiscoveryService): Hono<ERC8128Env> {
   const routes = new Hono<ERC8128Env>();
 
+  // Stats cache (60s TTL)
+  let statsCache: { data: unknown; expiry: number } | null = null;
+
+  routes.get("/data/stats", async (c) => {
+    const now = Date.now();
+    if (statsCache && statsCache.expiry > now) {
+      return c.json(statsCache.data);
+    }
+    const stats = await discovery.getStats();
+    statsCache = { data: stats, expiry: now + 60_000 };
+    return c.json(stats);
+  });
+
   // Search data registrations
   routes.get("/data/search", async (c) => {
     const schema = c.req.query("schema");
