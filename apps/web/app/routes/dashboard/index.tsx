@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "../../components/ConnectButton";
-import { getPublicVaultEntry, getPublicVaultKeys } from "../../lib/api";
+import { getPublicVaultEntry, getPublicVaultKeys, getUserStats } from "../../lib/api";
+import { createErc8128Headers } from "../../lib/erc8128";
 
 export const Route = createFileRoute("/dashboard/")({
   component: MyDataPage,
@@ -12,6 +13,18 @@ export const Route = createFileRoute("/dashboard/")({
 function MyDataPage() {
   const { address, isConnected } = useAccount();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+
+  const buildHeaders = useCallback(() => createErc8128Headers("GET", "/api/data/user/stats"), []);
+
+  const { data: userStats } = useQuery({
+    queryKey: ["userStats", address],
+    queryFn: async () => {
+      const headers = await buildHeaders();
+      return getUserStats(headers);
+    },
+    enabled: isConnected && !!address,
+    retry: false,
+  });
 
   const { data: keysResult, isLoading } = useQuery({
     queryKey: ["vaultKeys", address],
@@ -68,6 +81,25 @@ function MyDataPage() {
         </div>
         <ConnectButton />
       </div>
+
+      {userStats && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-5">
+            <p className="text-orbit-400 text-xs uppercase tracking-wider mb-1">
+              Feedback Submitted
+            </p>
+            <p className="text-2xl font-bold text-orbit-50">{userStats.feedbackSubmitted}</p>
+          </div>
+          <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-5">
+            <p className="text-orbit-400 text-xs uppercase tracking-wider mb-1">Avg Rating Given</p>
+            <p className="text-2xl font-bold text-orbit-50">{userStats.avgRatingGiven}</p>
+          </div>
+          <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-5">
+            <p className="text-orbit-400 text-xs uppercase tracking-wider mb-1">Entries Rated</p>
+            <p className="text-2xl font-bold text-orbit-50">{userStats.dataEntriesRated}</p>
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="text-center text-orbit-400 py-12">Loading vault keys...</div>

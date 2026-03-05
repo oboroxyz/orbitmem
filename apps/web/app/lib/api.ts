@@ -81,6 +81,19 @@ export function getDataStats() {
   return fetchJSON<DataStats>("/data/stats");
 }
 
+// ── User Stats (authenticated) ──
+
+export interface UserStats {
+  feedbackSubmitted: number;
+  avgRatingGiven: number;
+  dataEntriesRated: number;
+  topTagsUsed: { tag: string; count: number }[];
+}
+
+export function getUserStats(headers: Record<string, string>) {
+  return fetchJSON<UserStats>("/data/user/stats", { headers });
+}
+
 // ── Vault (public reads) ──
 
 export function getPublicVaultKeys(address: string, prefix?: string) {

@@ -1,6 +1,6 @@
 import { DataRegistryAbi } from "@orbitmem/contracts";
 import { OnChainRegistry, type OnChainRegistryConfig } from "@orbitmem/sdk/discovery";
-import type { DataStats, IDiscoveryService } from "./types.js";
+import type { DataStats, IDiscoveryService, UserStats } from "./types.js";
 
 export class LiveDiscoveryService implements IDiscoveryService {
   private registry: OnChainRegistry;
@@ -146,5 +146,10 @@ export class LiveDiscoveryService implements IDiscoveryService {
     }));
 
     return { totalEntries, totalFeedback, avgQuality, qualityDistribution, topTags, activity };
+  }
+
+  async getUserStats(_signer: string): Promise<UserStats> {
+    // On-chain per-signer feedback query deferred — return empty stats
+    return { feedbackSubmitted: 0, avgRatingGiven: 0, dataEntriesRated: 0, topTagsUsed: [] };
   }
 }

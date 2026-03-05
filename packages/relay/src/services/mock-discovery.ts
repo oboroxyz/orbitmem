@@ -1,5 +1,5 @@
 import { MockRegistry } from "@orbitmem/sdk/discovery";
-import type { DataStats, IDiscoveryService } from "./types.js";
+import type { DataStats, IDiscoveryService, UserStats } from "./types.js";
 
 export class MockDiscoveryService implements IDiscoveryService {
   private registry = new MockRegistry();
@@ -95,5 +95,27 @@ export class MockDiscoveryService implements IDiscoveryService {
     }));
 
     return { totalEntries, totalFeedback, avgQuality, qualityDistribution, topTags, activity };
+  }
+
+  async getUserStats(signer: string): Promise<UserStats> {
+    const feedback = this.registry.getUserFeedback(signer);
+    const feedbackSubmitted = feedback.length;
+    const avgRatingGiven =
+      feedbackSubmitted > 0
+        ? Math.round(feedback.reduce((sum, f) => sum + f.entry.value, 0) / feedbackSubmitted)
+        : 0;
+    const dataEntriesRated = new Set(feedback.map((f) => f.dataId)).size;
+
+    const tagCounts = new Map<string, number>();
+    for (const { entry } of feedback) {
+      if (entry.tag1) tagCounts.set(entry.tag1, (tagCounts.get(entry.tag1) ?? 0) + 1);
+      if (entry.tag2) tagCounts.set(entry.tag2, (tagCounts.get(entry.tag2) ?? 0) + 1);
+    }
+    const topTagsUsed = Array.from(tagCounts.entries())
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    return { feedbackSubmitted, avgRatingGiven, dataEntriesRated, topTagsUsed };
   }
 }

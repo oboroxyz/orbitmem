@@ -18,6 +18,13 @@ export function createDataRoutes(discovery: IDiscoveryService): Hono<ERC8128Env>
     return c.json(stats);
   });
 
+  // Per-user stats — requires ERC-8128
+  routes.get("/data/user/stats", erc8128(), async (c) => {
+    const signer = c.get("signer");
+    const stats = await discovery.getUserStats(signer);
+    return c.json(stats);
+  });
+
   // Search data registrations
   routes.get("/data/search", async (c) => {
     const schema = c.req.query("schema");

@@ -64,6 +64,16 @@ export class MockRegistry {
     this.dataFeedback.set(dataId, existing);
   }
 
+  getUserFeedback(address: string): { dataId: number; entry: DataFeedbackEntry }[] {
+    const results: { dataId: number; entry: DataFeedbackEntry }[] = [];
+    for (const [dataId, entries] of this.dataFeedback.entries()) {
+      for (const entry of entries) {
+        if (entry.clientAddress === address) results.push({ dataId, entry });
+      }
+    }
+    return results;
+  }
+
   getDataScore(dataId: number): DataScore {
     const reg = this.data.get(dataId);
     const feedback = this.dataFeedback.get(dataId) ?? [];

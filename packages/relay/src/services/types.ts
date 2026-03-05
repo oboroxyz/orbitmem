@@ -37,6 +37,13 @@ export interface DataStats {
   activity: { date: string; entries: number; feedback: number }[];
 }
 
+export interface UserStats {
+  feedbackSubmitted: number;
+  avgRatingGiven: number;
+  dataEntriesRated: number;
+  topTagsUsed: { tag: string; count: number }[];
+}
+
 export interface IDiscoveryService {
   search(query: {
     schema?: string;
@@ -54,6 +61,7 @@ export interface IDiscoveryService {
     tags: string[];
   }): Promise<unknown>;
   getStats(): Promise<DataStats>;
+  getUserStats(signer: string): Promise<UserStats>;
 }
 
 export interface RelayServices {

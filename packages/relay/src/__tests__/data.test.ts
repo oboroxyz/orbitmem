@@ -75,6 +75,24 @@ describe("Relay Discovery Routes", () => {
     expect(score.quality).toBe(90);
   });
 
+  test("GET /v1/data/user/stats returns per-user metrics", async () => {
+    const headers = makeERC8128Headers();
+    const res = await app.request("/v1/data/user/stats", { headers });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.feedbackSubmitted).toBe(1);
+    expect(body.avgRatingGiven).toBe(90);
+    expect(body.dataEntriesRated).toBe(1);
+    expect(body.topTagsUsed).toBeArray();
+    expect(body.topTagsUsed.length).toBeGreaterThan(0);
+    expect(body.topTagsUsed[0].tag).toBe("accurate");
+  });
+
+  test("GET /v1/data/user/stats requires auth", async () => {
+    const res = await app.request("/v1/data/user/stats");
+    expect(res.status).toBe(401);
+  });
+
   test("GET /v1/data/stats returns aggregate metrics", async () => {
     const res = await app.request("/v1/data/stats");
     expect(res.status).toBe(200);
