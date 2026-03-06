@@ -1,16 +1,21 @@
-import { app } from "./app.js";
-import { getOrbitDBPeer, stopOrbitDBPeer } from "./services/index.js";
+import { buildApp } from "./app.js";
+import { createLiveServices, createMockServices, getOrbitDBPeer, stopOrbitDBPeer } from "./services/index.js";
 
 const port = Number(process.env.PORT ?? 3000);
 const mode = process.env.RELAY_MODE ?? "mock";
 
 console.log(`OrbitMem Relay starting on port ${port} (mode: ${mode})`);
 
-// In live mode, start the OrbitDB peer
+let app: ReturnType<typeof buildApp>;
+
 if (mode === "live") {
+  const services = await createLiveServices();
+  app = buildApp(services);
   getOrbitDBPeer().then(() => {
     console.log("OrbitDB peer started");
   });
+} else {
+  app = buildApp(createMockServices());
 }
 
 // Graceful shutdown

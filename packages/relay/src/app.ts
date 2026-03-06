@@ -5,10 +5,10 @@ import { createDataRoutes } from "./routes/data.js";
 import { healthRoutes } from "./routes/health.js";
 import { createSnapshotRoutes } from "./routes/snapshots.js";
 import { createVaultRoutes } from "./routes/vault.js";
-import { createLiveServices, createMockServices } from "./services/index.js";
+import { createMockServices } from "./services/index.js";
 import type { RelayServices } from "./services/types.js";
 
-function buildApp(services: RelayServices): Hono {
+export function buildApp(services: RelayServices): Hono {
   const app = new Hono().basePath("/v1");
   app.use(logger());
   app.use(cors());
@@ -19,13 +19,6 @@ function buildApp(services: RelayServices): Hono {
   return app;
 }
 
-let app: Hono;
-
-if (process.env.RELAY_MODE === "live") {
-  const services = await createLiveServices();
-  app = buildApp(services);
-} else {
-  app = buildApp(createMockServices());
-}
+const app = buildApp(createMockServices());
 
 export { app };
