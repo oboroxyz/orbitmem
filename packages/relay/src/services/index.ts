@@ -29,34 +29,42 @@ function validateLiveEnv(): void {
   }
 }
 
-export async function createServices(mode?: string): Promise<RelayServices> {
-  if (mode === "live") {
-    validateLiveEnv();
-    const { createPublicClient, createWalletClient, http } = await import("viem");
-    const { privateKeyToAccount } = await import("viem/accounts");
-    const { LiveDiscoveryService } = await import("./live-discovery.js");
-    const { LiveSnapshotService } = await import("./live-snapshot.js");
-
-    const chain = getChain(process.env.CHAIN_ID);
-    const transport = http(process.env.RPC_URL);
-    const publicClient = createPublicClient({ chain, transport });
-    const account = privateKeyToAccount(process.env.RELAY_PRIVATE_KEY as `0x${string}`);
-    const walletClient = createWalletClient({ chain, transport, account });
-
-    return {
-      vault: new LiveVaultService(),
-      snapshot: new LiveSnapshotService({ spaceDID: process.env.STORACHA_SPACE_DID! }),
-      discovery: new LiveDiscoveryService({
-        publicClient,
-        walletClient,
-        dataRegistry: process.env.DATA_REGISTRY_ADDRESS as `0x${string}`,
-        feedbackRegistry: process.env.FEEDBACK_REGISTRY_ADDRESS as `0x${string}`,
-      }),
-    };
-  }
+export function createMockServices(): RelayServices {
   return {
     vault: new MockVaultService(),
     snapshot: new MockSnapshotService(),
     discovery: new MockDiscoveryService(),
   };
+}
+
+export async function createLiveServices(): Promise<RelayServices> {
+  validateLiveEnv();
+  const { createPublicClient, createWalletClient, http } = await import("viem");
+  const { privateKeyToAccount } = await import("viem/accounts");
+  const { LiveDiscoveryService } = await import("./live-discovery.js");
+  const { LiveSnapshotService } = await import("./live-snapshot.js");
+
+  const chain = getChain(process.env.CHAIN_ID);
+  const transport = http(process.env.RPC_URL);
+  const publicClient = createPublicClient({ chain, transport });
+  const account = privateKeyToAccount(process.env.RELAY_PRIVATE_KEY as `0x${string}`);
+  const walletClient = createWalletClient({ chain, transport, account });
+
+  return {
+    vault: new LiveVaultService(),
+    snapshot: new LiveSnapshotService({ spaceDID: process.env.STORACHA_SPACE_DID! }),
+    discovery: new LiveDiscoveryService({
+      publicClient,
+      walletClient,
+      dataRegistry: process.env.DATA_REGISTRY_ADDRESS as `0x${string}`,
+      feedbackRegistry: process.env.FEEDBACK_REGISTRY_ADDRESS as `0x${string}`,
+    }),
+  };
+}
+
+export async function createServices(mode?: string): Promise<RelayServices> {
+  if (mode === "live") {
+    return createLiveServices();
+  }
+  return createMockServices();
 }

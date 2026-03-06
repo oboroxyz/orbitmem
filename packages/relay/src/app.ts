@@ -5,16 +5,27 @@ import { createDataRoutes } from "./routes/data.js";
 import { healthRoutes } from "./routes/health.js";
 import { createSnapshotRoutes } from "./routes/snapshots.js";
 import { createVaultRoutes } from "./routes/vault.js";
-import { createServices } from "./services/index.js";
+import { createLiveServices, createMockServices } from "./services/index.js";
+import type { RelayServices } from "./services/types.js";
 
-const services = await createServices(process.env.RELAY_MODE);
+function buildApp(services: RelayServices): Hono {
+  const app = new Hono().basePath("/v1");
+  app.use(logger());
+  app.use(cors());
+  app.route("/", healthRoutes);
+  app.route("/", createVaultRoutes(services.vault));
+  app.route("/", createDataRoutes(services.discovery));
+  app.route("/", createSnapshotRoutes(services.snapshot));
+  return app;
+}
 
-export const app = new Hono().basePath("/v1");
+let app: Hono;
 
-app.use(logger());
-app.use(cors());
+if (process.env.RELAY_MODE === "live") {
+  const services = await createLiveServices();
+  app = buildApp(services);
+} else {
+  app = buildApp(createMockServices());
+}
 
-app.route("/", healthRoutes);
-app.route("/", createVaultRoutes(services.vault));
-app.route("/", createDataRoutes(services.discovery));
-app.route("/", createSnapshotRoutes(services.snapshot));
+export { app };
