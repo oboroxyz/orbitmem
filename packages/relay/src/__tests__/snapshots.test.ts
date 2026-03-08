@@ -53,4 +53,35 @@ describe("Relay Snapshot Routes", () => {
       expect(snap.data).toBeUndefined(); // data should be excluded
     }
   });
+
+  test("GET /v1/snapshots/usage returns tier and usage", async () => {
+    const res = await app.request("/v1/snapshots/usage", {
+      headers: makeERC8128Headers("0xUSAGE"),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.tier).toBe("free");
+    expect(body.used).toBe(0);
+    expect(body.limit).toBe(5 * 1024 * 1024);
+  });
+
+  test("POST /v1/snapshots/archive rejects when over quota", async () => {
+    const signer = "0xQUOTA";
+    // Fill up most of the quota with a request just under the limit
+    const almostFull = "x".repeat(5 * 1024 * 1024 - 1);
+    const res1 = await app.request("/v1/snapshots/archive", {
+      method: "POST",
+      headers: makeERC8128Headers(signer),
+      body: JSON.stringify({ data: almostFull, entryCount: 1 }),
+    });
+    expect(res1.status).toBe(200);
+
+    // Second request should exceed the remaining quota
+    const res2 = await app.request("/v1/snapshots/archive", {
+      method: "POST",
+      headers: makeERC8128Headers(signer),
+      body: JSON.stringify({ data: "more data", entryCount: 1 }),
+    });
+    expect(res2.status).toBe(413);
+  });
 });
