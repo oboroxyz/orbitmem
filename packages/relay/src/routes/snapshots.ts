@@ -1,18 +1,19 @@
 import { Hono } from "hono";
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
-import type { ISnapshotService } from "../services/types.js";
+import type { IPlanService, ISnapshotService } from "../services/types.js";
 
-export function createSnapshotRoutes(snapshot: ISnapshotService): Hono<ERC8128Env> {
+export function createSnapshotRoutes(
+  snapshot: ISnapshotService,
+  plan: IPlanService,
+): Hono<ERC8128Env> {
   const routes = new Hono<ERC8128Env>();
 
-  // List snapshots for the signer — requires ERC-8128
   routes.get("/snapshots", erc8128(), async (c) => {
     const signer = c.get("signer");
     const snapshots = await snapshot.list(signer);
     return c.json({ snapshots, count: snapshots.length });
   });
 
-  // Trigger archival — requires ERC-8128
   routes.post("/snapshots/archive", erc8128(), async (c) => {
     const signer = c.get("signer");
     const body = await c.req
@@ -22,8 +23,21 @@ export function createSnapshotRoutes(snapshot: ISnapshotService): Hono<ERC8128En
           ({ data: undefined, entryCount: undefined }) as { data?: string; entryCount?: number },
       );
 
+    const dataSize = new TextEncoder().encode(body.data ?? "{}").length;
+    const usage = await plan.getUsage(signer);
+    if (usage.used + dataSize > usage.limit) {
+      return c.json({ error: "Storage quota exceeded" }, 413);
+    }
+
     const meta = await snapshot.archive(signer, body.data, body.entryCount);
+    await plan.addUsage(signer, meta.size);
     return c.json(meta);
+  });
+
+  routes.get("/snapshots/usage", erc8128(), async (c) => {
+    const signer = c.get("signer");
+    const usage = await plan.getUsage(signer);
+    return c.json(usage);
   });
 
   return routes;
