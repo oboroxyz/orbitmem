@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrbitMem — PL_Genesis Hackathon</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .slide { display: none; min-height: 100vh; }
+  .slide.active { display: flex; }
+  .progress-bar { transition: width 0.3s ease; }
+  .fade-in { animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body class="bg-white text-gray-900 overflow-hidden select-none">
+
+<!-- Slide 1: Title -->
+<section class="slide active flex-col items-center justify-center text-center px-8" data-slide="1">
+  <div class="fade-in">
+    <div class="text-6xl font-extrabold tracking-tight mb-4">
+      <span class="text-blue-600">Orbit</span>Mem
+    </div>
+    <p class="text-2xl font-medium text-gray-600 max-w-2xl mx-auto mb-8">
+      The Sovereign Data Layer for the Agentic Web
+    </p>
+    <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-4 py-2 rounded-full border border-blue-200">
+      PL_Genesis: Frontiers of Collaboration Hackathon
+    </div>
+  </div>
+</section>
+
+<!-- Slide 2: The Problem -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="2">
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-bold mb-12 text-center">The Problem</h2>
+    <p class="text-lg text-gray-500 text-center mb-10">Today's AI agents require users to surrender personal data to centralized servers.</p>
+    <div class="grid grid-cols-3 gap-8">
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+        <div class="text-3xl mb-4">🔒</div>
+        <h3 class="text-lg font-bold mb-2">No Data Sovereignty</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Users don't own their data — platforms do. When a service shuts down, your context disappears.</p>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+        <div class="text-3xl mb-4">❓</div>
+        <h3 class="text-lg font-bold mb-2">No Trust Signal</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">Users can't verify if an agent is trustworthy. Agents can't verify if user data is accurate. No shared reputation.</p>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+        <div class="text-3xl mb-4">🚫</div>
+        <h3 class="text-lg font-bold mb-2">No Selective Disclosure</h3>
+        <p class="text-gray-500 text-sm leading-relaxed">It's all-or-nothing. You can't share dietary preferences while keeping your passport private.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 3: The Solution -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="3">
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-bold mb-12 text-center">The Solution</h2>
+    <div class="flex items-center justify-center gap-6">
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center w-56">
+        <div class="text-4xl mb-3">👤</div>
+        <h3 class="text-lg font-bold mb-2">User</h3>
+        <p class="text-gray-500 text-sm">Owns data<br>Sets rules<br>Rates agents</p>
+      </div>
+      <div class="flex flex-col items-center gap-1 text-gray-300">
+        <svg class="w-12 h-6" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <svg class="w-12 h-6 rotate-180" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bg-blue-50 rounded-2xl p-8 border-2 border-blue-200 text-center w-64">
+        <div class="text-4xl mb-3"><span class="text-blue-600 font-bold text-2xl">Orbit</span><span class="font-bold text-2xl">Mem</span></div>
+        <p class="text-gray-600 text-sm font-medium">Encrypted Vault<br>Trust Protocol<br>On-Chain Reputation</p>
+      </div>
+      <div class="flex flex-col items-center gap-1 text-gray-300">
+        <svg class="w-12 h-6" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <svg class="w-12 h-6 rotate-180" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center w-56">
+        <div class="text-4xl mb-3">🤖</div>
+        <h3 class="text-lg font-bold mb-2">AI Agent</h3>
+        <p class="text-gray-500 text-sm">Discovers data<br>Evaluates quality<br>Rates accuracy</p>
+      </div>
+    </div>
+    <p class="text-center text-gray-400 mt-8 text-sm">Users store data locally in encrypted P2P vaults. Agents discover and consume through on-chain trust — never touching a centralized server.</p>
+  </div>
+</section>
+
+<!-- Slide 4: How It Works -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="4">
+  <div class="fade-in w-full max-w-4xl">
+    <h2 class="text-4xl font-bold mb-12 text-center">How It Works</h2>
+    <div class="space-y-4">
+      <div class="flex items-start gap-4">
+        <span class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">1</span>
+        <div><span class="font-semibold">User stores data</span><span class="text-gray-500"> in a local-first OrbitDB Nested vault with per-path encryption</span></div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">2</span>
+        <div><span class="font-semibold">User registers data on-chain</span><span class="text-gray-500"> as discoverable assets via ERC-8004 (ERC-721 NFT = public pointer to private data)</span></div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">3</span>
+        <div><span class="font-semibold">Agent discovers data</span><span class="text-gray-500"> by querying on-chain registries for matching schemas and quality scores</span></div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">4</span>
+        <div><span class="font-semibold">Agent evaluates quality</span><span class="text-gray-500"> before consuming — reputation scores are on-chain and verifiable</span></div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">5</span>
+        <div><span class="font-semibold">Agent decrypts via Lit Protocol</span><span class="text-gray-500"> — reputation-gated access, plaintext zeroed after use</span></div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">6</span>
+        <div><span class="font-semibold">Both sides rate each other</span><span class="text-gray-500"> — bidirectional feedback loop improves the ecosystem over time</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 5: Architecture -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="5">
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-bold mb-10 text-center">Architecture — 6 Composable Layers</h2>
+    <table class="w-full text-left">
+      <thead>
+        <tr class="border-b-2 border-gray-200">
+          <th class="py-3 pr-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Layer</th>
+          <th class="py-3 pr-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Technology</th>
+          <th class="py-3 text-sm font-semibold text-gray-400 uppercase tracking-wider">Role</th>
+        </tr>
+      </thead>
+      <tbody class="text-sm">
+        <tr class="border-b border-gray-100">
+          <td class="py-4 pr-4 font-semibold">Identity</td>
+          <td class="py-4 pr-4 text-gray-600">Porto Passkeys + EVM + Solana</td>
+          <td class="py-4 text-gray-500">Biometric-first auth, multi-chain wallets</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-4 pr-4 font-semibold">Data Vault</td>
+          <td class="py-4 pr-4 text-gray-600">OrbitDB Nested</td>
+          <td class="py-4 text-gray-500">Local-first P2P storage, hierarchical paths</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-4 pr-4 font-semibold">Encryption</td>
+          <td class="py-4 pr-4"><span class="text-blue-600 font-semibold">Lit Protocol</span> + AES-256-GCM</td>
+          <td class="py-4 text-gray-500">Reputation-gated access, per-path encryption</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-4 pr-4 font-semibold">Persistence</td>
+          <td class="py-4 pr-4"><span class="text-blue-600 font-semibold">Storacha</span> (Filecoin/IPFS)</td>
+          <td class="py-4 text-gray-500">Immutable archival snapshots, disaster recovery</td>
+        </tr>
+        <tr class="border-b border-gray-100">
+          <td class="py-4 pr-4 font-semibold">Trust & Discovery</td>
+          <td class="py-4 pr-4">ERC-8004 (ERC-721 + Reputation)</td>
+          <td class="py-4 text-gray-500">On-chain data discovery & reputation scoring</td>
+        </tr>
+        <tr>
+          <td class="py-4 pr-4 font-semibold">Agent Adapter</td>
+          <td class="py-4 pr-4 text-gray-600">TypeScript SDK</td>
+          <td class="py-4 text-gray-500">Discover → decrypt → execute → rate lifecycle</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Slide 6: ERC-8004 -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="6">
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-bold mb-4 text-center">Key Innovation: ERC-8004 for Data</h2>
+    <p class="text-center text-gray-500 mb-10 text-lg">On-chain data quality scoring — "Is this data trustworthy?"</p>
+    <div class="flex items-center justify-center gap-8">
+      <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex-1 max-w-xs">
+        <h3 class="font-bold mb-2">DataRegistry</h3>
+        <p class="text-gray-400 text-xs uppercase tracking-wider mb-3">ERC-721</p>
+        <p class="text-gray-500 text-sm">Mint NFTs as on-chain pointers to off-chain encrypted data</p>
+      </div>
+      <div class="text-gray-300 text-3xl">→</div>
+      <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center flex-1 max-w-xs">
+        <h3 class="font-bold mb-2">FeedbackRegistry</h3>
+        <p class="text-gray-400 text-xs uppercase tracking-wider mb-3">Registry-Agnostic</p>
+        <p class="text-gray-500 text-sm">Bidirectional scoring with per-tag reputation (accurate, fresh, complete)</p>
+      </div>
+      <div class="text-gray-300 text-3xl">→</div>
+      <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 text-center flex-1 max-w-xs">
+        <h3 class="font-bold text-blue-700 mb-2">Virtuous Cycle</h3>
+        <p class="text-gray-400 text-xs uppercase tracking-wider mb-3">Trust Flywheel</p>
+        <p class="text-gray-500 text-sm">High-quality data → more consumption → more feedback → higher scores</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 7: Demo -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="7">
+  <div class="fade-in text-center">
+    <div class="text-7xl font-extrabold tracking-tight text-blue-600 mb-6">DEMO</div>
+    <p class="text-xl text-gray-400">Live walkthrough of OrbitMem dashboard</p>
+    <div class="mt-10 flex items-center justify-center gap-6 text-sm text-gray-400">
+      <span class="bg-gray-50 px-4 py-2 rounded-full border border-gray-100">Connect Wallet</span>
+      <span class="text-gray-300">→</span>
+      <span class="bg-gray-50 px-4 py-2 rounded-full border border-gray-100">Explore Vault</span>
+      <span class="text-gray-300">→</span>
+      <span class="bg-gray-50 px-4 py-2 rounded-full border border-gray-100">Search Data</span>
+      <span class="text-gray-300">→</span>
+      <span class="bg-gray-50 px-4 py-2 rounded-full border border-gray-100">Score & Feedback</span>
+      <span class="text-gray-300">→</span>
+      <span class="bg-gray-50 px-4 py-2 rounded-full border border-gray-100">Metrics</span>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 8: What We Built -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="8">
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-bold mb-10 text-center">What We Built</h2>
+    <div class="grid grid-cols-3 gap-6 mb-8">
+      <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+        <div class="text-4xl font-extrabold text-blue-600 mb-1">8,300+</div>
+        <p class="text-gray-500 text-sm">Lines of Code</p>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+        <div class="text-4xl font-extrabold text-blue-600 mb-1">4</div>
+        <p class="text-gray-500 text-sm">Packages (SDK, Relay, Contracts, Web)</p>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+        <div class="text-4xl font-extrabold text-blue-600 mb-1">21</div>
+        <p class="text-gray-500 text-sm">Test Files</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+        <div class="font-bold text-lg mb-1">SDK</div>
+        <p class="text-gray-400 text-xs">6 composable layers<br>~3,500 LoC</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+        <div class="font-bold text-lg mb-1">Relay</div>
+        <p class="text-gray-400 text-xs">11 API routes<br>ERC-8128 auth</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+        <div class="font-bold text-lg mb-1">Contracts</div>
+        <p class="text-gray-400 text-xs">2 Solidity contracts<br>ERC-8004</p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+        <div class="font-bold text-lg mb-1">Web</div>
+        <p class="text-gray-400 text-xs">React dashboard<br>Real-time metrics</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 9: Sponsor Tech -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="9">
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-bold mb-10 text-center">Sponsor Technology Integration</h2>
+    <div class="grid grid-cols-3 gap-8">
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+        <h3 class="text-xl font-bold mb-1 text-blue-600">Storacha</h3>
+        <p class="text-gray-400 text-xs uppercase tracking-wider mb-4">Persistence Layer</p>
+        <ul class="text-gray-500 text-sm space-y-2">
+          <li>Encrypted vault snapshots → Filecoin</li>
+          <li>CID-based retrieval & restore</li>
+          <li>Verifiable storage deals</li>
+          <li>No plaintext exposure</li>
+        </ul>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+        <h3 class="text-xl font-bold mb-1 text-blue-600">Lit Protocol</h3>
+        <p class="text-gray-400 text-xs uppercase tracking-wider mb-4">Encryption Engine</p>
+        <ul class="text-gray-500 text-sm space-y-2">
+          <li>On-chain condition-based decryption</li>
+          <li>Session signatures for agents</li>
+          <li>Reputation-gated access control</li>
+          <li>No trusted intermediary</li>
+        </ul>
+      </div>
+      <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+        <h3 class="text-xl font-bold mb-1 text-blue-600">Filecoin / IPFS</h3>
+        <p class="text-gray-400 text-xs uppercase tracking-wider mb-4">Data Infrastructure</p>
+        <ul class="text-gray-500 text-sm space-y-2">
+          <li>Content-addressable transport</li>
+          <li>OrbitDB on Helia (IPFS)</li>
+          <li>Verifiable long-term storage</li>
+          <li>ERC-721 → off-chain data bridge</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 10: Why It Matters -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="10">
+  <div class="fade-in w-full max-w-4xl text-center">
+    <h2 class="text-4xl font-bold mb-10">Why OrbitMem Matters</h2>
+    <div class="grid grid-cols-3 gap-8 mb-12">
+      <div>
+        <div class="text-3xl mb-3">👤</div>
+        <h3 class="font-bold mb-2">For Users</h3>
+        <p class="text-gray-500 text-sm">Own your data. Decide what to share, with whom, under what conditions. Portable across platforms.</p>
+      </div>
+      <div>
+        <div class="text-3xl mb-3">🤖</div>
+        <h3 class="font-bold mb-2">For Agents</h3>
+        <p class="text-gray-500 text-sm">Discover verified data sources. Evaluate quality on-chain before consuming. Reputation rewards reliability.</p>
+      </div>
+      <div>
+        <div class="text-3xl mb-3">🌐</div>
+        <h3 class="font-bold mb-2">For the Ecosystem</h3>
+        <p class="text-gray-500 text-sm">Verifiable data trust protocol. Foundation for the agentic web without centralized intermediaries.</p>
+      </div>
+    </div>
+    <div class="text-5xl font-extrabold tracking-tight mb-4">
+      <span class="text-blue-600">Orbit</span>Mem
+    </div>
+    <p class="text-lg text-gray-400 mb-6">Your data. Your vault. Your rules.</p>
+    <div class="flex items-center justify-center gap-6 text-sm text-gray-400">
+      <span>github.com/oboroxyz/orbitmem</span>
+    </div>
+  </div>
+</section>
+
+<!-- Progress Bar -->
+<div class="fixed bottom-0 left-0 w-full h-1 bg-gray-100">
+  <div class="progress-bar h-full bg-blue-600" id="progress" style="width: 10%"></div>
+</div>
+
+<!-- Slide Counter -->
+<div class="fixed bottom-4 right-6 text-xs text-gray-300 font-medium" id="counter">1 / 10</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let current = 0;
+
+function show(index) {
+  slides.forEach(s => s.classList.remove('active'));
+  slides[index].classList.add('active');
+  document.getElementById('progress').style.width = ((index + 1) / totalSlides * 100) + '%';
+  document.getElementById('counter').textContent = (index + 1) + ' / ' + totalSlides;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); current = Math.min(current + 1, totalSlides - 1); show(current); }
+  if (e.key === 'ArrowLeft') { current = Math.max(current - 1, 0); show(current); }
+  if (e.key === 'Home') { current = 0; show(current); }
+  if (e.key === 'End') { current = totalSlides - 1; show(current); }
+});
+
+document.addEventListener('click', (e) => {
+  if (e.clientX > window.innerWidth / 2) { current = Math.min(current + 1, totalSlides - 1); }
+  else { current = Math.max(current - 1, 0); }
+  show(current);
+});
+</script>
+</body>
+</html>
