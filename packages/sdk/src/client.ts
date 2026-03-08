@@ -54,8 +54,7 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
 
   // Initialize persistence layer
   const persistence = createPersistenceLayer({
-    spaceDID: config.persistence?.spaceDID ?? "",
-    mock: !config.persistence?.spaceDID,
+    mock: config.persistence?.mock ?? (!config.persistence?.relayUrl && !config.persistence?.proof),
   });
 
   return {

@@ -1,7 +1,6 @@
 import type { IPersistenceLayer, Snapshot, WalletAddress } from "../types.js";
 
 interface PersistenceConfig {
-  spaceDID: string;
   mock?: boolean;
   author?: WalletAddress;
 }

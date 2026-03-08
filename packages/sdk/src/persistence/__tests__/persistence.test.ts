@@ -4,7 +4,6 @@ import { createPersistenceLayer } from "../persistence-layer.js";
 describe("PersistenceLayer (mock)", () => {
   // Use in-memory mock for testing
   const layer = createPersistenceLayer({
-    spaceDID: "did:key:test",
     mock: true,
   });
 
