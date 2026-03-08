@@ -27,7 +27,7 @@ const LIVE_ENV_VARS = [
   "RELAY_PRIVATE_KEY",
   "DATA_REGISTRY_ADDRESS",
   "FEEDBACK_REGISTRY_ADDRESS",
-  "STORACHA_SPACE_DID",
+  "STORACHA_PROOF",
 ] as const;
 
 function validateLiveEnv(): void {
@@ -61,7 +61,7 @@ export async function createLiveServices(): Promise<RelayServices> {
 
   return {
     vault: new LiveVaultService(),
-    snapshot: new LiveSnapshotService({ spaceDID: process.env.STORACHA_SPACE_DID! }),
+    snapshot: new LiveSnapshotService({ proof: process.env.STORACHA_PROOF! }),
     discovery: new LiveDiscoveryService({
       publicClient,
       walletClient,
