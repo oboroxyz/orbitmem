@@ -1,5 +1,10 @@
 import { buildApp } from "./app.js";
-import { createLiveServices, createMockServices, getOrbitDBPeer, stopOrbitDBPeer } from "./services/index.js";
+import {
+  createLiveServices,
+  createMockServices,
+  getOrbitDBPeer,
+  stopOrbitDBPeer,
+} from "./services/index.js";
 
 const port = Number(process.env.PORT ?? 3000);
 const mode = process.env.RELAY_MODE ?? "mock";
