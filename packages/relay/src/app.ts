@@ -15,7 +15,7 @@ export function buildApp(services: RelayServices): Hono {
   app.route("/", healthRoutes);
   app.route("/", createVaultRoutes(services.vault));
   app.route("/", createDataRoutes(services.discovery));
-  app.route("/", createSnapshotRoutes(services.snapshot));
+  app.route("/", createSnapshotRoutes(services.snapshot, services.plan));
   return app;
 }
 

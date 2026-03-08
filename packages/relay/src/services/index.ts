@@ -3,10 +3,18 @@ import { LiveVaultService } from "./live-vault.js";
 import { MockDiscoveryService } from "./mock-discovery.js";
 import { MockSnapshotService } from "./mock-snapshot.js";
 import { MockVaultService } from "./mock-vault.js";
+import { PlanService } from "./plan.js";
 import type { RelayServices } from "./types.js";
 
 export { getOrbitDBPeer, stopOrbitDBPeer } from "./orbitdb-peer.js";
-export type { IDiscoveryService, ISnapshotService, IVaultService, RelayServices } from "./types.js";
+export { PlanService } from "./plan.js";
+export type {
+  IDiscoveryService,
+  IPlanService,
+  ISnapshotService,
+  IVaultService,
+  RelayServices,
+} from "./types.js";
 
 function getChain(chainId?: string): Chain {
   // Lazy-resolve chain definitions to avoid importing all chains at startup
@@ -19,7 +27,7 @@ const LIVE_ENV_VARS = [
   "RELAY_PRIVATE_KEY",
   "DATA_REGISTRY_ADDRESS",
   "FEEDBACK_REGISTRY_ADDRESS",
-  "STORACHA_SPACE_DID",
+  "STORACHA_PROOF",
 ] as const;
 
 function validateLiveEnv(): void {
@@ -34,6 +42,7 @@ export function createMockServices(): RelayServices {
     vault: new MockVaultService(),
     snapshot: new MockSnapshotService(),
     discovery: new MockDiscoveryService(),
+    plan: new PlanService(),
   };
 }
 
@@ -52,13 +61,14 @@ export async function createLiveServices(): Promise<RelayServices> {
 
   return {
     vault: new LiveVaultService(),
-    snapshot: new LiveSnapshotService({ spaceDID: process.env.STORACHA_SPACE_DID! }),
+    snapshot: new LiveSnapshotService({ proof: process.env.STORACHA_PROOF! }),
     discovery: new LiveDiscoveryService({
       publicClient,
       walletClient,
       dataRegistry: process.env.DATA_REGISTRY_ADDRESS as `0x${string}`,
       feedbackRegistry: process.env.FEEDBACK_REGISTRY_ADDRESS as `0x${string}`,
     }),
+    plan: new PlanService(),
   };
 }
 

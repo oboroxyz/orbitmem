@@ -705,13 +705,19 @@ export interface DecryptOptions {
 //  6. PERSISTENCE LAYER — Storacha (Filecoin / IPFS)
 // ────────────────────────────────────────────────────────────
 
-/** Storacha configuration */
+/** Configuration for the persistence layer — determines mode from shape */
 export interface StorachaConfig {
-  /** Storacha space DID */
-  spaceDID: string;
+  /** Mock mode for testing (in-memory) */
+  mock?: boolean;
+  /** Relay URL for managed persistence (free/paid tiers) */
+  relayUrl?: string;
+  /** Serialized UCAN delegation proof for direct Storacha uploads (BYOS) */
+  proof?: string;
+  /** Optional IPFS gateway URL (default: https://w3s.link) */
+  gatewayUrl?: string;
   /** Auto-archive interval in ms (0 = manual only) */
   autoArchiveInterval?: number;
-  /** Maximum snapshot size in bytes */
+  /** Maximum snapshot size in bytes (default: 10MB) */
   maxSnapshotSize?: number;
 }
 
@@ -1150,7 +1156,7 @@ export interface OrbitMemConfig {
  *     solana: { cluster: 'mainnet-beta', adapters: ['phantom'] },
  *   },
  *   encryption: { defaultEngine: 'lit' },
- *   persistence: { spaceDID: 'did:key:...' },
+ *   persistence: { mock: true },
  * });
  *
  * // Connect via Passkey (biometric — zero extensions)

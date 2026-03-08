@@ -64,8 +64,23 @@ export interface IDiscoveryService {
   getUserStats(signer: string): Promise<UserStats>;
 }
 
+export interface PlanInfo {
+  tier: "free" | "starter" | "pro" | "enterprise";
+  storageLimit: number;
+  used: number;
+}
+
+export interface IPlanService {
+  getPlan(signer: string): Promise<PlanInfo>;
+  addUsage(signer: string, bytes: number): Promise<void>;
+  removeUsage(signer: string, bytes: number): Promise<void>;
+  getUsage(signer: string): Promise<{ used: number; limit: number; tier: string }>;
+  setPlan(signer: string, tier: PlanInfo["tier"]): Promise<void>;
+}
+
 export interface RelayServices {
   vault: IVaultService;
   snapshot: ISnapshotService;
   discovery: IDiscoveryService;
+  plan: IPlanService;
 }
