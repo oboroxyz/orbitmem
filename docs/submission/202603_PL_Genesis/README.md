@@ -1,4 +1,4 @@
-# OrbitMem — The Sovereign Data Layer for the Agentic Web
+# OrbitMem — The decentralized data layer for agentic web
 
 > PL_Genesis: Frontiers of Collaboration Hackathon Submission
 
