@@ -17,8 +17,8 @@ export function ScoreCard({ label, score, feedbackCount }: ScoreCardProps) {
   const data = [{ value: score, fill: color }];
 
   return (
-    <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-4 flex flex-col items-center gap-2">
-      <span className="text-sm text-orbit-300 font-medium">{label}</span>
+    <div className="bg-blue-900 rounded-xl border border-blue-800 p-4 flex flex-col items-center gap-2">
+      <span className="text-sm text-blue-300 font-medium">{label}</span>
       <div className="w-24 h-24">
         <ResponsiveContainer>
           <RadialBarChart
@@ -40,7 +40,7 @@ export function ScoreCard({ label, score, feedbackCount }: ScoreCardProps) {
         {score}
       </span>
       {feedbackCount !== undefined && (
-        <span className="text-xs text-orbit-400">{feedbackCount} ratings</span>
+        <span className="text-xs text-blue-400">{feedbackCount} ratings</span>
       )}
     </div>
   );

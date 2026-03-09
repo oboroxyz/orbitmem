@@ -8,13 +8,13 @@ export function ConnectButton() {
   if (isConnected && address) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm text-orbit-300 font-mono">
+        <span className="text-sm font-mono">
           {address.slice(0, 6)}...{address.slice(-4)}
         </span>
         <button
           type="button"
           onClick={() => disconnect()}
-          className="px-3 py-1.5 text-sm rounded-lg border border-orbit-600 text-orbit-200 hover:bg-orbit-700 transition-colors"
+          className="px-3 py-1.5 text-sm rounded-lg border btn"
         >
           Disconnect
         </button>
@@ -29,7 +29,7 @@ export function ConnectButton() {
         const injected = connectors.find((c) => c.id === "injected");
         if (injected) connect({ connector: injected });
       }}
-      className="px-4 py-2 text-sm font-medium rounded-lg bg-accent-500 text-white hover:bg-accent-400 transition-colors"
+      className="px-4 py-2 text-sm btn"
     >
       Connect Wallet
     </button>

@@ -23,15 +23,15 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
-      <header className="border-b border-orbit-700 bg-orbit-800/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16 gap-6">
             {/* Logo — text hidden on mobile */}
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-medium text-sm">
                 OM
               </div>
-              <span className="hidden sm:inline text-lg font-semibold text-orbit-50">OrbitMem</span>
+              <span className="hidden sm:inline text-lg font-semibold ">OrbitMem</span>
             </Link>
 
             {/* Desktop nav */}
@@ -42,10 +42,8 @@ export function Layout({ children }: { children: ReactNode }) {
                   <Link
                     key={to}
                     to={to}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-1.5 ${
-                      isActive
-                        ? "bg-orbit-700 text-orbit-50"
-                        : "text-orbit-300 hover:text-orbit-100 hover:bg-orbit-700/50"
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-1.5 hover:bg-amber-50/10 ${
+                      isActive ? "font-bold" : "font-normal"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -60,7 +58,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => setMobileOpen((o) => !o)}
-                className="sm:hidden p-2 rounded-lg text-orbit-300 hover:text-orbit-50 hover:bg-orbit-700/50 transition-colors"
+                className="sm:hidden p-2 rounded-lg hover:text-amber-50 hover:bg-amber-50/10 transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileOpen ? (
@@ -75,7 +73,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
         {/* Mobile nav panel */}
         {mobileOpen && (
-          <nav className="sm:hidden border-t border-orbit-700 bg-orbit-800 px-4 pb-4 pt-2 space-y-1">
+          <nav className="sm:hidden border-t px-4 pb-4 pt-2 space-y-1">
             {navLinks.map(({ to, label, icon: Icon }) => {
               const isActive = currentPath.startsWith(to);
               return (
@@ -85,8 +83,8 @@ export function Layout({ children }: { children: ReactNode }) {
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-orbit-700 text-orbit-50"
-                      : "text-orbit-300 hover:text-orbit-100 hover:bg-orbit-700/50"
+                      ? "bg-amber-50/10 text-amber-50"
+                      : "text-amber-50 hover:text-amber-100 hover:bg-amber-50/10"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -102,21 +100,21 @@ export function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-orbit-700 py-8 mt-auto">
+      <footer className="border-t py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm text-orbit-400">
-              <div className="w-6 h-6 rounded bg-accent-500 flex items-center justify-center text-white font-bold text-[10px]">
+            <div className="flex items-center gap-2 text-sm">
+              <div className="w-6 h-6 rounded flex items-center justify-center font-bold text-[10px]">
                 OM
               </div>
               <span>OrbitMem — Sovereign Data Layer for the Agentic Web</span>
             </div>
-            <div className="flex items-center gap-2 text-orbit-400 text-sm">
+            <div className="flex items-center gap-2 text-sm">
               <a
                 href="https://github.com/oboroxyz/orbitmem"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-orbit-200 transition-colors inline-flex items-center gap-1.5"
+                className=" transition-colors inline-flex items-center gap-1.5"
               >
                 <FiGithub className="text-base" />
               </a>
@@ -125,7 +123,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 href="https://github.com/ethereum/ERCs/blob/master/ERCS/erc-8004.md"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-orbit-200 transition-colors"
+                className=" transition-colors"
               >
                 ERC-8004
               </a>
@@ -134,7 +132,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 href="https://erc8128.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-orbit-200 transition-colors"
+                className=" transition-colors"
               >
                 ERC-8128
               </a>

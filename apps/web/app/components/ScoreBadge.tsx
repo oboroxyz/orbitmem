@@ -4,9 +4,9 @@ interface ScoreBadgeProps {
 }
 
 function scoreColor(score: number): string {
-  if (score >= 80) return "bg-trust-high/20 text-trust-high";
-  if (score >= 50) return "bg-trust-mid/20 text-trust-mid";
-  return "bg-trust-low/20 text-trust-low";
+  if (score >= 80) return "bg-green-500/20 text-green-500";
+  if (score >= 50) return "bg-yellow-500/20 text-yellow-500";
+  return "bg-red-500/20 text-red-500";
 }
 
 export function ScoreBadge({ score, size = "sm" }: ScoreBadgeProps) {

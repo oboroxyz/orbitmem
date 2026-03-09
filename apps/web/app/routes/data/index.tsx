@@ -29,25 +29,25 @@ function DataPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-orbit-50 mb-1">Data Registry</h1>
-        <p className="text-orbit-400 text-sm">Browse data entries with quality scores and tags</p>
+        <h1 className="text-2xl font-bold text-amber-50 mb-1">Data Registry</h1>
+        <p className="text-sm">Browse data entries with quality scores and tags</p>
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
         <SearchBar placeholder="Search by schema..." onSearch={onSearch} />
-        <label className="flex items-center gap-2 text-sm text-orbit-300 cursor-pointer">
+        <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={verifiedOnly}
             onChange={(e) => setVerifiedOnly(e.target.checked)}
-            className="rounded border-orbit-600 bg-orbit-700 text-accent-500 focus:ring-accent-500/50"
+            className="rounded"
           />
           Verified only
         </label>
       </div>
 
       {isLoading ? (
-        <div className="text-center text-orbit-400 py-12">Loading data entries...</div>
+        <div className="text-center py-12">Loading data entries...</div>
       ) : (
         <DataTable<DataRegistration>
           data={entries}
@@ -57,7 +57,7 @@ function DataPage() {
             {
               key: "id",
               header: "ID",
-              render: (d) => <span className="text-orbit-400 font-mono">#{d.dataId}</span>,
+              render: (d) => <span className="font-mono">#{d.dataId}</span>,
               sortable: true,
               sortValue: (d) => d.dataId,
             },
@@ -67,7 +67,7 @@ function DataPage() {
               render: (d) => (
                 <a
                   href={`/data/${d.dataId}`}
-                  className="text-accent-300 hover:underline font-medium"
+                  className="text-violet-400 hover:underline font-medium"
                 >
                   {d.name}
                 </a>
@@ -78,11 +78,9 @@ function DataPage() {
               header: "Schema",
               render: (d) =>
                 d.schema ? (
-                  <span className="px-2 py-0.5 rounded-full bg-orbit-700 text-orbit-200 text-xs">
-                    {d.schema}
-                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-xs">{d.schema}</span>
                 ) : (
-                  <span className="text-orbit-500">-</span>
+                  <span className="">-</span>
                 ),
             },
             {
@@ -93,7 +91,7 @@ function DataPage() {
                   {d.tags.map((t) => (
                     <span
                       key={t}
-                      className="px-1.5 py-0.5 rounded bg-accent-500/20 text-accent-300 text-xs"
+                      className="px-1.5 py-0.5 rounded bg-violet-600/20 text-violet-400 text-xs"
                     >
                       {t}
                     </span>
@@ -106,7 +104,7 @@ function DataPage() {
               header: "Visibility",
               render: (d) => (
                 <span
-                  className={`text-xs ${d.visibility === "public" ? "text-trust-high" : "text-trust-mid"}`}
+                  className={`text-xs ${d.visibility === "public" ? "text-green-500" : "text-yellow-500"}`}
                 >
                   {d.visibility}
                 </span>
@@ -116,7 +114,7 @@ function DataPage() {
               key: "updated",
               header: "Updated",
               render: (d) => (
-                <span className="text-xs text-orbit-400">
+                <span className="text-xs text-blue-400">
                   {new Date(d.lastUpdated).toLocaleDateString()}
                 </span>
               ),

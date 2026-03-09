@@ -36,8 +36,8 @@ function MetricsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-orbit-50 mb-1">Metrics</h1>
-        <p className="text-orbit-400 text-sm">Network-wide metrics and data quality overview</p>
+        <h1 className="text-2xl font-bold mb-1">Metrics</h1>
+        <p className="text-sm">Network-wide metrics and data quality overview</p>
       </div>
 
       {/* Metric cards */}
@@ -57,8 +57,8 @@ function MetricsPage() {
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Activity chart */}
-        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
-          <h2 className="text-sm font-medium text-orbit-300 mb-4">Weekly Activity</h2>
+        <div className="bg-amber-50/10 rounded-xl p-6">
+          <h2 className="text-sm font-medium mb-4">Weekly Activity</h2>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={stats?.activity ?? []}>
               <defs>
@@ -99,7 +99,7 @@ function MetricsPage() {
               />
             </AreaChart>
           </ResponsiveContainer>
-          <div className="flex items-center gap-6 mt-3 text-xs text-orbit-400">
+          <div className="flex items-center gap-6 mt-3 text-xs">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]" />
               New entries
@@ -112,8 +112,8 @@ function MetricsPage() {
         </div>
 
         {/* Quality distribution */}
-        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
-          <h2 className="text-sm font-medium text-orbit-300 mb-4">Quality Score Distribution</h2>
+        <div className="bg-amber-50/10 rounded-xl p-6">
+          <h2 className="text-sm font-medium mb-4">Quality Score Distribution</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={stats?.qualityDistribution ?? []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -141,25 +141,25 @@ function MetricsPage() {
       {/* Bottom row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top tags */}
-        <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-6">
-          <h2 className="text-sm font-medium text-orbit-300 mb-4">Top Feedback Tags</h2>
+        <div className="bg-amber-50/10 rounded-xl p-6">
+          <h2 className="text-sm font-medium  mb-4">Top Feedback Tags</h2>
           {(stats?.topTags?.length ?? 0) > 0 ? (
             <div className="space-y-3">
               {stats!.topTags.map((t) => (
                 <div key={t.tag} className="flex items-center gap-3">
-                  <span className="text-sm text-orbit-200 w-20 font-mono">{t.tag}</span>
-                  <div className="flex-1 h-2 bg-orbit-700 rounded-full overflow-hidden">
+                  <span className="text-sm  w-20 font-mono">{t.tag}</span>
+                  <div className="flex-1 h-2 bg-amber-50/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-accent-500 rounded-full"
+                      className="h-full bg-violet-600 rounded-full"
                       style={{ width: `${(t.count / stats!.topTags[0].count) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs text-orbit-400 w-8 text-right">{t.count}</span>
+                  <span className="text-xs text-blue-400 w-8 text-right">{t.count}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-orbit-500 text-sm">No feedback tags yet</p>
+            <p className="text-blue-600 text-sm">No feedback tags yet</p>
           )}
         </div>
 
@@ -167,23 +167,18 @@ function MetricsPage() {
         <div className="space-y-4">
           <Link
             to="/dashboard"
-            className="group bg-orbit-800 rounded-xl border border-orbit-700 p-5 hover:border-accent-500/50 transition-colors block"
+            className="group rounded-xl bg-amber-50/10 p-5  transition-colors block"
           >
-            <h3 className="text-base font-semibold text-orbit-50 group-hover:text-accent-300 transition-colors mb-1">
+            <h3 className="text-base font-semibold text-amber-50  transition-colors mb-1">
               My Data
             </h3>
-            <p className="text-orbit-400 text-sm">
-              Connect your wallet to browse vault keys and entries
-            </p>
+            <p className="text-sm">Connect your wallet to browse vault keys and entries</p>
           </Link>
-          <Link
-            to="/metrics/snapshots"
-            className="group bg-orbit-800 rounded-xl border border-orbit-700 p-5 hover:border-accent-500/50 transition-colors block"
-          >
-            <h3 className="text-base font-semibold text-orbit-50 group-hover:text-accent-300 transition-colors mb-1">
+          <Link to="/metrics/snapshots" className="group rounded-xl bg-amber-50/10 p-5 block">
+            <h3 className="text-base font-semibold text-amber-50  transition-colors mb-1">
               Snapshots
             </h3>
-            <p className="text-orbit-400 text-sm">View and create vault archive snapshots</p>
+            <p className="text-sm">View and create vault archive snapshots</p>
           </Link>
         </div>
       </div>
@@ -193,9 +188,9 @@ function MetricsPage() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-5">
-      <p className="text-xs text-orbit-400 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-accent-300">{value}</p>
+    <div className="rounded-xl bg-amber-50/10 p-5">
+      <p className="text-xs text-amber-50 mb-1">{label}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   );
 }

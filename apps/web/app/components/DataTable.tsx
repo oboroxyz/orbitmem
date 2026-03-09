@@ -43,23 +43,23 @@ export function DataTable<T>({ data, columns, keyExtractor, emptyMessage }: Data
 
   if (data.length === 0) {
     return (
-      <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-8 text-center text-orbit-400">
+      <div className="bg-amber-50/10 rounded-xl border border-amber-50/30 p-8 text-center ">
         {emptyMessage ?? "No data available"}
       </div>
     );
   }
 
   return (
-    <div className="bg-orbit-800 rounded-xl border border-orbit-700 overflow-hidden">
+    <div className="bg-amber-50/10 rounded-xl border-amber-50/30 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-orbit-700">
+            <tr className="border-b">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-4 py-3 text-left text-xs font-medium text-orbit-400 uppercase tracking-wider ${
-                    col.sortable ? "cursor-pointer hover:text-orbit-200 select-none" : ""
+                  className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    col.sortable ? "cursor-pointer select-none" : ""
                   }`}
                   onClick={col.sortable ? () => handleSort(col.key) : undefined}
                 >
@@ -73,11 +73,11 @@ export function DataTable<T>({ data, columns, keyExtractor, emptyMessage }: Data
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-orbit-700/50">
+          <tbody className="divide-y divide-blue-800/50">
             {sorted.map((row) => (
-              <tr key={keyExtractor(row)} className="hover:bg-orbit-700/30 transition-colors">
+              <tr key={keyExtractor(row)} className="">
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-orbit-100">
+                  <td key={col.key} className="px-4 py-3">
                     {col.render(row)}
                   </td>
                 ))}

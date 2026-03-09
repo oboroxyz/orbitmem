@@ -20,27 +20,27 @@ function DataDetailPage() {
   return (
     <div className="space-y-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-orbit-400">
-        <Link to="/data" className="hover:text-orbit-200 transition-colors">
+      <div className="flex items-center gap-2 text-sm text-blue-400">
+        <Link to="/data" className="hover:text-blue-200 transition-colors">
           Data
         </Link>
         <span>/</span>
-        <span className="text-orbit-200">#{dataId}</span>
+        <span className="text-blue-200">#{dataId}</span>
       </div>
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-orbit-50 mb-2">Data Entry #{dataId}</h1>
-        <p className="text-orbit-300">Quality score breakdown and feedback</p>
+        <h1 className="text-2xl font-bold text-amber-50 mb-2">Data Entry #{dataId}</h1>
+        <p className="text-blue-300">Quality score breakdown and feedback</p>
       </div>
 
       {isLoading ? (
-        <div className="text-center text-orbit-400 py-12">Loading score data...</div>
+        <div className="text-center text-blue-400 py-12">Loading score data...</div>
       ) : score ? (
         <>
           {/* Score gauges */}
           <section>
-            <h2 className="text-lg font-semibold text-orbit-50 mb-4">Quality Breakdown</h2>
+            <h2 className="text-lg font-semibold text-amber-50 mb-4">Quality Breakdown</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <ScoreCard
                 label="Overall Quality"
@@ -62,17 +62,17 @@ function DataDetailPage() {
           </section>
 
           {/* Verification */}
-          <section className="bg-orbit-800 rounded-xl border border-orbit-700 p-4">
+          <section className="bg-blue-900 rounded-xl border border-blue-800 p-4">
             <div className="flex items-center gap-3">
               <span
-                className={`w-2.5 h-2.5 rounded-full ${score.verified ? "bg-trust-high" : "bg-orbit-500"}`}
+                className={`w-2.5 h-2.5 rounded-full ${score.verified ? "bg-green-500" : "bg-blue-600"}`}
               />
-              <span className="text-sm text-orbit-200">
+              <span className="text-sm text-blue-200">
                 {score.verified
                   ? `Verified via ${score.verificationMethod ?? "on-chain"}`
                   : "Not verified"}
               </span>
-              <span className="text-sm text-orbit-500 ml-auto">
+              <span className="text-sm text-blue-600 ml-auto">
                 {score.consumptionCount} reads | {score.totalFeedback} ratings
               </span>
             </div>
@@ -81,14 +81,14 @@ function DataDetailPage() {
           {/* Tag scores */}
           {Object.keys(score.tagScores).length > 0 && (
             <section>
-              <h2 className="text-lg font-semibold text-orbit-50 mb-4">Tag Scores</h2>
-              <div className="bg-orbit-800 rounded-xl border border-orbit-700 divide-y divide-orbit-700/50">
+              <h2 className="text-lg font-semibold text-amber-50 mb-4">Tag Scores</h2>
+              <div className="bg-blue-900 rounded-xl border border-blue-800 divide-y divide-blue-800/50">
                 {Object.entries(score.tagScores).map(([tag, { value, count }]) => (
                   <div key={tag} className="flex items-center justify-between px-4 py-3">
-                    <span className="text-sm text-orbit-200">{tag}</span>
+                    <span className="text-sm text-blue-200">{tag}</span>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-orbit-400">{count} ratings</span>
-                      <div className="w-32 h-2 bg-orbit-700 rounded-full overflow-hidden">
+                      <span className="text-xs text-blue-400">{count} ratings</span>
+                      <div className="w-32 h-2 bg-blue-800 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{
@@ -98,7 +98,7 @@ function DataDetailPage() {
                           }}
                         />
                       </div>
-                      <span className="text-sm font-semibold text-orbit-100 w-8 text-right">
+                      <span className="text-sm font-semibold text-blue-100 w-8 text-right">
                         {value}
                       </span>
                     </div>
@@ -109,14 +109,14 @@ function DataDetailPage() {
           )}
         </>
       ) : (
-        <div className="text-center text-orbit-400 py-12">
+        <div className="text-center text-blue-400 py-12">
           No score data available. Start the relay and seed data to see scores.
         </div>
       )}
 
       {/* Feedback form */}
       <section>
-        <h2 className="text-lg font-semibold text-orbit-50 mb-4">Submit Feedback</h2>
+        <h2 className="text-lg font-semibold text-amber-50 mb-4">Submit Feedback</h2>
         <FeedbackForm dataId={numId} />
       </section>
     </div>

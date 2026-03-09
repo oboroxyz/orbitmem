@@ -202,10 +202,10 @@ export function TrustGraph({
   }, [initialNodes, edges, width, height]);
 
   return (
-    <div className="bg-orbit-800 rounded-xl border border-orbit-700 p-4">
+    <div className="rounded-xl border border-amber-50/30 p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-orbit-300">Trust Graph</h3>
-        <div className="flex items-center gap-4 text-xs text-orbit-400">
+        <h3 className="text-sm font-medium">Trust Graph</h3>
+        <div className="flex items-center gap-4 text-xs text-blue-400">
           <span className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#8b5cf6" }} />
             Users

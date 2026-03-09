@@ -26,7 +26,7 @@ export function SearchBar({
       value={value}
       onChange={(e) => setValue(e.target.value)}
       placeholder={placeholder}
-      className="w-full sm:w-80 bg-orbit-700 border border-orbit-600 rounded-lg px-4 py-2 text-sm text-orbit-50 placeholder:text-orbit-500 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500 transition-colors"
+      className="w-full sm:w-80 rounded-lg px-4 py-2 text-sm text-amber-50 focus:outline-none transition-colors border border-amber-50/30 bg-amber-50/10 focus:border-amber-50/70"
     />
   );
 }
