@@ -1,0 +1,15 @@
+{
+  "name": "orbitmem",
+  "owner": {
+    "name": "oboroxyz",
+    "url": "https://github.com/oboroxyz"
+  },
+  "description": "Skills for the OrbitMem sovereign data layer for AI agents.",
+  "plugins": [
+    {
+      "name": "orbitmem",
+      "source": "./.",
+      "description": "CLI development, SDK patterns, and relay services for OrbitMem."
+    }
+  ]
+}

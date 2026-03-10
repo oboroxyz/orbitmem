@@ -1,0 +1,16 @@
+{
+  "name": "orbitmem",
+  "version": "0.1.0",
+  "description": "Skills for developing and extending the OrbitMem sovereign data layer — CLI commands, SDK layers, and relay services.",
+  "author": {
+    "name": "oboroxyz"
+  },
+  "keywords": ["orbitmem", "cli", "p2p", "vault", "agent", "web3"],
+  "skills": [
+    {
+      "name": "orbitmem-cli",
+      "path": ".claude/skills/orbitmem-cli",
+      "description": "Develops and extends the OrbitMem CLI (npx orbitmem). Use when adding commands, modifying CLI behavior, debugging CLI issues, or working on packages/cli/."
+    }
+  ]
+}
