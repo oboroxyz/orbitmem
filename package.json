@@ -17,7 +17,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "bun run --filter '*' typecheck"
+    "typecheck": "bun run --filter '*' typecheck",
+    "cli": "bun packages/cli/src/index.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
