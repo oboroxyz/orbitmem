@@ -2,6 +2,9 @@
   "name": "orbitmem",
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
+  "bin": {
+    "orbitmem": "./packages/cli/src/index.ts"
+  },
   "scripts": {
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '!@orbitmem/contracts' test",
