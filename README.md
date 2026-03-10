@@ -57,6 +57,18 @@ bun run dev:relay     # Relay server (localhost:3000)
 bun run dev:web       # Web (localhost:3001)
 ```
 
+### CLI
+
+```bash
+npx orbitmem init                    # Generate identity, create config
+npx orbitmem status                  # Show identity and vault info
+npx orbitmem vault store <path> <v>  # Store data in vault
+npx orbitmem vault get <path>        # Read data from vault
+npx orbitmem vault ls                # List vault keys
+npx orbitmem discover --schema dietary  # Search data sources
+npx orbitmem --help                  # Show all commands
+```
+
 ### Contract commands
 
 ```bash
@@ -114,6 +126,7 @@ await agent.rateData(datasets[0].dataId, 95);
 | `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, agent adapter |
 | `@orbitmem/relay` | Hono relay server — vault routes, discovery, snapshots, ERC-8128 auth |
 | `@orbitmem/contracts` | Solidity contracts — DataRegistry (ERC-721), FeedbackRegistry (reputation) |
+| `@orbitmem/cli` | CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots |
 | `@orbitmem/web` | React dashboard — data explorer, vault manager, trust graph, wallet connection |
 
 ## Tech Stack

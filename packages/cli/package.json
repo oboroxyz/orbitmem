@@ -1,0 +1,23 @@
+{
+  "name": "@orbitmem/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": {
+    "orbitmem": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@orbitmem/sdk": "workspace:*",
+    "@orbitmem/relay": "workspace:*",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "^5.5.0"
+  }
+}

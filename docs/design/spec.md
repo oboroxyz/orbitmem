@@ -18,7 +18,8 @@ Version 0.3.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit
 9. [Agent Integration — OpenClaw Demo](#9-agent-integration)
 10. [Security Model](#10-security-model)
 11. [Relay Node Specification](#11-relay-node)
-12. [SDK Quick Start](#12-quick-start)
+12. [CLI — `npx orbitmem`](#12-cli)
+13. [SDK Quick Start](#13-quick-start)
 
 ---
 
@@ -916,7 +917,48 @@ The Relay Node is a thin, stateless P2P bridge. It is **not** a backend.
 
 ---
 
-## 12. SDK Quick Start
+## 12. CLI — `npx orbitmem`
+
+The `@orbitmem/cli` package provides a unified command-line interface for both users and AI agents. No global install required — just `npx orbitmem <command>`.
+
+### Commands
+
+| Command | Description |
+|:--------|:------------|
+| `init` | Generate EVM identity, create `~/.orbitmem/` config |
+| `status` | Show identity, config, and vault info |
+| `vault store <path> <value>` | Store data in encrypted P2P vault |
+| `vault get <path>` | Read data from vault |
+| `vault ls` | List vault keys |
+| `register` | Register data on-chain (ERC-8004) |
+| `discover` | Search for data sources by schema/tags/quality |
+| `snapshot` | Archive vault to Filecoin via Storacha |
+| `dev` | Start a local relay server for development |
+
+### Config Directory (`~/.orbitmem/`)
+
+```
+~/.orbitmem/
+├── config.json    # { relay, chain, registryAddress, reputationAddress }
+├── key.json       # Generated EVM private key
+└── vault/         # Local OrbitDB data directory
+```
+
+### Flags
+
+All commands support shared flags parsed in the entry point:
+
+- `--relay <url>` — Override relay URL
+- `--chain <name>` — Override chain (default: `base`)
+- `--json` — Machine-readable JSON output (for agent consumption)
+
+### Architecture
+
+The CLI uses plain `process.argv` parsing (no framework) for fast `npx` startup. Commands are lazy-loaded via dynamic `import()` and share a common pattern: `loadConfig()` → `createClient()` → execute → `client.destroy()`.
+
+---
+
+## 13. SDK Quick Start
 
 ### Installation
 

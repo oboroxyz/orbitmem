@@ -2,6 +2,9 @@
   "name": "orbitmem",
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
+  "bin": {
+    "orbitmem": "./packages/cli/src/index.ts"
+  },
   "scripts": {
     "build": "bun run --filter '*' build",
     "test": "bun run --filter '!@orbitmem/contracts' test",
@@ -14,7 +17,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "bun run --filter '*' typecheck"
+    "typecheck": "bun run --filter '*' typecheck",
+    "cli": "bun packages/cli/src/index.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",

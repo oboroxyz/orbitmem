@@ -48,6 +48,21 @@ forge fmt --check        # Check Solidity formatting
 forge script script/Deploy.s.sol --broadcast --rpc-url <RPC_URL> --private-key <KEY>  # Deploy
 ```
 
+### CLI Commands
+
+```bash
+bun run cli init              # Initialize OrbitMem (generate keys, create config)
+bun run cli status            # Show identity, config, and vault info
+bun run cli vault store <p> <v>  # Store data in vault
+bun run cli vault get <path>  # Read data from vault
+bun run cli vault ls          # List vault keys
+bun run cli register          # Register data on-chain (ERC-8004)
+bun run cli discover          # Search data sources by schema/tags/quality
+bun run cli snapshot          # Archive vault to Filecoin via Storacha
+bun run cli dev               # Start local relay server
+bun run cli --help            # Show all commands
+```
+
 ## Architecture
 
 ### SDK Layer Structure (`packages/sdk/src/`)
@@ -97,6 +112,14 @@ Two Solidity 0.8.28 contracts implementing ERC-8004 for Data — on-chain data d
 - `script/Deploy.s.sol` — Foundry deploy script for both contracts
 - Tests in `test/*.t.sol` using `forge-std/Test.sol` with `vm.prank()` and `makeAddr()` cheatcodes
 - Dependencies: OpenZeppelin Contracts v5 (ERC721URIStorage), forge-std
+
+### CLI Structure (`packages/cli/src/`)
+
+- `index.ts` — Entry point, argv parser, command router
+- `config.ts` — Load/save `~/.orbitmem/` config and key files
+- `commands/` — One file per command (init, vault, status, register, discover, snapshot, dev)
+- `utils/output.ts` — Table/JSON output formatting
+- `utils/client.ts` — Shared `createOrbitMem()` bootstrap
 
 ### ERC-8128 Transport Auth
 
