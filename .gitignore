@@ -75,3 +75,6 @@ orbitdb/
 *.swp
 *.swo
 *~
+
+# Worktrees
+.worktrees/
