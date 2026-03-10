@@ -238,11 +238,12 @@ The bidirectional ERC-8004 trust model creates a **new economic primitive**: dat
 | On-Chain Trust       | ERC-8004 (ERC-721 + Reputation) | MIT              |
 | Registry Chain       | Base L2 (EVM)                   | —                |
 | Identity             | Porto Passkeys + EVM + Solana   | —                |
+| CLI                  | TypeScript (`@orbitmem/cli`)    | MIT              |
 | SDK                  | TypeScript (`@orbitmem/sdk`)    | MIT              |
 
 ---
 
-## What We've Built — 8,300+ Lines of Working Code
+## What We've Built — 8,800+ Lines of Working Code
 
 OrbitMem is a **fully functional MVP**, not a design document. Every layer is implemented, tested, and integrated end-to-end.
 
@@ -300,13 +301,28 @@ Interactive web app with React 19, Vite, TanStack Router, wagmi, Recharts, Tailw
 
 Deployed via Cloudflare Workers (wrangler).
 
-### Test Coverage — 21 Test Files
+### `@orbitmem/cli` — Command-Line Interface (~500 LoC, 3 test files)
+
+Unified CLI for users and AI agents — `npx orbitmem <command>`, no global install:
+
+- **`init`** — Generate EVM identity via `viem/accounts`, create `~/.orbitmem/` config
+- **`vault store/get/ls`** — Store, read, and list encrypted vault data via SDK
+- **`register`** — Register data on-chain as discoverable assets (ERC-8004)
+- **`discover`** — Search data sources by schema, tags, and quality scores
+- **`snapshot`** — Archive vault to Filecoin via Storacha
+- **`status`** — Show identity, config, and vault info
+- **`dev`** — Start local relay server for development
+
+All commands support `--json` for machine-readable output (agent consumption) and `--relay`/`--chain` overrides.
+
+### Test Coverage — 24 Test Files
 
 | Package | Tests | Coverage |
 | :--- | :--- | :--- |
 | SDK | 11 files | AES encryption, Lit conditions, vault CRUD, vault encryption, transport signing, on-chain registry, discovery dual-mode, persistence, agent adapter, identity, client |
 | Relay | 6 files | ERC-8128 middleware, data routes, vault routes, snapshots, health, integration |
 | Contracts | 3 files | DataRegistry, FeedbackRegistry, cross-contract integration |
+| CLI | 3 files | Config loading, init command, CLI router/argv parsing |
 
 ---
 
@@ -336,6 +352,7 @@ Deployed via Cloudflare Workers (wrangler).
 - GitHub: [github.com/oboroxyz/orbitmem](https://github.com/oboroxyz/orbitmem)
 - Technical Spec: `docs/design/spec.md` (v0.3.0)
 - SDK: `@orbitmem/sdk` (TypeScript, MIT)
+- CLI: `@orbitmem/cli` (`npx orbitmem`, TypeScript, MIT)
 - Contracts: `@orbitmem/contracts` (Solidity 0.8.28, MIT)
 
 ---
