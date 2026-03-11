@@ -2,21 +2,30 @@
   "name": "@orbitmem/cli",
   "version": "0.1.0",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
   "bin": {
-    "orbitmem": "./src/index.ts"
+    "orbitmem": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "build": "bun build ./src/index.ts --outdir ./dist --target node --packages external",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
+    "@hono/node-server": "^1.13.0",
     "@orbitmem/sdk": "workspace:*",
     "@orbitmem/relay": "workspace:*",
     "viem": "^2.0.0"
   },
   "devDependencies": {
+    "@types/node": "^25.4.0",
     "bun-types": "latest",
     "typescript": "^5.5.0"
   }

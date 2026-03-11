@@ -2,17 +2,41 @@
   "name": "@orbitmem/sdk",
   "version": "0.3.0",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./agent": "./src/agent/index.ts",
-    "./discovery": "./src/discovery/index.ts",
-    "./transport": "./src/transport/index.ts",
-    "./types": "./src/types.ts"
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./agent": {
+      "bun": "./src/agent/index.ts",
+      "import": "./dist/agent/index.js",
+      "types": "./dist/agent/index.d.ts"
+    },
+    "./discovery": {
+      "bun": "./src/discovery/index.ts",
+      "import": "./dist/discovery/index.js",
+      "types": "./dist/discovery/index.d.ts"
+    },
+    "./transport": {
+      "bun": "./src/transport/index.ts",
+      "import": "./dist/transport/index.js",
+      "types": "./dist/transport/index.d.ts"
+    },
+    "./types": {
+      "bun": "./src/types.ts",
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    }
   },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "build": "bunx tsc -p tsconfig.build.json",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
@@ -37,6 +61,7 @@
     "@solana/web3.js": "^1.95.0"
   },
   "devDependencies": {
+    "@types/node": "^25.4.0",
     "bun-types": "latest",
     "typescript": "^5.5.0"
   }

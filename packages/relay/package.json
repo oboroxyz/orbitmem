@@ -2,9 +2,32 @@
   "name": "@orbitmem/relay",
   "version": "0.3.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./app": {
+      "bun": "./src/app.ts",
+      "import": "./dist/app.js",
+      "types": "./dist/app.d.ts"
+    },
+    "./services": {
+      "bun": "./src/services/index.ts",
+      "import": "./dist/services/index.js",
+      "types": "./dist/services/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "build": "bunx tsc -p tsconfig.build.json",
     "start": "bun run dist/index.js",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
@@ -29,6 +52,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/node": "^25.4.0",
     "bun-types": "latest",
     "typescript": "^5.5.0"
   }

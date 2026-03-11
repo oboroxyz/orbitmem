@@ -4,14 +4,25 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./abi/index.ts",
-    "./abi/*": "./abi/*"
+    ".": {
+      "bun": "./abi/index.ts",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
+  "files": [
+    "abi",
+    "dist"
+  ],
   "scripts": {
-    "build": "forge build && bash scripts/generate-abi.sh",
+    "build": "forge build && bash scripts/generate-abi.sh && bunx tsc -p tsconfig.build.json",
+    "build:abi": "bunx tsc -p tsconfig.build.json",
     "test": "forge test -vvv",
     "test:gas": "forge test --gas-report",
     "fmt": "forge fmt",
     "fmt:check": "forge fmt --check"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
   }
 }
