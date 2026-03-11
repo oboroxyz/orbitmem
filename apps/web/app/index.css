@@ -1,19 +1,29 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+@theme {
+  --text-xxs: 0.625rem;
+
+  --animate-pulse-0: pulse-0 3s ease-in-out infinite;
+  @keyframes pulse-0 {
+    50% {
+      opacity: 0;
+    }
+  }
+}
 
 body {
-  @apply bg-blue-950 text-amber-50 antialiased;
-  font-family: "Raleway", system-ui, -apple-system, sans-serif;
+  @apply bg-stone-50 text-stone-900 antialiased;
+  font-family: "JetBrains Mono", system-ui, -apple-system, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Arvo", Georgia, serif;
+  font-weight: 600;
 }
 
 .btn {
-  @apply bg-amber-50 text-blue-950 hover:bg-amber-50/90 rounded-lg transition-colors inline-flex items-center gap-2 font-medium;
+  @apply bg-stone-900 text-stone-50 hover:bg-stone-700 rounded-lg transition-colors inline-flex items-center gap-2 font-medium;
 }
 
 .btn-outline {
-  @apply border border-amber-50 text-amber-50 hover:bg-amber-50/10 rounded-lg transition-colors inline-flex items-center gap-2 font-medium;
+  @apply border border-stone-900 text-stone-900 hover:bg-stone-100 rounded-lg transition-colors inline-flex items-center gap-2 font-medium;
 }

@@ -16,6 +16,7 @@
     "@tanstack/react-start": "^1.166.1",
     "@wagmi/connectors": "^5.7.0",
     "@wagmi/core": "^2.16.0",
+    "geist": "^1.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

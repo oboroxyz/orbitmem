@@ -184,7 +184,7 @@ export function TrustGraph({
 
         // Label
         ctx.font = "10px Inter, system-ui, sans-serif";
-        ctx.fillStyle = "#d0d0ff";
+        ctx.fillStyle = "#44403c";
         ctx.textAlign = "center";
         ctx.fillText(node.label, x, y + radius + 14);
       }
@@ -202,10 +202,10 @@ export function TrustGraph({
   }, [initialNodes, edges, width, height]);
 
   return (
-    <div className="rounded-xl border border-amber-50/30 p-4">
+    <div className="rounded-xl border border-stone-200 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium">Trust Graph</h3>
-        <div className="flex items-center gap-4 text-xs text-blue-400">
+        <div className="flex items-center gap-4 text-xs text-stone-500">
           <span className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#8b5cf6" }} />
             Users

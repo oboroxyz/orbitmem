@@ -74,8 +74,8 @@ function MyDataPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-amber-50 mb-1">My Data</h1>
-          <p className="text-blue-400 text-sm">
+          <h1 className="text-2xl font-bold text-stone-900 mb-1">My Data</h1>
+          <p className="text-stone-500 text-sm">
             Vault keys for <span className="font-mono">{address?.slice(0, 10)}...</span>
           </p>
         </div>
@@ -84,19 +84,19 @@ function MyDataPage() {
 
       {userStats && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-xl border border-amber-50/30 bg-amber-50/10 p-5">
-            <p className="text-blue-400 text-xs uppercase tracking-wider mb-1">
+          <div className="rounded-xl border border-stone-200 bg-stone-100 p-5">
+            <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">
               Feedback Submitted
             </p>
-            <p className="text-2xl font-bold text-amber-50">{userStats.feedbackSubmitted}</p>
+            <p className="text-2xl font-bold text-stone-900">{userStats.feedbackSubmitted}</p>
           </div>
-          <div className="rounded-xl border border-amber-50/30 bg-amber-50/10 p-5">
-            <p className="text-blue-400 text-xs uppercase tracking-wider mb-1">Avg Rating Given</p>
-            <p className="text-2xl font-bold text-amber-50">{userStats.avgRatingGiven}</p>
+          <div className="rounded-xl border border-stone-200 bg-stone-100 p-5">
+            <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Avg Rating Given</p>
+            <p className="text-2xl font-bold text-stone-900">{userStats.avgRatingGiven}</p>
           </div>
-          <div className="rounded-xl border border-amber-50/30 bg-amber-50/10 p-5">
-            <p className="text-blue-400 text-xs uppercase tracking-wider mb-1">Entries Rated</p>
-            <p className="text-2xl font-bold text-amber-50">{userStats.dataEntriesRated}</p>
+          <div className="rounded-xl border border-stone-200 bg-stone-100 p-5">
+            <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Entries Rated</p>
+            <p className="text-2xl font-bold text-stone-900">{userStats.dataEntriesRated}</p>
           </div>
         </div>
       )}
@@ -104,17 +104,17 @@ function MyDataPage() {
       {isLoading ? (
         <div className="text-center py-12">Loading vault keys...</div>
       ) : keys.length === 0 ? (
-        <div className="rounded-xl border border-amber-50/30 bg-amber-50/10 p-8 text-center">
+        <div className="rounded-xl border border-stone-200 bg-stone-100 p-8 text-center">
           No public vault keys found. Seed data via the relay to see entries here.
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Key list */}
-          <div className="lg:col-span-1 rounded-xl border border-amber-50/30 bg-amber-50/10 overflow-hidden">
-            <div className="px-4 py-3 border-b border-amber-50/30">
-              <h3 className="text-sm font-medium text-amber-50">Keys ({keys.length})</h3>
+          <div className="lg:col-span-1 rounded-xl border border-stone-200 bg-stone-100 overflow-hidden">
+            <div className="px-4 py-3 border-b border-stone-200">
+              <h3 className="text-sm font-medium text-stone-900">Keys ({keys.length})</h3>
             </div>
-            <div className="divide-y divide-amber-50/30 max-h-96 overflow-y-auto">
+            <div className="divide-y divide-stone-200 max-h-96 overflow-y-auto">
               {keys.map((key) => (
                 <button
                   key={key}
@@ -123,7 +123,7 @@ function MyDataPage() {
                   className={`w-full text-left px-4 py-3 text-sm font-mono transition-colors ${
                     selectedKey === key
                       ? "bg-violet-600/10 text-violet-400"
-                      : "text-amber-50 hover:bg-amber-50/10 hover:text-amber-50"
+                      : "text-stone-900 hover:bg-stone-100/50 hover:text-stone-900"
                   }`}
                 >
                   {key}
@@ -133,11 +133,11 @@ function MyDataPage() {
           </div>
 
           {/* Entry detail */}
-          <div className="lg:col-span-2 rounded-xl border border-amber-50/30 bg-amber-50/10 p-6">
+          <div className="lg:col-span-2 rounded-xl border border-stone-200 bg-stone-100 p-6">
             {selectedKey && entryResult ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-amber-50">{entryResult.key}</h3>
+                  <h3 className="font-medium text-stone-900">{entryResult.key}</h3>
                   <span
                     className={`text-xs px-2 py-0.5 rounded-full ${
                       entryResult.visibility === "public"
@@ -148,14 +148,16 @@ function MyDataPage() {
                     {entryResult.visibility}
                   </span>
                 </div>
-                <pre className="bg-blue-950 rounded-lg p-4 text-sm text-blue-200 overflow-x-auto font-mono">
+                <pre className="bg-stone-50 rounded-lg p-4 text-sm text-stone-700 overflow-x-auto font-mono">
                   {typeof entryResult.value === "string"
                     ? entryResult.value
                     : JSON.stringify(entryResult.value, null, 2)}
                 </pre>
               </div>
             ) : (
-              <div className="text-center text-blue-600 py-12">Select a key to view its value</div>
+              <div className="text-center text-stone-9000 py-12">
+                Select a key to view its value
+              </div>
             )}
           </div>
         </div>

@@ -47,13 +47,13 @@ export function FeedbackForm({ dataId }: FeedbackFormProps) {
 
   return (
     <div className="rounded-xl border p-6">
-      <h3 className="text-lg font-semibold text-amber-50 mb-4">Rate this data</h3>
+      <h3 className="text-lg font-semibold text-stone-900 mb-4">Rate this data</h3>
 
       <div className="space-y-4">
         {/* Score slider */}
         <div>
-          <label htmlFor="feedback-score" className="block text-sm text-blue-300 mb-1">
-            Score: <span className="font-semibold text-amber-50">{value}</span>
+          <label htmlFor="feedback-score" className="block text-sm text-stone-600 mb-1">
+            Score: <span className="font-semibold text-stone-900">{value}</span>
           </label>
           <input
             id="feedback-score"
@@ -68,14 +68,14 @@ export function FeedbackForm({ dataId }: FeedbackFormProps) {
 
         {/* Dimension */}
         <div>
-          <label htmlFor="feedback-dimension" className="block text-sm text-blue-300 mb-1">
+          <label htmlFor="feedback-dimension" className="block text-sm text-stone-600 mb-1">
             Quality Dimension
           </label>
           <select
             id="feedback-dimension"
             value={dimension}
             onChange={(e) => setDimension(e.target.value)}
-            className="w-full bg-blue-800 border border-indigo-900 rounded-lg px-3 py-2 text-amber-50 text-sm"
+            className="w-full bg-stone-100 border border-stone-300 rounded-lg px-3 py-2 text-stone-900 text-sm"
           >
             {QUALITY_DIMENSIONS.map((d) => (
               <option key={d} value={d}>
@@ -88,7 +88,7 @@ export function FeedbackForm({ dataId }: FeedbackFormProps) {
         {/* Tags */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="feedback-tag1" className="block text-sm text-blue-300 mb-1">
+            <label htmlFor="feedback-tag1" className="block text-sm text-stone-600 mb-1">
               Tag 1
             </label>
             <input
@@ -97,11 +97,11 @@ export function FeedbackForm({ dataId }: FeedbackFormProps) {
               value={tag1}
               onChange={(e) => setTag1(e.target.value)}
               placeholder="e.g. reliable"
-              className="w-full bg-blue-800 border border-indigo-900 rounded-lg px-3 py-2 text-amber-50 text-sm placeholder:text-blue-600"
+              className="w-full bg-stone-100 border border-stone-300 rounded-lg px-3 py-2 text-stone-900 text-sm placeholder:text-stone-400"
             />
           </div>
           <div>
-            <label htmlFor="feedback-tag2" className="block text-sm text-blue-300 mb-1">
+            <label htmlFor="feedback-tag2" className="block text-sm text-stone-600 mb-1">
               Tag 2
             </label>
             <input
@@ -110,7 +110,7 @@ export function FeedbackForm({ dataId }: FeedbackFormProps) {
               value={tag2}
               onChange={(e) => setTag2(e.target.value)}
               placeholder="e.g. accurate"
-              className="w-full bg-blue-800 border border-indigo-900 rounded-lg px-3 py-2 text-amber-50 text-sm placeholder:text-blue-600"
+              className="w-full bg-stone-100 border border-stone-300 rounded-lg px-3 py-2 text-stone-900 text-sm placeholder:text-stone-400"
             />
           </div>
         </div>
