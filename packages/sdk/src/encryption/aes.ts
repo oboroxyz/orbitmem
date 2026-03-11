@@ -7,6 +7,8 @@ export interface AESConfig {
 
 export class AESEngine {
   private config: AESConfig;
+  private lastSalt: Uint8Array = new Uint8Array(32);
+  private lastSource: "wallet-signature" | "password" | "raw" = "raw";
 
   constructor(config: AESConfig) {
     this.config = config;
@@ -14,6 +16,8 @@ export class AESEngine {
 
   async deriveKey(source: AESKeySource, walletSignature?: Uint8Array): Promise<CryptoKey> {
     if (source.type === "raw") {
+      this.lastSource = "raw";
+      this.lastSalt = new Uint8Array(0);
       return crypto.subtle.importKey(
         "raw",
         source.key as BufferSource,
@@ -34,6 +38,8 @@ export class AESEngine {
       );
       const salt = crypto.getRandomValues(new Uint8Array(32));
       const info = new TextEncoder().encode("orbitmem-aes-256-gcm");
+      this.lastSource = "wallet-signature";
+      this.lastSalt = salt;
       return crypto.subtle.deriveKey(
         { name: "HKDF", hash: "SHA-256", salt, info },
         ikm,
@@ -47,6 +53,8 @@ export class AESEngine {
       const enc = new TextEncoder().encode(source.password);
       const ikm = await crypto.subtle.importKey("raw", enc, "PBKDF2", false, ["deriveKey"]);
       const salt = crypto.getRandomValues(new Uint8Array(32));
+      this.lastSource = "password";
+      this.lastSalt = salt;
       return crypto.subtle.deriveKey(
         { name: "PBKDF2", hash: "SHA-256", salt, iterations: this.config.iterations ?? 100000 },
         ikm,
@@ -77,9 +85,10 @@ export class AESEngine {
       iv,
       authTag,
       keyDerivation: {
-        source: "wallet-signature",
-        salt: new Uint8Array(32), // placeholder — real salt from deriveKey
+        source: this.lastSource,
+        salt: new Uint8Array(this.lastSalt),
         kdf: this.config.kdf === "hkdf-sha256" ? "hkdf-sha256" : "pbkdf2-sha256",
+        ...(this.lastSource === "password" ? { iterations: this.config.iterations ?? 100000 } : {}),
       },
     };
   }
