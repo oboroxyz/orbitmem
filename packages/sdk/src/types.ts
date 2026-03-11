@@ -844,6 +844,8 @@ export interface DiscoveryConfig {
   publicClient?: import("viem").PublicClient;
   /** viem wallet client for on-chain writes (register, rate, revoke) */
   walletClient?: import("viem").WalletClient;
+  /** Block number at which contracts were deployed (for event queries) */
+  deployBlock?: bigint;
 }
 
 // ── Data Registry Types (ERC-8004 applied to data sources) ──

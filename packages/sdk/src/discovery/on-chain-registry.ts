@@ -8,6 +8,7 @@ export interface OnChainRegistryConfig {
   walletClient: WalletClient;
   dataRegistry: Address;
   feedbackRegistry: Address;
+  deployBlock?: bigint;
 }
 
 export class OnChainRegistry {
@@ -15,12 +16,14 @@ export class OnChainRegistry {
   private wallet: WalletClient;
   private dataReg: Address;
   private feedbackReg: Address;
+  private deployBlock: bigint;
 
   constructor(config: OnChainRegistryConfig) {
     this.pub = config.publicClient;
     this.wallet = config.walletClient;
     this.dataReg = config.dataRegistry;
     this.feedbackReg = config.feedbackRegistry;
+    this.deployBlock = config.deployBlock ?? 0n;
   }
 
   // ── Data Registry ──
@@ -48,7 +51,7 @@ export class OnChainRegistry {
       address: this.dataReg,
       abi: DataRegistryAbi,
       eventName: "DataRegistered",
-      fromBlock: 0n,
+      fromBlock: this.deployBlock,
     });
 
     const results: DataRegistration[] = [];

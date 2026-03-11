@@ -18,6 +18,7 @@ function createOnChainDiscoveryLayer(config: DiscoveryConfig): IDiscoveryLayer {
     walletClient: config.walletClient!,
     dataRegistry: config.dataRegistry as Address,
     feedbackRegistry: config.reputationRegistry as Address,
+    deployBlock: config.deployBlock,
   });
 
   return {

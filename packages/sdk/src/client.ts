@@ -46,13 +46,16 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
 
   // Initialize discovery layer (defaults to current network's contracts)
   const network = getNetwork(config.network);
-  const discovery = createDiscoveryLayer(
-    config.discovery ?? {
-      dataRegistry: network.dataRegistry,
-      reputationRegistry: network.feedbackRegistry,
-      registryChain: network.chain,
-    },
-  );
+  const discoveryConfig = config.discovery ?? {
+    dataRegistry: network.dataRegistry,
+    reputationRegistry: network.feedbackRegistry,
+    registryChain: network.chain,
+  };
+  // Inject deployBlock from network if not explicitly set
+  if (discoveryConfig.deployBlock === undefined) {
+    discoveryConfig.deployBlock = network.deployBlock;
+  }
+  const discovery = createDiscoveryLayer(discoveryConfig);
 
   // Initialize persistence layer
   const persistence = createPersistenceLayer({
