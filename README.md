@@ -69,7 +69,14 @@ npx orbitmem discover --schema dietary  # Search data sources
 npx orbitmem --help                  # Show all commands
 ```
 
-### Contract commands
+### Contracts
+
+Deployed on **Base Sepolia**:
+
+| Contract | Address |
+|----------|---------|
+| DataRegistry | [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
+| FeedbackRegistry | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
 
 ```bash
 cd packages/contracts

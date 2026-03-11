@@ -7,7 +7,7 @@ import {FeedbackRegistry} from "../src/FeedbackRegistry.sol";
 
 contract Deploy is Script {
     function run() external {
-        address owner = vm.envAddress("OWNER");
+        address owner = vm.envOr("OWNER", msg.sender);
 
         vm.startBroadcast();
 

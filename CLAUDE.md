@@ -45,8 +45,15 @@ forge test -vvv          # Run all contract tests (verbose)
 forge test --gas-report  # Run tests with gas reporting
 forge fmt                # Format Solidity files
 forge fmt --check        # Check Solidity formatting
-forge script script/Deploy.s.sol --broadcast --rpc-url <RPC_URL> --private-key <KEY>  # Deploy
+OWNER=<SAFE_ADDRESS> forge script script/Deploy.s.sol --broadcast --rpc-url <RPC_URL> --private-key <KEY>  # Deploy
 ```
+
+### Deployed Contracts (Base Sepolia)
+
+| Contract | Address |
+|----------|---------|
+| DataRegistry | `0x9eE44938ED77227470CaA2DbCC0459F49d249B7A` |
+| FeedbackRegistry | `0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a` |
 
 ### CLI Commands
 
