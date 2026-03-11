@@ -8,10 +8,7 @@ export async function snapshot(_args: string[], flags: Record<string, string>): 
   const client = await createClient(config, loadKey());
 
   try {
-    const snap = await client.vault.exportSnapshot();
     const result = await client.persistence.archive({
-      data: snap.data,
-      entryCount: snap.entryCount,
       label: flags.label,
     });
 

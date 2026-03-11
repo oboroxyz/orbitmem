@@ -20,10 +20,35 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
 
   return {
     async connect(opts) {
-      // In a real implementation, this would open the wallet adapter
-      // For now, this is a hook point — external code sets the connection
+      // If a private key was provided (CLI / server usage), auto-connect via viem
+      if (config.privateKey && opts.method === "evm") {
+        const { privateKeyToAccount } = await import("viem/accounts");
+        const account = privateKeyToAccount(config.privateKey as `0x${string}`);
+
+        connection = {
+          address: account.address,
+          family: "evm",
+          signatureAlgorithm: "ecdsa-secp256k1",
+          connectedAt: Date.now(),
+        };
+
+        signFn = async (message: string) => {
+          const sig = await account.signMessage({ message });
+          const bytes = new Uint8Array(
+            sig
+              .slice(2)
+              .match(/.{2}/g)!
+              .map((b) => Number.parseInt(b, 16)),
+          );
+          return { signature: bytes, algorithm: "ecdsa-secp256k1" as const };
+        };
+
+        for (const cb of listeners) cb(connection);
+        return connection;
+      }
+
       throw new Error(
-        `connect(${opts.method}) requires a wallet adapter. ` +
+        `connect(${opts.method}) requires a wallet adapter or privateKey config. ` +
           "Use setConnection() for testing or integrate a wallet provider.",
       );
     },

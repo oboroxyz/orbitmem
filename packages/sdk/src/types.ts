@@ -61,8 +61,10 @@ export type SignatureAlgorithm = "p256" | "ecdsa-secp256k1" | "ed25519";
 
 /** Configuration for the Identity Layer */
 export interface IdentityConfig {
-  /** Supported chain families */
-  chains: ChainFamily[];
+  /** Supported chain families (default: ["evm"]) */
+  chains?: ChainFamily[];
+  /** EVM private key for CLI / server-side usage (hex string) */
+  privateKey?: string;
   /** Porto Passkey config (optional if not using passkey auth) */
   passkey?: {
     /** WebAuthn Relying Party ID (e.g., "app.orbitmem.xyz") */

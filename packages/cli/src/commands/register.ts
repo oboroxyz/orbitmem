@@ -18,7 +18,7 @@ export async function register(args: string[], flags: Record<string, string>): P
     if (!entry) error(`Vault entry not found: ${path}`);
 
     const result = await client.discovery.registerData({
-      vaultKey: path,
+      key: path,
       name: flags.name ?? path,
       description: flags.description ?? "",
       schema: flags.schema,
