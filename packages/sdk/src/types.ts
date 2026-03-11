@@ -27,7 +27,7 @@ export type OrbitAddress = string;
 export type ChainFamily = "passkey" | "evm" | "solana";
 
 /** EVM chain identifiers */
-export type EvmChain = "ethereum" | "polygon" | "optimism" | "arbitrum" | "base";
+export type EvmChain = "ethereum" | "polygon" | "optimism" | "arbitrum" | "base" | "base-sepolia";
 
 /** Solana cluster identifiers */
 export type SolanaCluster = "mainnet-beta" | "devnet" | "testnet";
@@ -1123,6 +1123,10 @@ export interface IDiscoveryLayer {
 
 /** Full OrbitMem SDK configuration */
 export interface OrbitMemConfig {
+  /** Network preset — "base-sepolia" (default) or "base" (mainnet).
+   *  Sets contract addresses and relay URL. Overridden by explicit
+   *  discovery/persistence config. */
+  network?: import("./contracts.js").NetworkId;
   /** Identity layer config */
   identity: IdentityConfig;
   /** Vault (data layer) config */

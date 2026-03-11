@@ -35,7 +35,8 @@ describe("CLI integration", () => {
     await proc.exited;
     const result = JSON.parse(text);
     expect(result.address).toMatch(/^0x[0-9a-fA-F]{40}$/);
-    expect(result.relay).toBe("https://relay.orbitmem.xyz");
+    expect(result.network).toBe("base-sepolia");
+    expect(result.relay).toBe("https://relay.orbitmem.0x7.sh");
   });
 
   test("status --json after init shows config", async () => {
@@ -55,7 +56,7 @@ describe("CLI integration", () => {
     await proc.exited;
     const result = JSON.parse(text);
     expect(result.address).toMatch(/^0x/);
-    expect(result.chain).toBe("base");
+    expect(result.chain).toBe("base-sepolia");
   });
 
   test("unknown command exits with error", async () => {

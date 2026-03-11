@@ -29,9 +29,12 @@ describe("init", () => {
     expect(key).toMatch(/^0x[0-9a-f]{64}$/);
   });
 
-  test("config has default relay", async () => {
+  test("config has default network and relay", async () => {
     await init([], {});
     const config = loadConfig();
-    expect(config.relay).toBe("https://relay.orbitmem.xyz");
+    expect(config.network).toBe("base-sepolia");
+    expect(config.relay).toBe("https://relay.orbitmem.0x7.sh");
+    expect(config.registryAddress).toBe("0x9eE44938ED77227470CaA2DbCC0459F49d249B7A");
+    expect(config.reputationAddress).toBe("0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a");
   });
 });

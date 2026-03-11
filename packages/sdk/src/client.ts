@@ -1,3 +1,4 @@
+import { getNetwork } from "./contracts.js";
 import { createOrbitDBInstance, createVault } from "./data/index.js";
 import { createDiscoveryLayer } from "./discovery/index.js";
 import { createEncryptionLayer } from "./encryption/index.js";
@@ -43,14 +44,15 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
     family: "evm",
   });
 
-  // Initialize discovery layer
-  const discovery = config.discovery
-    ? createDiscoveryLayer(config.discovery)
-    : createDiscoveryLayer({
-        dataRegistry: "0x0" as any,
-        reputationRegistry: "0x0" as any,
-        registryChain: "base",
-      });
+  // Initialize discovery layer (defaults to current network's contracts)
+  const network = getNetwork(config.network);
+  const discovery = createDiscoveryLayer(
+    config.discovery ?? {
+      dataRegistry: network.dataRegistry,
+      reputationRegistry: network.feedbackRegistry,
+      registryChain: network.chain,
+    },
+  );
 
   // Initialize persistence layer
   const persistence = createPersistenceLayer({

@@ -1,18 +1,26 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { type NetworkId, getNetwork } from "@orbitmem/sdk";
 
 export interface CliConfig {
+  network: NetworkId;
   relay: string;
   chain: string;
-  registryAddress?: string;
-  reputationAddress?: string;
+  registryAddress: string;
+  reputationAddress: string;
 }
 
-const DEFAULT_CONFIG: CliConfig = {
-  relay: "https://relay.orbitmem.xyz",
-  chain: "base",
-};
+function defaultConfig(network?: NetworkId): CliConfig {
+  const net = getNetwork(network);
+  return {
+    network: network ?? "base-sepolia",
+    relay: net.relayUrl,
+    chain: net.chain,
+    registryAddress: net.dataRegistry,
+    reputationAddress: net.feedbackRegistry,
+  };
+}
 
 export function getConfigDir(): string {
   return process.env.ORBITMEM_HOME ?? join(homedir(), ".orbitmem");
@@ -25,9 +33,12 @@ function ensureDir(): void {
 
 export function loadConfig(): CliConfig {
   const configPath = join(getConfigDir(), "config.json");
-  if (!existsSync(configPath)) return { ...DEFAULT_CONFIG };
-  const raw = readFileSync(configPath, "utf-8");
-  return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+  const defaults = defaultConfig();
+  if (!existsSync(configPath)) return { ...defaults };
+  const raw = JSON.parse(readFileSync(configPath, "utf-8"));
+  // If saved config has a network, resolve defaults from that network
+  const base = raw.network ? defaultConfig(raw.network) : defaults;
+  return { ...base, ...raw };
 }
 
 export function saveConfig(config: Partial<CliConfig>): void {

@@ -26,8 +26,8 @@ describe("config", () => {
 
   test("loadConfig returns defaults when no file exists", () => {
     const config = loadConfig();
-    expect(config.relay).toBe("https://relay.orbitmem.xyz");
-    expect(config.chain).toBe("base");
+    expect(config.relay).toBe("https://relay.orbitmem.0x7.sh");
+    expect(config.chain).toBe("base-sepolia");
   });
 
   test("saveKey and loadKey roundtrip", () => {

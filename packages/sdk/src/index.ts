@@ -1,4 +1,6 @@
 export { createOrbitMem } from "./client.js";
+export { DEFAULT_NETWORK, getNetwork, NETWORKS } from "./contracts.js";
+export type { NetworkConfig, NetworkId } from "./contracts.js";
 export { createOrbitDBInstance, createVault } from "./data/index.js";
 export { createDiscoveryLayer, MockRegistry, OnChainRegistry } from "./discovery/index.js";
 // Layer-level exports for advanced usage
