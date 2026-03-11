@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "bun run --filter '*' build",
-    "test": "bun run --filter '!@orbitmem/contracts' test",
+    "test": "bun test packages/sdk packages/relay packages/cli apps",
     "dev": "concurrently -n relay,web -c blue,magenta \"bun run dev:relay\" \"bun run dev:web\"",
     "dev:relay": "bun run --filter @orbitmem/relay dev",
     "dev:web": "bun run --filter @orbitmem/web dev",
