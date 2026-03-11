@@ -3,14 +3,17 @@ pragma solidity ^0.8.28;
 
 import {Test} from "forge-std/Test.sol";
 import {DataRegistry} from "../src/DataRegistry.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 contract DataRegistryTest is Test {
     DataRegistry public registry;
+    address owner = makeAddr("owner");
     address alice = makeAddr("alice");
     address bob = makeAddr("bob");
 
     function setUp() public {
-        registry = new DataRegistry();
+        registry = new DataRegistry(owner);
     }
 
     function test_register_mints_and_sets_URI() public {
@@ -93,5 +96,64 @@ contract DataRegistryTest is Test {
         vm.expectEmit(true, false, false, true);
         emit DataRegistry.DataActiveToggled(id, false);
         registry.setActive(id, false);
+    }
+
+    // --- Ownable tests ---
+
+    function test_owner_is_set() public view {
+        assertEq(registry.owner(), owner);
+    }
+
+    function test_non_owner_cannot_pause() public {
+        vm.prank(alice);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, alice));
+        registry.pause();
+    }
+
+    // --- Pausable tests ---
+
+    function test_pause_blocks_register() public {
+        vm.prank(owner);
+        registry.pause();
+
+        vm.prank(alice);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        registry.register("ipfs://data-1");
+    }
+
+    function test_pause_blocks_setDataURI() public {
+        vm.prank(alice);
+        uint256 id = registry.register("ipfs://data-1");
+
+        vm.prank(owner);
+        registry.pause();
+
+        vm.prank(alice);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        registry.setDataURI(id, "ipfs://data-2");
+    }
+
+    function test_pause_blocks_setActive() public {
+        vm.prank(alice);
+        uint256 id = registry.register("ipfs://data-1");
+
+        vm.prank(owner);
+        registry.pause();
+
+        vm.prank(alice);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        registry.setActive(id, false);
+    }
+
+    function test_unpause_restores_functionality() public {
+        vm.prank(owner);
+        registry.pause();
+
+        vm.prank(owner);
+        registry.unpause();
+
+        vm.prank(alice);
+        uint256 id = registry.register("ipfs://data-1");
+        assertEq(id, 1);
     }
 }

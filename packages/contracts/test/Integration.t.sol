@@ -18,8 +18,8 @@ contract IntegrationTest is Test {
     uint256 dataId;
 
     function setUp() public {
-        dataReg = new DataRegistry();
-        feedback = new FeedbackRegistry();
+        dataReg = new DataRegistry(address(this));
+        feedback = new FeedbackRegistry(address(this));
 
         // Alice registers data
         vm.prank(alice);

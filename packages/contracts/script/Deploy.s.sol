@@ -7,13 +7,17 @@ import {FeedbackRegistry} from "../src/FeedbackRegistry.sol";
 
 contract Deploy is Script {
     function run() external {
+        address owner = vm.envAddress("OWNER");
+
         vm.startBroadcast();
 
-        DataRegistry dataReg = new DataRegistry();
+        DataRegistry dataReg = new DataRegistry(owner);
         console.log("DataRegistry deployed at:", address(dataReg));
 
-        FeedbackRegistry feedbackReg = new FeedbackRegistry();
+        FeedbackRegistry feedbackReg = new FeedbackRegistry(owner);
         console.log("FeedbackRegistry deployed at:", address(feedbackReg));
+
+        console.log("Owner:", owner);
 
         vm.stopBroadcast();
     }

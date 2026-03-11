@@ -4,11 +4,14 @@ pragma solidity ^0.8.28;
 import {Test} from "forge-std/Test.sol";
 import {DataRegistry} from "../src/DataRegistry.sol";
 import {FeedbackRegistry} from "../src/FeedbackRegistry.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 contract FeedbackRegistryTest is Test {
     DataRegistry public dataReg;
     FeedbackRegistry public feedback;
 
+    address owner = makeAddr("owner");
     address alice = makeAddr("alice");
     address bob = makeAddr("bob");
     address carol = makeAddr("carol");
@@ -17,8 +20,8 @@ contract FeedbackRegistryTest is Test {
     uint256 dataId;
 
     function setUp() public {
-        dataReg = new DataRegistry();
-        feedback = new FeedbackRegistry();
+        dataReg = new DataRegistry(owner);
+        feedback = new FeedbackRegistry(owner);
 
         vm.prank(alice);
         dataId = dataReg.register("ipfs://data-1");
@@ -158,5 +161,55 @@ contract FeedbackRegistryTest is Test {
         vm.expectEmit(true, true, true, true);
         emit FeedbackRegistry.FeedbackRevoked(address(dataReg), dataId, bob, 0);
         feedback.revokeFeedback(address(dataReg), dataId, 0);
+    }
+
+    // --- Ownable tests ---
+
+    function test_owner_is_set() public view {
+        assertEq(feedback.owner(), owner);
+    }
+
+    function test_non_owner_cannot_pause() public {
+        vm.prank(alice);
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, alice));
+        feedback.pause();
+    }
+
+    // --- Pausable tests ---
+
+    function test_pause_blocks_giveFeedback() public {
+        vm.prank(owner);
+        feedback.pause();
+
+        vm.prank(bob);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        feedback.giveFeedback(address(dataReg), dataId, 85, 0, "", "", "", bytes32(0));
+    }
+
+    function test_pause_blocks_revokeFeedback() public {
+        vm.prank(bob);
+        feedback.giveFeedback(address(dataReg), dataId, 80, 0, "", "", "", bytes32(0));
+
+        vm.prank(owner);
+        feedback.pause();
+
+        vm.prank(bob);
+        vm.expectRevert(Pausable.EnforcedPause.selector);
+        feedback.revokeFeedback(address(dataReg), dataId, 0);
+    }
+
+    function test_unpause_restores_functionality() public {
+        vm.prank(owner);
+        feedback.pause();
+
+        vm.prank(owner);
+        feedback.unpause();
+
+        vm.prank(bob);
+        feedback.giveFeedback(address(dataReg), dataId, 85, 0, "", "", "", bytes32(0));
+
+        (int256 total, uint256 count) = feedback.getScore(address(dataReg), dataId);
+        assertEq(total, 85);
+        assertEq(count, 1);
     }
 }

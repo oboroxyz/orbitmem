@@ -5,10 +5,12 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {
     ERC721URIStorage
 } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title DataRegistry — ERC-8004 Data Entry NFTs
 /// @notice Each token represents a data entry with metadata URI and active flag.
-contract DataRegistry is ERC721URIStorage {
+contract DataRegistry is ERC721URIStorage, Ownable, Pausable {
     uint256 private _nextTokenId = 1;
 
     mapping(uint256 => bool) private _active;
@@ -23,10 +25,20 @@ contract DataRegistry is ERC721URIStorage {
         _;
     }
 
-    constructor() ERC721("OrbitMem Data", "OMD") {}
+    constructor(address initialOwner) ERC721("OrbitMem Data", "OMD") Ownable(initialOwner) {}
+
+    /// @notice Pause all registrations and state changes.
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpause the contract.
+    function unpause() external onlyOwner {
+        _unpause();
+    }
 
     /// @notice Register a new data entry, minting an NFT to the caller.
-    function register(string calldata dataURI) external returns (uint256) {
+    function register(string calldata dataURI) external whenNotPaused returns (uint256) {
         uint256 tokenId = _nextTokenId++;
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, dataURI);
@@ -37,12 +49,16 @@ contract DataRegistry is ERC721URIStorage {
     }
 
     /// @notice Update the metadata URI for a data entry.
-    function setDataURI(uint256 tokenId, string calldata dataURI) external onlyTokenOwner(tokenId) {
+    function setDataURI(uint256 tokenId, string calldata dataURI)
+        external
+        onlyTokenOwner(tokenId)
+        whenNotPaused
+    {
         _setTokenURI(tokenId, dataURI);
     }
 
     /// @notice Toggle the active status of a data entry.
-    function setActive(uint256 tokenId, bool active) external onlyTokenOwner(tokenId) {
+    function setActive(uint256 tokenId, bool active) external onlyTokenOwner(tokenId) whenNotPaused {
         _active[tokenId] = active;
         emit DataActiveToggled(tokenId, active);
     }

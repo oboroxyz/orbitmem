@@ -2,11 +2,13 @@
 pragma solidity ^0.8.28;
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title FeedbackRegistry — ERC-8004 Shared Reputation Ledger
 /// @notice Registry-agnostic feedback system. Callers pass a registry address + entity ID.
 ///         Works with DataRegistry or any ERC-721 registry.
-contract FeedbackRegistry {
+contract FeedbackRegistry is Ownable, Pausable {
     struct FeedbackEntry {
         int128 value;
         uint8 valueDecimals;
@@ -51,6 +53,18 @@ contract FeedbackRegistry {
     error FeedbackAlreadyRevoked();
     error FeedbackIndexOutOfBounds();
 
+    constructor(address initialOwner) Ownable(initialOwner) {}
+
+    /// @notice Pause all feedback submissions and revocations.
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpause the contract.
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
     /// @notice Submit feedback for an entity in a given registry.
     /// @param registry Address of the ERC-721 registry (e.g. DataRegistry).
     /// @param entityId Token ID of the entity being rated.
@@ -69,7 +83,7 @@ contract FeedbackRegistry {
         string calldata tag2,
         string calldata feedbackURI,
         bytes32 feedbackHash
-    ) external {
+    ) external whenNotPaused {
         // Validate entity exists via ownerOf (reverts for nonexistent tokens)
         address entityOwner = IERC721(registry).ownerOf(entityId);
         if (entityOwner == msg.sender) revert SelfFeedbackNotAllowed();
@@ -108,7 +122,7 @@ contract FeedbackRegistry {
     /// @param registry Address of the ERC-721 registry.
     /// @param entityId Token ID of the entity.
     /// @param index Index of the feedback entry in the caller's feedback array.
-    function revokeFeedback(address registry, uint256 entityId, uint256 index) external {
+    function revokeFeedback(address registry, uint256 entityId, uint256 index) external whenNotPaused {
         FeedbackEntry[] storage entries = _feedback[registry][entityId][msg.sender];
         if (index >= entries.length) revert FeedbackIndexOutOfBounds();
 
