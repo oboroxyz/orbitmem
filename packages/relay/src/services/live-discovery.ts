@@ -50,43 +50,6 @@ export class LiveDiscoveryService implements IDiscoveryService {
     return this.registry.getDataScore(dataId);
   }
 
-  async rate(dataId: number, feedback: Record<string, unknown>): Promise<void> {
-    await this.registry.rateData(
-      dataId,
-      (feedback.value as number) ?? 0,
-      (feedback.valueDecimals as number) ?? 0,
-      (feedback.tag1 as string) ?? "",
-      (feedback.tag2 as string) ?? "",
-      (feedback.feedbackURI as string) ?? "",
-      (feedback.feedbackHash as `0x${string}`) ??
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-    );
-  }
-
-  async register(opts: {
-    key: string;
-    name: string;
-    description: string;
-    schema?: string;
-    tags: string[];
-  }): Promise<unknown> {
-    const dataURI = JSON.stringify({
-      name: opts.name,
-      description: opts.description,
-      key: opts.key,
-      schema: opts.schema,
-      tags: opts.tags,
-    });
-    const dataId = await this.registry.registerData(dataURI);
-    return {
-      dataId,
-      dataRegistry: this.config.dataRegistry,
-      ...opts,
-      active: true,
-      registeredAt: Date.now(),
-    };
-  }
-
   async getStats(): Promise<DataStats> {
     const allData = await this.search({});
     const scores = await Promise.all((allData as any[]).map((d) => this.getScore(d.dataId)));

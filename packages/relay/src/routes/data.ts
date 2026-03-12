@@ -49,43 +49,5 @@ export function createDataRoutes(discovery: IDiscoveryService): Hono<ERC8128Env>
     return c.json(score);
   });
 
-  // Submit quality feedback — requires ERC-8128
-  routes.post("/data/:dataId/feedback", erc8128(), async (c) => {
-    const dataId = Number(c.req.param("dataId"));
-    const body = await c.req.json<{
-      value: number;
-      qualityDimension?: string;
-      tag1?: string;
-      tag2?: string;
-    }>();
-
-    await discovery.rate(dataId, {
-      clientAddress: c.get("signer"),
-      value: body.value,
-      valueDecimals: 0,
-      tag1: body.tag1,
-      tag2: body.tag2,
-      isRevoked: false,
-      vaultKey: "",
-      qualityDimension: body.qualityDimension,
-    });
-
-    return c.json({ status: "ok", dataId, signer: c.get("signer") });
-  });
-
-  // Register data (for seeding / testing)
-  routes.post("/data/register", async (c) => {
-    const body = await c.req.json<{
-      key: string;
-      name: string;
-      description: string;
-      schema?: string;
-      tags: string[];
-    }>();
-
-    const reg = await discovery.register(body);
-    return c.json(reg);
-  });
-
   return routes;
 }

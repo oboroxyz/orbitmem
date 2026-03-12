@@ -22,26 +22,6 @@ export class MockDiscoveryService implements IDiscoveryService {
     return this.registry.getDataScore(dataId);
   }
 
-  async rate(dataId: number, feedback: Record<string, unknown>): Promise<void> {
-    this.registry.rateData(dataId, feedback as any);
-  }
-
-  async register(opts: {
-    key: string;
-    name: string;
-    description: string;
-    schema?: string;
-    tags: string[];
-  }): Promise<unknown> {
-    return this.registry.registerData({
-      key: opts.key,
-      name: opts.name,
-      description: opts.description,
-      schema: opts.schema,
-      tags: opts.tags as any,
-    });
-  }
-
   async getStats(): Promise<DataStats> {
     const allData = await this.search({});
     const scores = await Promise.all((allData as any[]).map((d) => this.getScore(d.dataId)));

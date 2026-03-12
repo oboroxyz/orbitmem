@@ -70,61 +70,20 @@ describe("SDK ↔ Relay Integration", () => {
     expect(body.signer).toBe(testAddress);
   });
 
-  test("discovery + feedback lifecycle", async () => {
-    // Register data for discovery
-    const regRes = await app.request("/v1/data/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        key: "travel/dietary",
-        name: "Dietary Preferences",
-        description: "Dietary data for booking agents",
-        schema: "orbitmem:dietary:v1",
-        tags: ["verified"],
-      }),
-    });
-    expect(regRes.status).toBe(200);
-    const { dataId } = (await regRes.json()) as any;
-
+  test("discovery read-only flow: search + score", async () => {
     // Search by schema
     const searchRes = await app.request("/v1/data/search?schema=orbitmem:dietary:v1");
     expect(searchRes.status).toBe(200);
-    const { results } = (await searchRes.json()) as any;
-    expect(results.length).toBeGreaterThan(0);
+    const { results, count } = (await searchRes.json()) as any;
+    expect(results).toBeArray();
+    expect(typeof count).toBe("number");
 
-    // Check initial score
-    const scoreRes1 = await app.request(`/v1/data/${dataId}/score`);
-    const score1 = (await scoreRes1.json()) as any;
-    expect(score1.totalFeedback).toBe(0);
-
-    // Submit feedback with signed request
-    const transport = createTransportLayer({
-      signer: async (_payload) => ({
-        signature: new Uint8Array(64).fill(0xcd),
-        algorithm: "ecdsa-secp256k1" as const,
-      }),
-      signerAddress: "0xAGENT_REVIEWER" as any,
-      family: "evm",
-    });
-
-    const signed = await transport.createSignedRequest({
-      url: `/v1/data/${dataId}/feedback`,
-      method: "POST",
-      body: { value: 85, qualityDimension: "accuracy" },
-    });
-
-    const fbRes = await app.request(signed.url, {
-      method: signed.method,
-      headers: { ...signed.headers, "Content-Type": "application/json" },
-      body: JSON.stringify({ value: 85, qualityDimension: "accuracy" }),
-    });
-    expect(fbRes.status).toBe(200);
-
-    // Verify score updated
-    const scoreRes2 = await app.request(`/v1/data/${dataId}/score`);
-    const score2 = (await scoreRes2.json()) as any;
-    expect(score2.totalFeedback).toBe(1);
-    expect(score2.quality).toBe(85);
+    // Check score endpoint works
+    const scoreRes = await app.request("/v1/data/1/score");
+    expect(scoreRes.status).toBe(200);
+    const score = (await scoreRes.json()) as any;
+    expect(score.dataId).toBe(1);
+    expect(typeof score.totalFeedback).toBe("number");
   });
 
   test("snapshot archival with signed request", async () => {

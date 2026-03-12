@@ -52,14 +52,6 @@ export interface IDiscoveryService {
     minQuality?: number;
   }): Promise<unknown[]>;
   getScore(dataId: number): Promise<unknown>;
-  rate(dataId: number, feedback: Record<string, unknown>): Promise<void>;
-  register(opts: {
-    key: string;
-    name: string;
-    description: string;
-    schema?: string;
-    tags: string[];
-  }): Promise<unknown>;
   getStats(): Promise<DataStats>;
   getUserStats(signer: string): Promise<UserStats>;
 }

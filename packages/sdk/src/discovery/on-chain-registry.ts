@@ -5,7 +5,7 @@ import type { DataRegistration, DataScore, WalletAddress } from "../types.js";
 
 export interface OnChainRegistryConfig {
   publicClient: PublicClient;
-  walletClient: WalletClient;
+  walletClient?: WalletClient;
   dataRegistry: Address;
   feedbackRegistry: Address;
   deployBlock?: bigint;
@@ -13,7 +13,7 @@ export interface OnChainRegistryConfig {
 
 export class OnChainRegistry {
   private pub: PublicClient;
-  private wallet: WalletClient;
+  private wallet: WalletClient | undefined;
   private dataReg: Address;
   private feedbackReg: Address;
   private deployBlock: bigint;
@@ -26,16 +26,24 @@ export class OnChainRegistry {
     this.deployBlock = config.deployBlock ?? 0n;
   }
 
+  private requireWallet(): WalletClient {
+    if (!this.wallet) {
+      throw new Error("WalletClient is required for write operations");
+    }
+    return this.wallet;
+  }
+
   // ── Data Registry ──
 
   async registerData(dataURI: string): Promise<number> {
-    const hash = await this.wallet.writeContract({
+    const wallet = this.requireWallet();
+    const hash = await wallet.writeContract({
       address: this.dataReg,
       abi: DataRegistryAbi,
       functionName: "register",
       args: [dataURI],
-      chain: this.wallet.chain,
-      account: this.wallet.account!,
+      chain: wallet.chain,
+      account: wallet.account!,
     });
     const receipt = await this.pub.waitForTransactionReceipt({ hash });
     const logs = parseEventLogs({
@@ -148,7 +156,8 @@ export class OnChainRegistry {
     feedbackURI: string,
     feedbackHash: `0x${string}`,
   ): Promise<{ txHash: string; feedbackIndex: number }> {
-    const hash = await this.wallet.writeContract({
+    const wallet = this.requireWallet();
+    const hash = await wallet.writeContract({
       address: this.feedbackReg,
       abi: FeedbackRegistryAbi,
       functionName: "giveFeedback",
@@ -162,8 +171,8 @@ export class OnChainRegistry {
         feedbackURI,
         feedbackHash,
       ],
-      chain: this.wallet.chain,
-      account: this.wallet.account!,
+      chain: wallet.chain,
+      account: wallet.account!,
     });
     const receipt = await this.pub.waitForTransactionReceipt({ hash });
     const logs = parseEventLogs({
@@ -175,40 +184,43 @@ export class OnChainRegistry {
   }
 
   async revokeFeedback(registryAddr: Address, entityId: number, index: number): Promise<string> {
-    const hash = await this.wallet.writeContract({
+    const wallet = this.requireWallet();
+    const hash = await wallet.writeContract({
       address: this.feedbackReg,
       abi: FeedbackRegistryAbi,
       functionName: "revokeFeedback",
       args: [registryAddr, BigInt(entityId), BigInt(index)],
-      chain: this.wallet.chain,
-      account: this.wallet.account!,
+      chain: wallet.chain,
+      account: wallet.account!,
     });
     await this.pub.waitForTransactionReceipt({ hash });
     return hash;
   }
 
   async updateDataURI(dataId: number, dataURI: string): Promise<string> {
-    const hash = await this.wallet.writeContract({
+    const wallet = this.requireWallet();
+    const hash = await wallet.writeContract({
       address: this.dataReg,
       abi: DataRegistryAbi,
       functionName: "setDataURI",
       args: [BigInt(dataId), dataURI],
-      chain: this.wallet.chain,
-      account: this.wallet.account!,
+      chain: wallet.chain,
+      account: wallet.account!,
     });
     await this.pub.waitForTransactionReceipt({ hash });
     return hash;
   }
 
   async setActive(registryAddr: Address, entityId: number, active: boolean): Promise<string> {
+    const wallet = this.requireWallet();
     const abi = DataRegistryAbi;
-    const hash = await this.wallet.writeContract({
+    const hash = await wallet.writeContract({
       address: registryAddr,
       abi,
       functionName: "setActive",
       args: [BigInt(entityId), active],
-      chain: this.wallet.chain,
-      account: this.wallet.account!,
+      chain: wallet.chain,
+      account: wallet.account!,
     });
     await this.pub.waitForTransactionReceipt({ hash });
     return hash;

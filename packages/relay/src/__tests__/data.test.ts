@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { app } from "../app.js";
 
 function makeERC8128Headers() {
@@ -14,78 +14,28 @@ function makeERC8128Headers() {
 }
 
 describe("Relay Discovery Routes", () => {
-  let dataId: number;
-
-  beforeAll(async () => {
-    // Register test data
-    const res = await app.request("/v1/data/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        key: "travel/dietary",
-        name: "Dietary Preferences",
-        description: "Dietary restrictions for booking agents",
-        schema: "orbitmem:dietary:v1",
-        tags: ["verified", "human-curated"],
-      }),
-    });
-    const body = (await res.json()) as any;
-    dataId = body.dataId;
-  });
-
   test("GET /v1/data/search returns results", async () => {
     const res = await app.request("/v1/data/search?schema=orbitmem:dietary:v1");
     expect(res.status).toBe(200);
     const body = (await res.json()) as any;
-    expect(body.count).toBeGreaterThan(0);
-    expect(body.results[0].vaultKey).toBe("travel/dietary");
+    expect(typeof body.count).toBe("number");
+    expect(body.results).toBeArray();
+  });
+
+  test("GET /v1/data/search without params returns all", async () => {
+    const res = await app.request("/v1/data/search");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(typeof body.count).toBe("number");
+    expect(body.results).toBeArray();
   });
 
   test("GET /v1/data/:dataId/score returns score", async () => {
-    const res = await app.request(`/v1/data/${dataId}/score`);
+    const res = await app.request("/v1/data/1/score");
     expect(res.status).toBe(200);
     const body = (await res.json()) as any;
-    expect(body.dataId).toBe(dataId);
-    expect(body.totalFeedback).toBe(0);
-  });
-
-  test("POST /v1/data/:dataId/feedback requires ERC-8128", async () => {
-    const res = await app.request(`/v1/data/${dataId}/feedback`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ value: 90 }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  test("POST /v1/data/:dataId/feedback with valid auth", async () => {
-    const res = await app.request(`/v1/data/${dataId}/feedback`, {
-      method: "POST",
-      headers: makeERC8128Headers(),
-      body: JSON.stringify({ value: 90, qualityDimension: "accuracy", tag1: "accurate" }),
-    });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
-    expect(body.signer).toBe("0xAGENT");
-
-    // Verify score updated
-    const scoreRes = await app.request(`/v1/data/${dataId}/score`);
-    const score = (await scoreRes.json()) as any;
-    expect(score.totalFeedback).toBe(1);
-    expect(score.quality).toBe(90);
-  });
-
-  test("GET /v1/data/user/stats returns per-user metrics", async () => {
-    const headers = makeERC8128Headers();
-    const res = await app.request("/v1/data/user/stats", { headers });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as any;
-    expect(body.feedbackSubmitted).toBe(1);
-    expect(body.avgRatingGiven).toBe(90);
-    expect(body.dataEntriesRated).toBe(1);
-    expect(body.topTagsUsed).toBeArray();
-    expect(body.topTagsUsed.length).toBeGreaterThan(0);
-    expect(body.topTagsUsed[0].tag).toBe("accurate");
+    expect(body.dataId).toBe(1);
+    expect(typeof body.totalFeedback).toBe("number");
   });
 
   test("GET /v1/data/user/stats requires auth", async () => {
@@ -93,11 +43,22 @@ describe("Relay Discovery Routes", () => {
     expect(res.status).toBe(401);
   });
 
+  test("GET /v1/data/user/stats returns per-user metrics with auth", async () => {
+    const headers = makeERC8128Headers();
+    const res = await app.request("/v1/data/user/stats", { headers });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(typeof body.feedbackSubmitted).toBe("number");
+    expect(typeof body.avgRatingGiven).toBe("number");
+    expect(typeof body.dataEntriesRated).toBe("number");
+    expect(body.topTagsUsed).toBeArray();
+  });
+
   test("GET /v1/data/stats returns aggregate metrics", async () => {
     const res = await app.request("/v1/data/stats");
     expect(res.status).toBe(200);
     const body = (await res.json()) as any;
-    expect(body.totalEntries).toBeGreaterThanOrEqual(1);
+    expect(typeof body.totalEntries).toBe("number");
     expect(typeof body.totalFeedback).toBe("number");
     expect(typeof body.avgQuality).toBe("number");
     expect(body.qualityDistribution).toBeArray();
