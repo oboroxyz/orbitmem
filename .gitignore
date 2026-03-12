@@ -39,6 +39,7 @@ coverage/
 *.d.ts.map
 
 # Environment
+delegation.proof
 .env
 .env.local
 .env.*.local
