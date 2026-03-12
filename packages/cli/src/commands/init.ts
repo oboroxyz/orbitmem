@@ -10,9 +10,7 @@ export async function init(_args: string[], flags: Record<string, string>): Prom
   const keyPath = join(configDir, "key.json");
 
   if (existsSync(keyPath) && flags.force === undefined) {
-    process.stderr.write(
-      `Already initialized at ${configDir}. Use --force to reinitialize.\n`,
-    );
+    process.stderr.write(`Already initialized at ${configDir}. Use --force to reinitialize.\n`);
     process.exit(1);
   }
 

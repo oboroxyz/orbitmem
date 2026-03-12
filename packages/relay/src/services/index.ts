@@ -29,11 +29,7 @@ function getChain(chainId?: string): Chain {
   return { id, name: `chain-${id}` } as Chain;
 }
 
-const LIVE_ENV_VARS = [
-  "RPC_URL",
-  "DATA_REGISTRY_ADDRESS",
-  "FEEDBACK_REGISTRY_ADDRESS",
-] as const;
+const LIVE_ENV_VARS = ["RPC_URL", "DATA_REGISTRY_ADDRESS", "FEEDBACK_REGISTRY_ADDRESS"] as const;
 
 function validateLiveEnv(): void {
   const missing = LIVE_ENV_VARS.filter((v) => !process.env[v]);

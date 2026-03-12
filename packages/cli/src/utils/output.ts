@@ -1,8 +1,8 @@
 export function output(data: unknown, json: boolean): void {
   if (json) {
-    process.stdout.write(JSON.stringify(data, null, 2) + "\n");
+    process.stdout.write(`${JSON.stringify(data, null, 2)}\n`);
   } else if (typeof data === "string") {
-    process.stdout.write(data + "\n");
+    process.stdout.write(`${data}\n`);
   } else if (Array.isArray(data)) {
     printTable(data);
   } else if (typeof data === "object" && data !== null) {
@@ -18,9 +18,7 @@ function printTable(rows: Record<string, unknown>[]): void {
     return;
   }
   const keys = Object.keys(rows[0]);
-  const widths = keys.map((k) =>
-    Math.max(k.length, ...rows.map((r) => String(r[k] ?? "").length)),
-  );
+  const widths = keys.map((k) => Math.max(k.length, ...rows.map((r) => String(r[k] ?? "").length)));
   const header = keys.map((k, i) => k.padEnd(widths[i])).join("  ");
   const sep = widths.map((w) => "─".repeat(w)).join("──");
   process.stdout.write(`${header}\n${sep}\n`);

@@ -1,6 +1,6 @@
-import { describe, test, expect, beforeEach, afterEach } from "bun:test";
-import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
 
 const TEST_DIR = join(import.meta.dir, ".test-orbitmem-cli");
 const CLI = join(import.meta.dir, "..", "index.ts");

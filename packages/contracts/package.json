@@ -7,7 +7,7 @@
     ".": {
       "bun": "./abi/index.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./abi/index.ts"
     }
   },
   "files": [

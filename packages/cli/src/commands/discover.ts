@@ -27,7 +27,7 @@ export async function discover(args: string[], flags: Record<string, string>): P
         id: r.dataId,
         name: r.name,
         quality: r.quality,
-        vault: String(r.vaultAddress ?? "").slice(0, 10) + "...",
+        vault: `${String(r.vaultAddress ?? "").slice(0, 10)}...`,
       }));
       output(rows, false);
     }

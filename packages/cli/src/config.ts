@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { type NetworkId, getNetwork } from "@orbitmem/sdk";
+import { getNetwork, type NetworkId } from "@orbitmem/sdk";
 
 export interface CliConfig {
   network: NetworkId;
@@ -46,7 +46,7 @@ export function saveConfig(config: Partial<CliConfig>): void {
   const configPath = join(getConfigDir(), "config.json");
   const existing = loadConfig();
   const merged = { ...existing, ...config };
-  writeFileSync(configPath, JSON.stringify(merged, null, 2) + "\n");
+  writeFileSync(configPath, `${JSON.stringify(merged, null, 2)}\n`);
 }
 
 export function loadKey(): string {
@@ -61,5 +61,5 @@ export function loadKey(): string {
 export function saveKey(privateKey: string): void {
   ensureDir();
   const keyPath = join(getConfigDir(), "key.json");
-  writeFileSync(keyPath, JSON.stringify({ privateKey }, null, 2) + "\n");
+  writeFileSync(keyPath, `${JSON.stringify({ privateKey }, null, 2)}\n`);
 }
