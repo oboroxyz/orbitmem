@@ -1,7 +1,10 @@
 {
   "name": "orbitmem",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "bin": {
     "orbitmem": "./packages/cli/src/index.ts"
   },
@@ -14,6 +17,7 @@
     "build:contracts": "bun run --filter @orbitmem/contracts build",
     "test:contracts": "bun run --filter @orbitmem/contracts test",
     "deploy:web": "bun run --filter @orbitmem/web deploy",
+    "deploy:relay": "fly deploy --config packages/relay/fly.toml --dockerfile packages/relay/Dockerfile",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
