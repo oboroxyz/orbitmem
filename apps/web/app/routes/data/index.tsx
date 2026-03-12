@@ -29,7 +29,7 @@ function DataPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-amber-50 mb-1">Data Registry</h1>
+        <h1 className="text-2xl font-bold text-stone-900 mb-1">Data Registry</h1>
         <p className="text-sm">Browse data entries with quality scores and tags</p>
       </div>
 
@@ -114,7 +114,7 @@ function DataPage() {
               key: "updated",
               header: "Updated",
               render: (d) => (
-                <span className="text-xs text-blue-400">
+                <span className="text-xs text-stone-500">
                   {new Date(d.lastUpdated).toLocaleDateString()}
                 </span>
               ),

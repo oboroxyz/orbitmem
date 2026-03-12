@@ -43,14 +43,14 @@ export function DataTable<T>({ data, columns, keyExtractor, emptyMessage }: Data
 
   if (data.length === 0) {
     return (
-      <div className="bg-amber-50/10 rounded-xl border border-amber-50/30 p-8 text-center ">
+      <div className="bg-stone-100 rounded-xl border border-stone-200 p-8 text-center ">
         {emptyMessage ?? "No data available"}
       </div>
     );
   }
 
   return (
-    <div className="bg-amber-50/10 rounded-xl border-amber-50/30 overflow-hidden">
+    <div className="bg-stone-100 rounded-xl border-stone-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -73,7 +73,7 @@ export function DataTable<T>({ data, columns, keyExtractor, emptyMessage }: Data
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-blue-800/50">
+          <tbody className="divide-y divide-stone-200">
             {sorted.map((row) => (
               <tr key={keyExtractor(row)} className="">
                 {columns.map((col) => (

@@ -57,7 +57,7 @@ function MetricsPage() {
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Activity chart */}
-        <div className="bg-amber-50/10 rounded-xl p-6">
+        <div className="bg-stone-100 rounded-xl p-6">
           <h2 className="text-sm font-medium mb-4">Weekly Activity</h2>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={stats?.activity ?? []}>
@@ -71,15 +71,15 @@ function MetricsPage() {
                   <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
-              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" />
+              <XAxis dataKey="date" tick={{ fill: "#78716c", fontSize: 12 }} axisLine={false} />
+              <YAxis tick={{ fill: "#78716c", fontSize: 12 }} axisLine={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1f2937",
-                  border: "1px solid #374151",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #d6d3d1",
                   borderRadius: "8px",
-                  color: "#f3f4f6",
+                  color: "#1c1917",
                   fontSize: "12px",
                 }}
               />
@@ -112,19 +112,19 @@ function MetricsPage() {
         </div>
 
         {/* Quality distribution */}
-        <div className="bg-amber-50/10 rounded-xl p-6">
+        <div className="bg-stone-100 rounded-xl p-6">
           <h2 className="text-sm font-medium mb-4">Quality Score Distribution</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={stats?.qualityDistribution ?? []}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="range" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
-              <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" />
+              <XAxis dataKey="range" tick={{ fill: "#78716c", fontSize: 12 }} axisLine={false} />
+              <YAxis tick={{ fill: "#78716c", fontSize: 12 }} axisLine={false} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#1f2937",
-                  border: "1px solid #374151",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #d6d3d1",
                   borderRadius: "8px",
-                  color: "#f3f4f6",
+                  color: "#1c1917",
                   fontSize: "12px",
                 }}
               />
@@ -141,25 +141,25 @@ function MetricsPage() {
       {/* Bottom row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top tags */}
-        <div className="bg-amber-50/10 rounded-xl p-6">
+        <div className="bg-stone-100 rounded-xl p-6">
           <h2 className="text-sm font-medium  mb-4">Top Feedback Tags</h2>
           {(stats?.topTags?.length ?? 0) > 0 ? (
             <div className="space-y-3">
               {stats!.topTags.map((t) => (
                 <div key={t.tag} className="flex items-center gap-3">
                   <span className="text-sm  w-20 font-mono">{t.tag}</span>
-                  <div className="flex-1 h-2 bg-amber-50/10 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-violet-600 rounded-full"
                       style={{ width: `${(t.count / stats!.topTags[0].count) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs text-blue-400 w-8 text-right">{t.count}</span>
+                  <span className="text-xs text-stone-500 w-8 text-right">{t.count}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-blue-600 text-sm">No feedback tags yet</p>
+            <p className="text-stone-9000 text-sm">No feedback tags yet</p>
           )}
         </div>
 
@@ -167,15 +167,15 @@ function MetricsPage() {
         <div className="space-y-4">
           <Link
             to="/dashboard"
-            className="group rounded-xl bg-amber-50/10 p-5  transition-colors block"
+            className="group rounded-xl bg-stone-100 p-5  transition-colors block"
           >
-            <h3 className="text-base font-semibold text-amber-50  transition-colors mb-1">
+            <h3 className="text-base font-semibold text-stone-900  transition-colors mb-1">
               My Data
             </h3>
             <p className="text-sm">Connect your wallet to browse vault keys and entries</p>
           </Link>
-          <Link to="/metrics/snapshots" className="group rounded-xl bg-amber-50/10 p-5 block">
-            <h3 className="text-base font-semibold text-amber-50  transition-colors mb-1">
+          <Link to="/metrics/snapshots" className="group rounded-xl bg-stone-100 p-5 block">
+            <h3 className="text-base font-semibold text-stone-900  transition-colors mb-1">
               Snapshots
             </h3>
             <p className="text-sm">View and create vault archive snapshots</p>
@@ -188,8 +188,8 @@ function MetricsPage() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl bg-amber-50/10 p-5">
-      <p className="text-xs text-amber-50 mb-1">{label}</p>
+    <div className="rounded-xl bg-stone-100 p-5">
+      <p className="text-xs text-stone-900 mb-1">{label}</p>
       <p className="text-2xl font-bold">{value}</p>
     </div>
   );
