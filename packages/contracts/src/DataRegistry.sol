@@ -58,7 +58,11 @@ contract DataRegistry is ERC721URIStorage, Ownable, Pausable {
     }
 
     /// @notice Toggle the active status of a data entry.
-    function setActive(uint256 tokenId, bool active) external onlyTokenOwner(tokenId) whenNotPaused {
+    function setActive(uint256 tokenId, bool active)
+        external
+        onlyTokenOwner(tokenId)
+        whenNotPaused
+    {
         _active[tokenId] = active;
         emit DataActiveToggled(tokenId, active);
     }

@@ -3,32 +3,37 @@
   "version": "0.3.0",
   "type": "module",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "bun": "./src/index.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./src/index.ts"
     },
     "./agent": {
       "bun": "./src/agent/index.ts",
       "import": "./dist/agent/index.js",
-      "types": "./dist/agent/index.d.ts"
+      "types": "./src/agent/index.ts"
     },
     "./discovery": {
       "bun": "./src/discovery/index.ts",
       "import": "./dist/discovery/index.js",
-      "types": "./dist/discovery/index.d.ts"
+      "types": "./src/discovery/index.ts"
     },
     "./transport": {
       "bun": "./src/transport/index.ts",
       "import": "./dist/transport/index.js",
-      "types": "./dist/transport/index.d.ts"
+      "types": "./src/transport/index.ts"
+    },
+    "./contracts": {
+      "bun": "./src/contracts.ts",
+      "import": "./dist/contracts.js",
+      "types": "./src/contracts.ts"
     },
     "./types": {
       "bun": "./src/types.ts",
       "import": "./dist/types.js",
-      "types": "./dist/types.d.ts"
+      "types": "./src/types.ts"
     }
   },
   "files": [

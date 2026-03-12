@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { NetworkId } from "@orbitmem/sdk";
+import type { NetworkId } from "@orbitmem/sdk/contracts";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { getConfigDir, loadConfig, saveConfig, saveKey } from "../config.js";
 import { output } from "../utils/output.js";

@@ -122,7 +122,10 @@ contract FeedbackRegistry is Ownable, Pausable {
     /// @param registry Address of the ERC-721 registry.
     /// @param entityId Token ID of the entity.
     /// @param index Index of the feedback entry in the caller's feedback array.
-    function revokeFeedback(address registry, uint256 entityId, uint256 index) external whenNotPaused {
+    function revokeFeedback(address registry, uint256 entityId, uint256 index)
+        external
+        whenNotPaused
+    {
         FeedbackEntry[] storage entries = _feedback[registry][entityId][msg.sender];
         if (index >= entries.length) revert FeedbackIndexOutOfBounds();
 

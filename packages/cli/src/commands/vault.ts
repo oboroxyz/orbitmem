@@ -1,4 +1,4 @@
-import type { Visibility } from "@orbitmem/sdk";
+import type { Visibility } from "@orbitmem/sdk/types";
 import { loadConfig, loadKey } from "../config.js";
 import { createClient } from "../utils/client.js";
 import { error, output } from "../utils/output.js";
