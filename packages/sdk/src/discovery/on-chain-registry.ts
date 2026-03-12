@@ -55,12 +55,20 @@ export class OnChainRegistry {
   }
 
   async findData(query: { activeOnly?: boolean }): Promise<DataRegistration[]> {
-    const logs = await this.pub.getContractEvents({
-      address: this.dataReg,
-      abi: DataRegistryAbi,
-      eventName: "DataRegistered",
-      fromBlock: this.deployBlock,
-    });
+    const latestBlock = await this.pub.getBlockNumber();
+    const CHUNK = 1000n;
+    const logs: Awaited<ReturnType<typeof this.pub.getContractEvents>>  = [];
+    for (let from = this.deployBlock; from <= latestBlock; from += CHUNK) {
+      const to = from + CHUNK - 1n > latestBlock ? latestBlock : from + CHUNK - 1n;
+      const chunk = await this.pub.getContractEvents({
+        address: this.dataReg,
+        abi: DataRegistryAbi,
+        eventName: "DataRegistered",
+        fromBlock: from,
+        toBlock: to,
+      });
+      logs.push(...chunk);
+    }
 
     const results: DataRegistration[] = [];
     for (const log of logs) {

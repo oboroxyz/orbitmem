@@ -33,7 +33,6 @@ const LIVE_ENV_VARS = [
   "RPC_URL",
   "DATA_REGISTRY_ADDRESS",
   "FEEDBACK_REGISTRY_ADDRESS",
-  "STORACHA_PROOF",
 ] as const;
 
 function validateLiveEnv(): void {
@@ -56,20 +55,20 @@ export async function createLiveServices(): Promise<RelayServices> {
   validateLiveEnv();
   const { createPublicClient, http } = await import("viem");
   const { LiveDiscoveryService } = await import("./live-discovery.js");
-  const { LiveSnapshotService } = await import("./live-snapshot.js");
-  const { LiveVaultService } = await import("./live-vault.js");
 
   const chain = getChain(process.env.CHAIN_ID);
   const transport = http(process.env.RPC_URL);
   const publicClient = createPublicClient({ chain, transport });
+  const deployBlock = BigInt(process.env.DEPLOY_BLOCK ?? "38728995");
 
   return {
-    vault: new LiveVaultService(),
-    snapshot: new LiveSnapshotService({ proof: process.env.STORACHA_PROOF! }),
+    vault: new MockVaultService(),
+    snapshot: new MockSnapshotService(),
     discovery: new LiveDiscoveryService({
       publicClient,
       dataRegistry: process.env.DATA_REGISTRY_ADDRESS as `0x${string}`,
       feedbackRegistry: process.env.FEEDBACK_REGISTRY_ADDRESS as `0x${string}`,
+      deployBlock,
     }),
     plan: new PlanService(),
   };
