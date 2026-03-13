@@ -29,32 +29,30 @@ IPFS gives you content-addressable storage — but not a database. Three things 
 `OrbitMem` is a sovereign data layer that sits between users and AI agents. Users store personal data locally in an encrypted P2P vault. Agents discover and consume data through an on-chain trust protocol — never touching a centralized server.
 
 ```
-┌─────────────┐         ┌──────────────────┐         ┌─────────────┐
-│   User       │◄───────►│   OrbitMem        │◄───────►│  AI Agent    │
-│              │         │                  │         │              │
-│  Owns data   │         │  Encrypted Vault │         │  Discovers   │
-│  Sets rules  │         │  Trust Protocol  │         │  Evaluates   │
-│  Rates agent │         │  Reputation      │         │  Consumes    │
-│              │         │                  │         │  Rates data  │
-└─────────────┘         └──────────────────┘         └─────────────┘
+┌─────────────────────────────────────────────────────────┐
+│  Interface          SDK + CLI (Skills)                   │
+└─────────────────────────────────────────────────────────┘
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│    Identity      │ │   Encryption    │ │ Discovery &     │
+│ Passkeys + EVM  │ │  Lit + AES-256  │ │ Trust           │
+│   + Solana      │ │                 │ │ ERC-8004        │
+└─────────────────┘ └─────────────────┘ └─────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│  Data Vault       OrbitDB Nested — local-first P2P      │
+└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│  Persistence      Storacha → Filecoin/IPFS              │
+└─────────────────────────────────────────────────────────┘
 ```
 
-- **Encryption** — Per-path encryption with fine-grained visibility control (Lit Protocol + AES-256-GCM)
-- **Authentication** — ERC-8128 signed HTTP transport with Passkey, EVM, and Solana wallets
-- **Discovery** — On-chain data discovery and quality scoring via ERC-8004
-
----
-
-## 📐 Architecture
-
-| Layer                 | Technology                            | Role                                                           |
-| :-------------------- | :------------------------------------ | :------------------------------------------------------------- |
-| **Identity**          | Porto Passkeys + EVM + Solana         | Biometric-first auth, multi-chain wallet support               |
-| **Data Vault**        | OrbitDB Nested (`@orbitdb/nested-db`) | Local-first P2P storage with hierarchical JSON paths           |
-| **Encryption**        | **Lit Protocol** + AES-256-GCM        | Reputation-gated access control, per-path encryption           |
-| **Persistence**       | **Storacha** (Filecoin/IPFS)          | Immutable archival snapshots, disaster recovery                |
-| **Data Discovery & Trust** | ERC-8004 for Data (ERC-721 + Reputation) | On-chain data discovery & reputation — data is a scored asset |
-| **Interface**         | TypeScript SDK + CLI + Claude Code Skill   | One-call lifecycle for users and AI agents — SDK, `npx orbitmem`, or natural language via Claude Code |
+| Layer | Technology | Role |
+| :--- | :--- | :--- |
+| **Interface** | SDK + CLI (Skills) | One-call lifecycle for users and AI agents |
+| **Identity** | Porto Passkeys + EVM + Solana | Biometric-first auth, multi-chain wallet support |
+| **Encryption** | Lit Protocol + AES-256-GCM | Reputation-gated access control, per-path encryption |
+| **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation) | On-chain data discovery & quality scoring |
+| **Data Vault** | OrbitDB Nested | Local-first P2P storage with hierarchical JSON paths |
+| **Persistence** | Storacha (Filecoin/IPFS) | Immutable archival snapshots, disaster recovery |
 
 ---
 
@@ -237,11 +235,11 @@ OrbitMem uses Lit Protocol as the encryption engine for shared data — reputati
 
 > Fully autonomous agent workflows — no human in the loop.
 
-OrbitMem is built for agent-first consumption. The CLI, SDK, and Claude Code skill provide everything an autonomous agent needs:
+OrbitMem is built for agent-first consumption. The CLI, SDK, and Skills provide everything an autonomous agent needs:
 
 - **`@orbitmem/cli`** — every command supports `--json` for machine-readable output, `--relay`/`--chain` overrides
 - **`createOrbitMemClient()`** — one-call lifecycle: discover → read → score → rate, no UI required
-- **Claude Code Skill** — AI agents operate OrbitMem via natural language (e.g. "store my travel preferences in the vault")
+- **Skills** — AI agents operate OrbitMem via natural language (e.g. "store my travel preferences in the vault")
 - **ERC-8128 transport auth** — agents sign their own requests with wallet keys, no OAuth or API keys
 
 ### 8. Agents With Receipts — ERC-8004
