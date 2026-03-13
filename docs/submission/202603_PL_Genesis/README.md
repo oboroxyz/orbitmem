@@ -10,7 +10,7 @@
 
 ---
 
-## The Problem
+## Problem
 
 There is no usable decentralized database. IPFS gives you content-addressable storage — but that's where it stops. Building real applications on top of decentralized infrastructure requires three things that IPFS alone doesn't provide:
 
@@ -24,7 +24,7 @@ AI agents, dApps, and user-facing applications all hit the same wall: IPFS is a 
 
 ---
 
-## The Solution
+## Solution
 
 OrbitMem is a sovereign data layer that sits between users and AI agents. Users store personal data locally in an encrypted P2P vault. Agents discover and consume data through an on-chain trust protocol — never touching a centralized server.
 
@@ -63,7 +63,7 @@ OrbitMem is a sovereign data layer that sits between users and AI agents. Users 
 
 ---
 
-## Key Innovation: ERC-8004 for Data
+## Key Feature: ERC-8004 for Data
 
 Most data systems have no quality signal. OrbitMem asks: **"Is this data trustworthy?"**
 
@@ -112,67 +112,97 @@ An agent can read `travel/dietary` instantly, negotiate access to `travel/budget
 
 ---
 
-## Sponsor Technology Integration
+## [Challenges](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/hackathons/52?activeTab=challenges)
 
-### Storacha — Decentralized Hot Storage (Filecoin/IPFS)
+### 1. Fresh Code
 
-OrbitMem uses Storacha as the **persistence and archival layer**. All vault data is periodically snapshotted and stored on the Filecoin network via Storacha, providing:
+> Build new solutions
 
-- **Immutable backups** — encrypted vault snapshots archived to Filecoin via Storacha upload
-- **Disaster recovery** — restore full vault state from any snapshot CID
-- **Verifiable storage** — Filecoin deals provide cryptographic proof that data is stored
-- **No plaintext exposure** — Storacha only sees encrypted blobs (encryption happens before upload)
+OrbitMem is built from scratch for this hackathon — SDK, relay, contracts, CLI, and web. [GitHub](https://github.com/oboroxyz/orbitmem)
+
+### 2. Infrastructure & Digital Rights
+
+> Build the foundational systems that secure the internet and expand digital human rights.
+
+OrbitMem gives users self-custodial, encrypted data with access control — no centralized server ever sees plaintext data.
+
+- **`@orbitmem/sdk`** — 6-layer composable SDK: identity, encryption (AES-256-GCM + Lit Protocol), P2P vault (OrbitDB Nested), transport (ERC-8128 signed requests), discovery, persistence
+- **`@orbitmem/cli`** — `npx orbitmem init` generates EVM identity, `vault store/get/ls` manages encrypted data, all commands support `--json` for machine consumption
+- **Per-path visibility** — same vault tree with `public`, `shared` (reputation-gated via Lit), and `private` (AES encrypted) paths
+
+### 3. AI & Robotics
+
+> Verifiable AI, agent coordination, and autonomous systems.
+
+OrbitMem provides the data layer for autonomous AI agents — on-chain data discovery, verifiable quality scores, and auditable receipts for every interaction.
+
+- **Agent Adapter** — `createOrbitMemAgentAdapter()` provides a one-call lifecycle: `discoverData` → `readPublicData` → `getDataScore` → `rateData`
+- **ERC-8004 on-chain trust** — `DataRegistry` (ERC-721) mints data as discoverable assets; `FeedbackRegistry` scores data quality with per-tag reputation (`accurate`, `fresh`)
+- **Agents with receipts** — every data interaction produces an auditable on-chain receipt via `giveFeedback()`
 
 ```
-OrbitDB Nested Vault → Export Snapshot → Already Encrypted → Storacha Upload
-                                                              ↓
-                                                         Filecoin Deal
-                                                         (verifiable storage)
+Agent A registers data → DataRegistry mints NFT (receipt)
+                                        ↓
+Agent B discovers via schema query → checks FeedbackRegistry score
+                                        ↓
+Agent B consumes data → rates via giveFeedback() → on-chain receipt
+                                        ↓
+Agent A's reputation increases → more discoverable → virtuous cycle
 ```
 
-### Lit Protocol — Reputation-Gated Encryption
+### 4. Filecoin
 
-Lit Protocol is OrbitMem's **primary encryption engine for shared data**. It enables:
+> Agent storage, onchain registry, reputation, and data marketplace.
 
-- **On-chain condition-based decryption** — agents can only decrypt if data quality conditions are met
-- **No trusted intermediary** — Lit's distributed key management means no single party holds decryption keys
-- **Dynamic access** — if an agent's reputation drops below threshold, they lose access automatically
-- **Composable conditions** — combine reputation score, token holdings, time windows, and more
+OrbitMem uses Filecoin (via Storacha) for verifiable archival storage and IPFS/OrbitDB for local-first P2P replication.
 
-```typescript
-// Lit encrypts data with on-chain access conditions
-const accessConditions = [
-  orbitmem.discovery.createDataQualityCondition({
-    minQuality: 80,        // Feedback Registry quality check
-    verifiedOnly: true,    // Require verified data sources
-  }),
-];
-```
+OrbitMem addresses **4 of 7** Filecoin challenge ideas:
 
-### Filecoin Ecosystem — Sovereign Data Layer
+| Challenge Idea | OrbitMem Implementation |
+| :--- | :--- |
+| **Onchain Agent Registry** | `DataRegistry` (ERC-721) — `register(dataURI)` mints on-chain pointers to off-chain data |
+| **Agent Reputation & Portable Identity** | `FeedbackRegistry` — registry-agnostic reputation with per-tag scoring, bidirectional feedback |
+| **Agent-Generated Data Marketplace** | Agent Adapter lifecycle: discover → evaluate → consume → rate |
+| **Agent Storage SDK** | `@orbitmem/sdk` + `@orbitmem/cli` — encrypted vault, Storacha persistence, `--json` output |
 
-OrbitMem directly advances the **"Sovereign Data Layer"** vision from the Protocol Labs ecosystem:
+**Storacha integration:** encrypted vault snapshots archived to Filecoin via `@storacha/client` — immutable backups, CID-based retrieval, verifiable storage deals. No plaintext exposure (encryption before upload).
 
-- IPFS for content-addressable data transport
-- Filecoin (via Storacha) for verifiable long-term storage
-- OrbitDB (built on Helia/IPFS) for local-first P2P replication
-- ERC-721 NFTs as on-chain pointers to off-chain data
+### 5. Storacha
+
+> Meaningful use of Storacha SDK.
+
+OrbitMem wraps Storacha as its persistence layer — encrypted vault snapshots archived to Filecoin with one command.
+
+- **`createPersistenceLayer()`** — wraps `@storacha/client` for Filecoin/IPFS archival snapshots
+- **`npx orbitmem snapshot`** — one-command vault archive from CLI
+- **`POST /v1/snapshots/archive`** — relay endpoint for programmatic snapshot creation
+
+### 6. Lit Protocol
+
+> NextGen AI apps with Lit Protocol integration.
+
+OrbitMem uses Lit Protocol as the encryption engine for shared data — reputation-gated decryption with no trusted intermediary.
+
+- **`LitEngine`** in `@orbitmem/sdk` — lazy-loaded client with session signatures and reputation-gated access conditions
+- **On-chain condition-based decryption** — agents can only decrypt if `FeedbackRegistry` quality score meets threshold
+- **Dynamic access revocation** — reputation drops below minimum → access revoked automatically
+
+### 7. Funding the Commons
+
+> Opportunity to become EIR
 
 ---
 
-## Example Applications
+## Example Apps
 
-### 1. Decentralized Personal Memo App
+### Decentralized Memo App
 
-A fully decentralized note-taking app — no server, no platform, no lock-in. The app itself is deployed on IPFS, so even the frontend runs in a decentralized way.
-
-**How it works:**
+A fully decentralized note-taking app — no server, no platform, no lock-in.
 
 - User connects a wallet (passkey or EVM) → creates an OrbitMem vault
-- **Public memos** — stored with `visibility: 'public'`, anyone with the vault address can read and share them. Discoverable on-chain via ERC-8004 Data Registry
-- **Private memos** — stored with `visibility: 'private'`, AES-256-GCM encrypted with the user's session key. Only the owner can decrypt
-- All data persisted to Filecoin via Storacha — memos survive even if the user's device is lost
-- The app is a static site deployed on IPFS — no backend, no database server, fully sovereign
+- **Public memos** — `visibility: 'public'`, shareable links anyone can view without a wallet
+- **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
+- Markdown editor with live preview and GFM support
 
 ```
 User writes memo → OrbitMem Vault (OrbitDB)
@@ -182,47 +212,7 @@ User writes memo → OrbitMem Vault (OrbitDB)
                     Storacha → Filecoin (backup)
 ```
 
-**What this demonstrates:** OrbitMem turns IPFS into a usable database — with encryption, authentication, and indexing — enabling fully decentralized applications that were previously impossible with raw IPFS alone.
-
-### 2. Agent-to-Agent Data Marketplace
-
-AI agents don't just consume user data — they produce valuable data too. Research summaries, market analyses, curated datasets. Today, there's no decentralized way for agents to publish and discover each other's work.
-
-**How it works:**
-
-- An AI research agent completes an analysis and publishes it to an OrbitMem vault
-- The agent registers the data on-chain via ERC-8004 — minting an NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
-- Other agents discover the data by querying the Data Registry for matching schemas and minimum quality scores
-- Consuming agents rate the data via the Feedback Registry — was it accurate? fresh? complete?
-- High-quality data producers earn higher reputation scores, making their future publications more discoverable
-
-```
-Agent A publishes research → Vault + ERC-8004 (on-chain pointer)
-                                        ↓
-Agent B discovers via schema query → evaluates quality score
-                                        ↓
-Agent B consumes data → rates accuracy → FeedbackRegistry
-                                        ↓
-Agent A's reputation increases → more discoverable
-```
-
-**What this demonstrates:** ERC-8004 creates a decentralized data marketplace where quality is verifiable on-chain. Agents build reputation through the data they produce, not just the data they consume — enabling a trust-based economy for autonomous AI collaboration.
-
----
-
-## Hackathon Track Alignment
-
-### Primary: AI/AGI and Robotics
-
-OrbitMem solves the **data access problem for autonomous AI agents** — how agents get the personal context they need to act on behalf of users, without compromising privacy or requiring centralized data brokers.
-
-### Secondary: Web3 and Digital Human Rights
-
-OrbitMem establishes **data sovereignty as a protocol-level right**: users own their data in a P2P vault, control who accesses what through on-chain conditions, and maintain a verifiable reputation system that holds both users and agents accountable.
-
-### Secondary: Crypto and Economic Systems
-
-The bidirectional ERC-8004 trust model creates a **new economic primitive**: data-as-a-scored-asset. Quality data is discoverable and valuable. A reputation economy emerges where both data providers and consumers are incentivized to maintain high standards.
+See [`examples/memo/`](../../examples/memo/) for the full source.
 
 ---
 

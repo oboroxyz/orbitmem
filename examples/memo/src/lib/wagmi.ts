@@ -16,7 +16,7 @@ const connectors = [
   ...(portoConnector ? [portoConnector] : []),
   injected(),
   walletConnect({
-    projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "orbitmem-memo-dev",
+    projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "orbitmem-memo-demo",
   }),
 ];
 

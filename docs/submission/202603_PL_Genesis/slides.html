@@ -6,12 +6,15 @@
 <title>OrbitMem — PL_Genesis Hackathon</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  :root{
-    --color-accent-500: #FEF073;
-  }
-  @import url('https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet');
-  body { font-family: 'Raleway', sans-serif; }
-  h1, h2, h3, h4, h5, h6 { font-family: 'Arvo', Georgia, serif; }
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+  body { font-family: 'JetBrains Mono', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3, h4, h5, h6 { font-weight: 600; }
+  .text-xxs { font-size: 0.625rem; }
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.15s; }
+  .btn-outline { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.15s; }
+  @keyframes pulse-0 { 50% { opacity: 0; } }
+  .animate-pulse-0 { animation: pulse-0 3s ease-in-out infinite; }
+  /* --- slides-specific --- */
   .slide { display: none; min-height: 100vh; }
   .slide.active { display: flex; }
   .progress-bar { transition: width 0.3s ease; }
@@ -19,275 +22,236 @@
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
-<body class="bg-blue-950 text-amber-50 overflow-hidden select-none">
+<body class="bg-stone-50 text-stone-900 overflow-hidden select-none">
 
 <!-- Slide 1: Title -->
 <section class="slide active flex-col items-center justify-center text-center px-8" data-slide="1">
   <div class="fade-in">
-    <h1 class="text-7xl font-bold tracking-tight mb-6 text-amber-100">
-      OrbitMem
+    <h1 class="font-mono text-sm tracking-tight mb-8">
+      <pre>▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄   <br />██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██   <br />▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██ <span class="animate-pulse-0">██</span><br /></pre>
     </h1>
-    <p class="text-2xl max-w-2xl mx-auto mb-12">
-      The decentralized data layer for the agentic web
+    <p class="text-2xl max-w-2xl mx-auto mb-24 text-stone-700">
+      Decentralized data layer for the agentic web
     </p>
-    <div class="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full bg-amber-50/20">
-      PL_Genesis: Frontiers of Collaboration Hackathon
-    </div>
+    <div class="inline-flex bg-white px-4 py-2 rounded-full border border-stone-200 text-stone-500">PL_Genesis: Frontiers of Collaboration Hackathon</div>
   </div>
 </section>
 
-<!-- Slide 2: The Problem -->
+<!-- Slide 2: Problem -->
 <section class="slide flex-col items-center justify-center px-16" data-slide="2">
   <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-bold mb-12 text-center">Problem</h2>
-    <p class="text-lg  text-center mb-10">Today's AI agents require users to surrender personal data to centralized servers.</p>
-    <div class="grid grid-cols-3 gap-8">
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100">
-        <div class="text-3xl mb-4">🔒</div>
-        <h3 class="text-lg font-bold mb-2">No Data Sovereignty</h3>
-        <p class="text-sm leading-relaxed">Users don't own their data — platforms do. When a service shuts down, your context disappears.</p>
+    <h2 class="text-4xl font-semibold mb-4 text-center">Problem</h2>
+    <p class="text-lg text-stone-500 text-center mb-14">There is no usable decentralized database.<br>IPFS gives you content-addressable storage — but that's where it stops.</p>
+    <div class="grid grid-cols-3 gap-12 text-center">
+      <div class="space-y-4">
+        <div class="text-5xl">🔓</div>
+        <h3 class="text-xl font-semibold">No Encryption</h3>
+        <p class="text-base text-stone-500 leading-relaxed">IPFS stores data in the open. No built-in per-record encryption or fine-grained access control.</p>
       </div>
-      <div class="bg-smber-50/10 rounded-2xl p-8 border border-gray-100">
-        <div class="text-3xl mb-4">❓</div>
-        <h3 class="text-lg font-bold mb-2">No Trust Signal</h3>
-        <p class=" text-sm leading-relaxed">Users can't verify if an agent is trustworthy. Agents can't verify if user data is accurate. No shared reputation.</p>
+      <div class="space-y-4">
+        <div class="text-5xl">🚫</div>
+        <h3 class="text-xl font-semibold">No Authentication</h3>
+        <p class="text-base text-stone-500 leading-relaxed">No identity layer, no signed requests. Any node can access any content if it has the CID.</p>
       </div>
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100">
-        <div class="text-3xl mb-4">🚫</div>
-        <h3 class="text-lg font-bold mb-2">No Selective Disclosure</h3>
-        <p class=" text-sm leading-relaxed">It's all-or-nothing. You can't share dietary preferences while keeping your passport private.</p>
+      <div class="space-y-4">
+        <div class="text-5xl">🔍</div>
+        <h3 class="text-xl font-semibold">No Indexing</h3>
+        <p class="text-base text-stone-500 leading-relaxed">No discovery, no search, no quality signal. Without indexing, decentralized data is invisible.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Slide 3: The Solution -->
+<!-- Slide 3: Solution -->
 <section class="slide flex-col items-center justify-center px-16" data-slide="3">
-  <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-bold mb-12 text-center">The Solution</h2>
-    <div class="flex items-center justify-center gap-6">
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100 text-center w-56">
-        <div class="text-4xl mb-3">👤</div>
-        <h3 class="text-lg font-bold mb-2">User</h3>
-        <p class=" text-sm">Owns data<br>Sets rules<br>Rates agents</p>
+  <div class="fade-in w-full max-w-4xl text-center">
+    <h2 class="text-4xl font-semibold mb-6">OrbitMem</h2>
+    <p class="text-2xl text-stone-700 leading-relaxed mb-14">
+      A sovereign data layer for AI agents — encrypted P2P vaults,<br>
+      multi-chain identity, and on-chain data trust.
+    </p>
+    <div class="grid grid-cols-3 gap-12">
+      <div class="space-y-4">
+        <div class="text-4xl">🔒</div>
+        <h3 class="text-xl font-semibold">Encryption</h3>
+        <p class="text-base text-stone-500">Per-path encryption with fine-grained visibility control</p>
       </div>
-      <div class="flex flex-col items-center gap-1 text-gray-300">
-        <svg class="w-12 h-6" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-        <svg class="w-12 h-6 rotate-180" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+      <div class="space-y-4">
+        <div class="text-4xl">🔑</div>
+        <h3 class="text-xl font-semibold">Authentication</h3>
+        <p class="text-base text-stone-500">Signed HTTP transport with Passkey, EVM, and Solana wallets</p>
       </div>
-      <div class="bg-blue-50 rounded-2xl p-8 border-2 border-blue-200 text-center w-64">
-        <div class="text-4xl mb-3"><span class="text-blue-600 font-bold text-2xl">Orbit</span><span class="font-bold text-2xl">Mem</span></div>
-        <p class="text-gray-600 text-sm font-medium">Encrypted Vault<br>Trust Protocol<br>On-Chain Reputation</p>
-      </div>
-      <div class="flex flex-col items-center gap-1 text-gray-300">
-        <svg class="w-12 h-6" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-        <svg class="w-12 h-6 rotate-180" viewBox="0 0 48 24"><path d="M0 12h44m-6-6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
-      </div>
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100 text-center w-56">
-        <div class="text-4xl mb-3">🤖</div>
-        <h3 class="text-lg font-bold mb-2">AI Agent</h3>
-        <p class=" text-sm">Discovers data<br>Evaluates quality<br>Rates accuracy</p>
+      <div class="space-y-4">
+        <div class="text-4xl">📡</div>
+        <h3 class="text-xl font-semibold">Indexing</h3>
+        <p class="text-base text-stone-500">On-chain data discovery and quality scoring via ERC-8004</p>
       </div>
     </div>
-    <p class="text-center text-gray-400 mt-8 text-sm">Users store data locally in encrypted P2P vaults. Agents discover and consume through on-chain trust — never touching a centralized server.</p>
   </div>
 </section>
 
-<!-- Slide 4: How It Works -->
+<!-- Slide 4: Features -->
 <section class="slide flex-col items-center justify-center px-16" data-slide="4">
-  <div class="fade-in w-full max-w-4xl">
-    <h2 class="text-4xl font-bold mb-12 text-center">How It Works</h2>
-    <div class="space-y-4">
-      <div class="flex items-start gap-4">
-        <span class="flex shrink-0 w-10 h-10 bg-yellow-600 text-white rounded-full items-center justify-center font-bold text-lg">1</span>
-        <div><span class="font-semibold">User stores data</span><span class=""> in a local-first OrbitDB Nested vault with per-path encryption</span></div>
+  <div class="fade-in w-full max-w-5xl">
+    <h2 class="text-4xl font-semibold mb-12 text-center">Features</h2>
+    <div class="grid gap-10 grid-cols-2 text-center">
+      <div class="space-y-4">
+        <div class="text-4xl">🌐</div>
+        <h3 class="text-xl font-semibold">Fully Decentralized</h3>
+        <p class="text-base text-stone-500 leading-relaxed">Built on IPFS and OrbitDB — no central servers, no single point of failure. Offline-first, censorship resistant.</p>
       </div>
-      <div class="flex items-start gap-4">
-        <span class="flex shrink-0 w-10 h-10 bg-yellow-600 text-white rounded-full items-center justify-center font-bold text-lg">2</span>
-        <div><span class="font-semibold">User registers data on-chain</span><span class=""> as discoverable assets via ERC-8004 (ERC-721 NFT = public pointer to private data)</span></div>
+      <div class="space-y-4">
+        <div class="text-4xl">🔒</div>
+        <h3 class="text-xl font-semibold">Encrypted Vaults</h3>
+        <p class="text-base text-stone-500 leading-relaxed">P2P data vaults with per-path visibility control. End-to-end encryption — only authorized parties can decrypt.</p>
       </div>
-      <div class="flex items-start gap-4">
-        <span class="flex shrink-0 w-10 h-10 bg-yellow-600 text-white rounded-full  items-center justify-center font-bold text-lg">3</span>
-        <div><span class="font-semibold">Agent discovers data</span><span class=""> by querying on-chain registries for matching schemas and quality scores</span></div>
+      <div class="space-y-4">
+        <div class="text-4xl">✅</div>
+        <h3 class="text-xl font-semibold">On-chain Trust</h3>
+        <p class="text-base text-stone-500 leading-relaxed">Quality scoring via ERC-8004. Every data entry is rated by humans and agents, building a decentralized reputation layer.</p>
       </div>
-      <div class="flex items-start gap-4">
-        <span class="flex shrink-0 w-10 h-10 bg-yellow-600 text-white rounded-full  items-center justify-center font-bold text-lg">4</span>
-        <div><span class="font-semibold">Agent evaluates quality</span><span class=""> before consuming — reputation scores are on-chain and verifiable</span></div>
-      </div>
-      <div class="flex items-start gap-4">
-        <span class="flex shrink-0 w-10 h-10 bg-yellow-600 text-white rounded-full  items-center justify-center font-bold text-lg">5</span>
-        <div><span class="font-semibold">Agent decrypts via Lit Protocol</span><span class=""> — reputation-gated access, plaintext zeroed after use</span></div>
-      </div>
-      <div class="flex items-start gap-4">
-        <span class="flex shrink-0 w-10 h-10 bg-yellow-600 text-white rounded-full  items-center justify-center font-bold text-lg">6</span>
-        <div><span class="font-semibold">Both sides rate each other</span><span class=""> — bidirectional feedback loop improves the ecosystem over time</span></div>
+      <div class="space-y-4">
+        <div class="text-4xl">✍️</div>
+        <h3 class="text-xl font-semibold">Signed Transport</h3>
+        <p class="text-base text-stone-500 leading-relaxed">ERC-8128 signed HTTP with Passkey, ETH or Solana Wallet. Every request is cryptographically verified across chains.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Slide 5: Architecture -->
+<!-- Slide 5: Getting Started -->
 <section class="slide flex-col items-center justify-center px-16" data-slide="5">
+  <div class="fade-in w-full max-w-3xl">
+    <h2 class="text-4xl font-semibold mb-12 text-center">Getting Started</h2>
+    <div class="space-y-6">
+      <div class="flex items-center gap-6">
+        <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">1</span>
+        <div>
+          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem init</code>
+          <p class="text-base text-stone-500 mt-2">Generate keys and create config</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">2</span>
+        <div>
+          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem vault store &lt;path&gt; &lt;value&gt;</code>
+          <p class="text-base text-stone-500 mt-2">Store data in your encrypted vault</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">3</span>
+        <div>
+          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem register</code>
+          <p class="text-base text-stone-500 mt-2">Register data on-chain (ERC-8004)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">4</span>
+        <div>
+          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem discover</code>
+          <p class="text-base text-stone-500 mt-2">Search data sources by quality and tags</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slide 6: Architecture -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="6">
   <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-bold mb-10 text-center">Architecture — 6 Composable Layers</h2>
+    <h2 class="text-4xl font-semibold mb-10 text-center">Architecture — 6 Composable Layers</h2>
     <table class="w-full text-left">
       <thead>
-        <tr class="border-b-2 border-gray-200">
-          <th class="py-3 pr-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Layer</th>
-          <th class="py-3 pr-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">Technology</th>
-          <th class="py-3 text-sm font-semibold text-gray-400 uppercase tracking-wider">Role</th>
+        <tr class="border-b-2 border-stone-300">
+          <th class="py-3 pr-4 text-sm font-semibold text-stone-500 uppercase tracking-wider">Layer</th>
+          <th class="py-3 pr-4 text-sm font-semibold text-stone-500 uppercase tracking-wider">Technology</th>
+          <th class="py-3 text-sm font-semibold text-stone-500 uppercase tracking-wider">Role</th>
         </tr>
       </thead>
       <tbody class="text-sm">
-        <tr class="border-b border-gray-100">
+        <tr class="border-b border-stone-200">
           <td class="py-4 pr-4 font-semibold">Identity</td>
-          <td class="py-4 pr-4 text-gray-600">Porto Passkeys + EVM + Solana</td>
-          <td class="py-4 ">Biometric-first auth, multi-chain wallets</td>
+          <td class="py-4 pr-4 text-stone-600">Porto Passkeys + EVM + Solana</td>
+          <td class="py-4 text-stone-700">Biometric-first auth, multi-chain wallets</td>
         </tr>
-        <tr class="border-b border-gray-100">
+        <tr class="border-b border-stone-200">
           <td class="py-4 pr-4 font-semibold">Data Vault</td>
-          <td class="py-4 pr-4 text-gray-600">OrbitDB Nested</td>
-          <td class="py-4 ">Local-first P2P storage, hierarchical paths</td>
+          <td class="py-4 pr-4 text-stone-600">OrbitDB Nested</td>
+          <td class="py-4 text-stone-700">Local-first P2P storage, hierarchical paths</td>
         </tr>
-        <tr class="border-b border-gray-100">
+        <tr class="border-b border-stone-200">
           <td class="py-4 pr-4 font-semibold">Encryption</td>
-          <td class="py-4 pr-4"><span class="text-blue-600 font-semibold">Lit Protocol</span> + AES-256-GCM</td>
-          <td class="py-4 ">Reputation-gated access, per-path encryption</td>
+          <td class="py-4 pr-4"><span class="text-stone-900 font-semibold">Lit Protocol</span> + AES-256-GCM</td>
+          <td class="py-4 text-stone-700">Reputation-gated access, per-path encryption</td>
         </tr>
-        <tr class="border-b border-gray-100">
+        <tr class="border-b border-stone-200">
           <td class="py-4 pr-4 font-semibold">Persistence</td>
-          <td class="py-4 pr-4"><span class="text-blue-600 font-semibold">Storacha</span> (Filecoin/IPFS)</td>
-          <td class="py-4 ">Immutable archival snapshots, disaster recovery</td>
+          <td class="py-4 pr-4"><span class="text-stone-900 font-semibold">Storacha</span> (Filecoin/IPFS)</td>
+          <td class="py-4 text-stone-700">Immutable archival snapshots, disaster recovery</td>
         </tr>
-        <tr class="border-b border-gray-100">
+        <tr class="border-b border-stone-200">
           <td class="py-4 pr-4 font-semibold">Trust & Discovery</td>
-          <td class="py-4 pr-4">ERC-8004 (ERC-721 + Reputation)</td>
-          <td class="py-4 ">On-chain data discovery & reputation scoring</td>
+          <td class="py-4 pr-4 text-stone-600">ERC-8004 (ERC-721 + Reputation)</td>
+          <td class="py-4 text-stone-700">On-chain data discovery & reputation scoring</td>
         </tr>
         <tr>
           <td class="py-4 pr-4 font-semibold">Agent Adapter</td>
-          <td class="py-4 pr-4 text-gray-600">TypeScript SDK</td>
-          <td class="py-4 ">Discover → decrypt → execute → rate lifecycle</td>
+          <td class="py-4 pr-4 text-stone-600">TypeScript SDK</td>
+          <td class="py-4 text-stone-700">Discover → decrypt → execute → rate lifecycle</td>
         </tr>
       </tbody>
     </table>
   </div>
 </section>
 
-<!-- Slide 6: ERC-8004 -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="6">
-  <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-bold mb-4 text-center">Key Innovation: ERC-8004 for Data</h2>
-    <p class="text-center  mb-10 text-lg">On-chain data quality scoring — "Is this data trustworthy?"</p>
-    <div class="flex items-center justify-center gap-8">
-      <div class="bg-amber-50/10 rounded-2xl p-6 border border-gray-100 text-center flex-1 max-w-xs">
-        <h3 class="font-bold mb-2">DataRegistry</h3>
-        <p class="text-gray-400 text-xs uppercase tracking-wider mb-3">ERC-721</p>
-        <p class=" text-sm">Mint NFTs as on-chain pointers to off-chain encrypted data</p>
-      </div>
-      <div class="text-gray-300 text-3xl">→</div>
-      <div class="bg-amber-50/10 rounded-2xl p-6 border border-gray-100 text-center flex-1 max-w-xs">
-        <h3 class="font-bold mb-2">FeedbackRegistry</h3>
-        <p class="text-gray-400 text-xs uppercase tracking-wider mb-3">Registry-Agnostic</p>
-        <p class=" text-sm">Bidirectional scoring with per-tag reputation (accurate, fresh, complete)</p>
-      </div>
-      <div class="text-gray-300 text-3xl">→</div>
-      <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 text-center flex-1 max-w-xs">
-        <h3 class="font-bold text-blue-700 mb-2">Virtuous Cycle</h3>
-        <p class="text-gray-400 text-xs uppercase tracking-wider mb-3">Trust Flywheel</p>
-        <p class=" text-sm">High-quality data → more consumption → more feedback → higher scores</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- Slide 7: Demo -->
 <section class="slide flex-col items-center justify-center px-16" data-slide="7">
   <div class="fade-in text-center">
-    <div class="text-7xl font-extrabold tracking-tight mb-6 text-amber-100">DEMO</div>
-    <p class="text-xl text-gray-400">Live walkthrough of OrbitMem dashboard</p>
-    <div class="mt-10 flex items-center justify-center gap-6 text-sm text-gray-400">
-      <span class="bg-amber-50/10 px-4 py-2 rounded-full border border-gray-100">Connect Wallet</span>
-      <span class="text-gray-300">→</span>
-      <span class="bg-amber-50/10 px-4 py-2 rounded-full border border-gray-100">Explore Vault</span>
-      <span class="text-gray-300">→</span>
-      <span class="bg-amber-50/10 px-4 py-2 rounded-full border border-gray-100">Search Data</span>
-      <span class="text-gray-300">→</span>
-      <span class="bg-amber-50/10 px-4 py-2 rounded-full border border-gray-100">Score & Feedback</span>
-      <span class="text-gray-300">→</span>
-      <span class="bg-amber-50/10 px-4 py-2 rounded-full border border-gray-100">Metrics</span>
+    <div class="text-7xl font-extrabold tracking-tight mb-6 text-stone-900">DEMO</div>
+    <p class="text-xl text-stone-500">Live walkthrough of OrbitMem dashboard</p>
+    <div class="mt-10 flex items-center justify-center gap-6 text-sm text-stone-500">
+      <span class="bg-white px-4 py-2 rounded-full border border-stone-200">Connect Wallet</span>
+      <span class="text-stone-400">→</span>
+      <span class="bg-white px-4 py-2 rounded-full border border-stone-200">Explore Vault</span>
+      <span class="text-stone-400">→</span>
+      <span class="bg-white px-4 py-2 rounded-full border border-stone-200">Search Data</span>
+      <span class="text-stone-400">→</span>
+      <span class="bg-white px-4 py-2 rounded-full border border-stone-200">Score & Feedback</span>
+      <span class="text-stone-400">→</span>
+      <span class="bg-white px-4 py-2 rounded-full border border-stone-200">Metrics</span>
     </div>
   </div>
 </section>
 
-<!-- Slide 8: What We Built -->
+<!-- Slide 8: Challenges -->
 <section class="slide flex-col items-center justify-center px-16" data-slide="8">
   <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-bold mb-10 text-center">What We Built</h2>
-    <div class="grid grid-cols-3 gap-6 mb-8">
-      <div class="bg-amber-50/10 rounded-2xl p-6 border border-gray-100 text-center">
-        <div class="text-4xl font-extrabold text-blue-600 mb-1">8,300+</div>
-        <p class=" text-sm">Lines of Code</p>
-      </div>
-      <div class="bg-amber-50/10 rounded-2xl p-6 border border-gray-100 text-center">
-        <div class="text-4xl font-extrabold text-blue-600 mb-1">4</div>
-        <p class=" text-sm">Packages (SDK, Relay, Contracts, Web)</p>
-      </div>
-      <div class="bg-amber-50/10 rounded-2xl p-6 border border-gray-100 text-center">
-        <div class="text-4xl font-extrabold text-blue-600 mb-1">21</div>
-        <p class=" text-sm">Test Files</p>
-      </div>
-    </div>
-    <div class="grid grid-cols-4 gap-4">
-      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-        <div class="font-bold text-lg mb-1">SDK</div>
-        <p class="text-gray-400 text-xs">6 composable layers<br>~3,500 LoC</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-        <div class="font-bold text-lg mb-1">Relay</div>
-        <p class="text-gray-400 text-xs">11 API routes<br>ERC-8128 auth</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-        <div class="font-bold text-lg mb-1">Contracts</div>
-        <p class="text-gray-400 text-xs">2 Solidity contracts<br>ERC-8004</p>
-      </div>
-      <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-        <div class="font-bold text-lg mb-1">Web</div>
-        <p class="text-gray-400 text-xs">React dashboard<br>Real-time metrics</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Slide 9: Sponsor Tech -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="9">
-  <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-bold mb-10 text-center">Sponsor Technology Integration</h2>
+    <h2 class="text-4xl font-semibold mb-10 text-center">Challenges</h2>
     <div class="grid grid-cols-3 gap-8">
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100">
-        <h3 class="text-xl font-bold mb-1 text-blue-600">Storacha</h3>
-        <p class="text-gray-400 text-xs uppercase tracking-wider mb-4">Persistence Layer</p>
-        <ul class=" text-sm space-y-2">
+      <div class="bg-white rounded-2xl p-8 border border-stone-200">
+        <h3 class="text-xl font-semibold mb-1 text-stone-900">Storacha</h3>
+        <p class="text-stone-500 text-xs uppercase tracking-wider mb-4">Persistence Layer</p>
+        <ul class="text-sm space-y-2 text-stone-700">
           <li>Encrypted vault snapshots → Filecoin</li>
           <li>CID-based retrieval & restore</li>
           <li>Verifiable storage deals</li>
           <li>No plaintext exposure</li>
         </ul>
       </div>
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100">
-        <h3 class="text-xl font-bold mb-1 text-blue-600">Lit Protocol</h3>
-        <p class="text-gray-400 text-xs uppercase tracking-wider mb-4">Encryption Engine</p>
-        <ul class=" text-sm space-y-2">
+      <div class="bg-white rounded-2xl p-8 border border-stone-200">
+        <h3 class="text-xl font-semibold mb-1 text-stone-900">Lit Protocol</h3>
+        <p class="text-stone-500 text-xs uppercase tracking-wider mb-4">Encryption Engine</p>
+        <ul class="text-sm space-y-2 text-stone-700">
           <li>On-chain condition-based decryption</li>
           <li>Session signatures for agents</li>
           <li>Reputation-gated access control</li>
           <li>No trusted intermediary</li>
         </ul>
       </div>
-      <div class="bg-amber-50/10 rounded-2xl p-8 border border-gray-100">
-        <h3 class="text-xl font-bold mb-1 text-blue-600">Filecoin / IPFS</h3>
-        <p class="text-gray-400 text-xs uppercase tracking-wider mb-4">Data Infrastructure</p>
-        <ul class=" text-sm space-y-2">
+      <div class="bg-white rounded-2xl p-8 border border-stone-200">
+        <h3 class="text-xl font-semibold mb-1 text-stone-900">Filecoin / IPFS</h3>
+        <p class="text-stone-500 text-xs uppercase tracking-wider mb-4">Data Infrastructure</p>
+        <ul class="text-sm space-y-2 text-stone-700">
           <li>Content-addressable transport</li>
           <li>OrbitDB on Helia (IPFS)</li>
           <li>Verifiable long-term storage</li>
@@ -298,44 +262,44 @@
   </div>
 </section>
 
-<!-- Slide 10: Why It Matters -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="10">
+<!-- Slide 9: Why It Matters -->
+<section class="slide flex-col items-center justify-center px-16" data-slide="9">
   <div class="fade-in w-full max-w-4xl text-center">
-    <h2 class="text-4xl font-bold mb-10">Why OrbitMem Matters</h2>
+    <h2 class="text-4xl font-semibold mb-10">Why OrbitMem Matters</h2>
     <div class="grid grid-cols-3 gap-8 mb-12">
       <div>
         <div class="text-3xl mb-3">👤</div>
-        <h3 class="font-bold mb-2">For Users</h3>
-        <p class=" text-sm">Own your data. Decide what to share, with whom, under what conditions. Portable across platforms.</p>
+        <h3 class="font-semibold mb-2">For Users</h3>
+        <p class="text-sm text-stone-700">Own your data. Decide what to share, with whom, under what conditions. Portable across platforms.</p>
       </div>
       <div>
         <div class="text-3xl mb-3">🤖</div>
-        <h3 class="font-bold mb-2">For Agents</h3>
-        <p class=" text-sm">Discover verified data sources. Evaluate quality on-chain before consuming. Reputation rewards reliability.</p>
+        <h3 class="font-semibold mb-2">For Agents</h3>
+        <p class="text-sm text-stone-700">Discover verified data sources. Evaluate quality on-chain before consuming. Reputation rewards reliability.</p>
       </div>
       <div>
         <div class="text-3xl mb-3">🌐</div>
-        <h3 class="font-bold mb-2">For the Ecosystem</h3>
-        <p class=" text-sm">Verifiable data trust protocol. Foundation for the agentic web without centralized intermediaries.</p>
+        <h3 class="font-semibold mb-2">For the Ecosystem</h3>
+        <p class="text-sm text-stone-700">Verifiable data trust protocol. Foundation for the agentic web without centralized intermediaries.</p>
       </div>
     </div>
-    <div class="text-4xl font-extrabold tracking-tight mb-4">
-      <span class="text-blue-600">Orbit</span>Mem
+    <div class="text-4xl font-extrabold tracking-tight mb-4 text-stone-900">
+      OrbitMem
     </div>
-    <p class="text-lg text-gray-400 mb-6">Your data. Your vault. Your rules.</p>
-    <div class="flex items-center justify-center gap-6 text-sm text-gray-400">
+    <p class="text-lg text-stone-500 mb-6">Your data. Your vault. Your rules.</p>
+    <div class="flex items-center justify-center gap-6 text-sm text-stone-500">
       <span>github.com/oboroxyz/orbitmem</span>
     </div>
   </div>
 </section>
 
 <!-- Progress Bar -->
-<div class="fixed bottom-0 left-0 w-full h-1 bg-gray-100">
-  <div class="progress-bar h-full bg-amber-500" id="progress" style="width: 10%"></div>
+<div class="fixed bottom-0 left-0 w-full h-1 bg-stone-200">
+  <div class="progress-bar h-full bg-stone-900" id="progress" style="width: 10%"></div>
 </div>
 
 <!-- Slide Counter -->
-<div class="fixed bottom-4 right-6 text-xs text-gray-300 font-medium" id="counter">1 / 10</div>
+<div class="fixed bottom-4 right-6 text-xs text-stone-400 font-medium" id="counter">1 / 10</div>
 
 <script>
 const slides = document.querySelectorAll('.slide');

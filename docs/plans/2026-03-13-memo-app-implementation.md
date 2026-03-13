@@ -473,7 +473,7 @@ export default defineConfig({
 
 ```
 VITE_RELAY_URL=http://localhost:3000
-VITE_WALLETCONNECT_PROJECT_ID=orbitmem-memo-dev
+VITE_WALLETCONNECT_PROJECT_ID=orbitmem-memo-demo
 ```
 
 - [ ] **Step 6: Create `examples/memo/src/styles/index.css`**
@@ -547,7 +547,7 @@ export const config = createConfig({
     porto(),
     injected(),
     walletConnect({
-      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "orbitmem-memo-dev",
+      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "orbitmem-memo-demo",
     }),
   ],
   storage: createStorage({ storage: localStorage }),
