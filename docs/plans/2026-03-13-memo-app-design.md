@@ -162,16 +162,25 @@ Single-page app with three states:
 - App title, description of what OrbitMem Memo is
 - "Connect" button → wagmi modal (Porto Passkey, MetaMask, WalletConnect, injected)
 
-### 2. Connected — memo list
+### 2. Public memo view (no wallet required)
+- Route: `/:address/:memoId`
+- Fetches memo via `GET /v1/vault/public/:address/memos/:memoId/*`
+- Renders title + markdown body (read-only)
+- Shows author address, created date
+- If memo is private → "This memo is private" message
+- Share button to copy URL
+
+### 3. Connected — memo list
 - Header: wallet address (truncated), disconnect button
 - "New Memo" button
 - List of memos: title, visibility badge (public/private), created date
 - Click memo → opens editor
+- Share button on public memos → copies `/:address/:memoId` URL
 - Delete button per memo
 
-### 3. Memo editor
+### 4. Memo editor
 - Title input
-- Body textarea (plain text, no markdown rendering)
+- Body textarea (markdown input, rendered preview)
 - Visibility toggle: public / private
 - Save button, Back button
 - If editing existing memo: shows created/updated timestamps
@@ -193,6 +202,8 @@ Single-page app with three states:
 | viem | 2 | EVM signing, message hashing |
 | @orbitmem/sdk | workspace | AESEngine for encryption |
 | nanoid | latest | Memo ID generation |
+| react-markdown | latest | Markdown rendering |
+| remark-gfm | latest | GitHub-flavored markdown support |
 
 ### wagmi chain config
 
@@ -209,7 +220,7 @@ examples/memo/
   .env.example                — VITE_RELAY_URL
   src/
     main.tsx                  — React root mount
-    App.tsx                   — Connect screen vs memo app
+    App.tsx                   — Simple router: / (home) vs /:address/:memoId (public view)
     lib/
       relay.ts                — Relay API client (read/write/delete/list)
       encryption.ts           — AES key derivation + encrypt/decrypt using SDK AESEngine
@@ -219,8 +230,9 @@ examples/memo/
       useOrbitMem.ts          — React hook: wallet state, memo CRUD operations
     components/
       ConnectButton.tsx       — wagmi connect (Porto Passkey + EVM wallets)
-      MemoList.tsx            — List all memos with delete
+      MemoList.tsx            — List all memos with delete/share
       MemoEditor.tsx          — Create/edit memo with visibility toggle
+      PublicMemoView.tsx      — Read-only rendered markdown (no wallet needed)
     styles/
       index.css               — Tailwind base
 ```
@@ -323,6 +335,8 @@ Reuses the same signing pattern as `apps/web/app/lib/erc8128.ts`:
 - Wallet connection (wagmi: Porto Passkey + EVM wallets)
 - Create, read, edit, delete memos
 - Per-memo visibility toggle (public/private)
+- Markdown editing and rendering (react-markdown + remark-gfm)
+- Shareable public memo URL (`/:address/:memoId`) — rendered markdown, no wallet needed
 - Client-side AES-256-GCM encryption for private memos
 - Relay-backed storage via new write/delete/keys endpoints
 - ERC-8128 signed requests for authenticated operations
@@ -332,7 +346,6 @@ Reuses the same signing pattern as `apps/web/app/lib/erc8128.ts`:
 
 ### Out of scope
 - Folders, tags, search, filtering
-- Markdown rendering
 - On-chain registration (ERC-8004)
 - Storacha snapshots
 - Lit Protocol shared access
