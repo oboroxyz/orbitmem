@@ -15,9 +15,9 @@ const FEATURES: { title: string; description: string; tag: string; icon: IconTyp
     icon: PiLockKey,
   },
   {
-    title: "On-chain Trust",
+    title: "Discovery & Trust",
     description:
-      "Quality scoring via ERC-8004. Every data entry is rated by humans and agents, building a decentralized reputation layer for AI data.",
+      "On-chain data discovery and quality scoring via ERC-8004. Every data entry is rated by humans and agents, building a decentralized reputation layer.",
     tag: "ERC-8004",
     icon: PiSealCheck,
   },
@@ -69,8 +69,8 @@ function HomePage() {
             <div>
               <h3 className="text-sm font-semibold text-stone-900 mb-4">For Users, Developers</h3>
               <p className="text-sm text-stone-500 leading-relaxed">
-                Create and use a decentralized database in minutes — with built-in encryption,
-                access control, and automatic P2P backup.
+                Create and use a decentralized database in minutes via SDK + CLI — with built-in
+                encryption, access control, and automatic P2P backup.
               </p>
             </div>
           </div>
@@ -85,7 +85,7 @@ function HomePage() {
                 <code className="text-xs font-mono bg-white px-1.5 py-0.5 rounded">
                   npx orbitmem
                 </code>{" "}
-                as a skill to access decentralized database — with built-in data discovery and
+                CLI (Skills) to access decentralized database — with built-in data discovery and
                 on-chain data reputation.
               </p>
             </div>
@@ -93,67 +93,51 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Architecture & Features */}
       <section className="max-w-4xl mx-auto pb-16">
-        <h2 className="text-sm font-semibold text-stone-900 mb-6">Features</h2>
-
-        <div className="rounded-lg border border-stone-200 p-6 sm:p-8 mb-4">
-          <h2 className="text-sm font-semibold text-stone-900 mb-4 flex items-center gap-3">
-            <PiNetwork size={20} className="text-stone-700" />
-            Fully Decentralized
-          </h2>
-          <p className="text-sm text-stone-500 leading-relaxed mb-5">
-            Built on IPFS and OrbitDB — no central servers, no single point of failure. Data is
-            distributed across a peer-to-peer network where every node contributes to storage and
-            availability.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="flex gap-3 items-start">
-              <span className="text-stone-300 text-xs mt-0.5 shrink-0">&#x25CB;</span>
-              <div>
-                <p className="text-xs font-medium text-stone-900">No single point of failure</p>
-                <p className="text-xs text-stone-400">
-                  Data persists as long as any peer is online
-                </p>
-              </div>
+        <h2 className="text-sm font-semibold text-stone-900 mb-6">Architecture</h2>
+        <div className="space-y-2 mb-10">
+          <div className="rounded-lg bg-stone-900 text-stone-50 px-6 py-3 flex justify-between items-center">
+            <span className="text-sm font-semibold">Interface</span>
+            <span className="text-xs text-stone-400">SDK + CLI (Skills)</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-lg border border-stone-200 px-4 py-3 text-center">
+              <p className="text-sm font-semibold text-stone-900">Identity</p>
+              <p className="text-xs text-stone-400 mt-1">Passkeys + EVM + Solana</p>
             </div>
-            <div className="flex gap-3 items-start">
-              <span className="text-stone-300 text-xs mt-0.5 shrink-0">&#x25CB;</span>
-              <div>
-                <p className="text-xs font-medium text-stone-900">Censorship resistant</p>
-                <p className="text-xs text-stone-400">No authority can block or delete your data</p>
-              </div>
+            <div className="rounded-lg border border-stone-200 px-4 py-3 text-center">
+              <p className="text-sm font-semibold text-stone-900">Encryption</p>
+              <p className="text-xs text-stone-400 mt-1">Lit Protocol + AES-256-GCM</p>
             </div>
-            <div className="flex gap-3 items-start">
-              <span className="text-stone-300 text-xs mt-0.5 shrink-0">&#x25CB;</span>
-              <div>
-                <p className="text-xs font-medium text-stone-900">Offline-first capable</p>
-                <p className="text-xs text-stone-400">
-                  Read and write locally, sync when connected
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3 items-start">
-              <span className="text-stone-300 text-xs mt-0.5 shrink-0">&#x25CB;</span>
-              <div>
-                <p className="text-xs font-medium text-stone-900">Content-addressed</p>
-                <p className="text-xs text-stone-400">IPFS CIDs guarantee data integrity by hash</p>
-              </div>
+            <div className="rounded-lg border border-stone-200 px-4 py-3 text-center">
+              <p className="text-sm font-semibold text-stone-900">Discovery & Trust</p>
+              <p className="text-xs text-stone-400 mt-1">ERC-8004 (ERC-721 + Reputation)</p>
             </div>
           </div>
+          <div className="rounded-lg border border-stone-200 px-6 py-3 flex justify-between items-center">
+            <span className="text-sm font-semibold text-stone-900">Data Vault</span>
+            <span className="text-xs text-stone-400">OrbitDB Nested — local-first P2P storage</span>
+          </div>
+          <div className="rounded-lg border border-stone-200 px-6 py-3 flex justify-between items-center">
+            <span className="text-sm font-semibold text-stone-900">Persistence</span>
+            <span className="text-xs text-stone-400">Storacha → Filecoin/IPFS</span>
+          </div>
         </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
+        <h2 className="text-sm font-semibold text-stone-900 mb-4">Key Features</h2>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="rounded-lg border border-stone-200 px-5 py-3 flex items-center gap-3">
+            <PiNetwork className="text-base text-stone-400 shrink-0" />
+            <span className="text-sm font-semibold text-stone-900">Fully Decentralized</span>
+            <span className="text-xs text-stone-400 ml-auto">IPFS + OrbitDB, offline-first</span>
+          </div>
           {FEATURES.map((f) => (
-            <div key={f.title} className="rounded-lg border border-stone-200 p-6 space-y-2">
-              <div className="flex items-center gap-3">
-                <f.icon className="text-base text-stone-400 shrink-0" />
-                <h3 className="text-sm font-semibold text-stone-900">{f.title}</h3>
-                <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5">
-                  {f.tag}
-                </span>
-              </div>
-              <p className="text-sm text-stone-500 leading-relaxed">{f.description}</p>
+            <div key={f.title} className="rounded-lg border border-stone-200 px-5 py-3 flex items-center gap-3">
+              <f.icon className="text-base text-stone-400 shrink-0" />
+              <span className="text-sm font-semibold text-stone-900">{f.title}</span>
+              <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5 ml-auto">
+                {f.tag}
+              </span>
             </div>
           ))}
         </div>

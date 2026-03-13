@@ -217,7 +217,6 @@ function createDirectPersistence(config: PersistenceConfig): IPersistenceLayer {
 
     async deleteSnapshot(cid) {
       const client = await getClient();
-      // @ts-expect-error — multiformats is a transitive dep of @storacha/client
       const { CID: CIDClass } = await import("multiformats/cid");
       await client.capability.upload.remove(CIDClass.parse(cid));
     },
