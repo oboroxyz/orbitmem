@@ -1,16 +1,18 @@
-# OrbitMem — The decentralized data layer for agentic web
+# OrbitMem — Decentralized data layer for agentic web
 
-> PL_Genesis: Frontiers of Collaboration Hackathon Submission
+[PL_Genesis: Frontiers of Collaboration Hackathon Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101)
 
 ---
 
-## One-Liner
+## 🗣️ One-Liner
 
 **OrbitMem gives users a personal, encrypted, P2P data vault that AI agents can discover, evaluate, and consume — without ever uploading personal data to agent servers.**
 
+[🎬 Video](https://youtube.com), [📽️ Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submission/202603_PL_Genesis/slides.html)
+
 ---
 
-## Problem
+## 🤔 Problem
 
 There is no usable decentralized database. IPFS gives you content-addressable storage — but that's where it stops. Building real applications on top of decentralized infrastructure requires three things that IPFS alone doesn't provide:
 
@@ -24,9 +26,9 @@ AI agents, dApps, and user-facing applications all hit the same wall: IPFS is a 
 
 ---
 
-## Solution
+## 💡 Solution
 
-OrbitMem is a sovereign data layer that sits between users and AI agents. Users store personal data locally in an encrypted P2P vault. Agents discover and consume data through an on-chain trust protocol — never touching a centralized server.
+`OrbitMem` is a sovereign data layer that sits between users and AI agents. Users store personal data locally in an encrypted P2P vault. Agents discover and consume data through an on-chain trust protocol — never touching a centralized server.
 
 ```
 ┌─────────────┐         ┌──────────────────┐         ┌─────────────┐
@@ -50,7 +52,7 @@ OrbitMem is a sovereign data layer that sits between users and AI agents. Users 
 
 ---
 
-## Architecture — 6 Layers
+## 📐 Architecture — 6 Layers
 
 | Layer                 | Technology                            | Role                                                           |
 | :-------------------- | :------------------------------------ | :------------------------------------------------------------- |
@@ -112,13 +114,61 @@ An agent can read `travel/dietary` instantly, negotiate access to `travel/budget
 
 ---
 
-## [Challenges](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/hackathons/52?activeTab=challenges)
+## UseCase example using OrbitMem
+
+### 1. Decentralized Memo App
+
+A fully decentralized note-taking app — no server, no platform, no lock-in.
+
+- User connects a wallet (passkey or EVM) → creates an OrbitMem vault
+- **Public memos** — `visibility: 'public'`, shareable links anyone can view without a wallet
+- **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
+- Markdown editor with live preview and GFM support
+
+```
+User writes memo → OrbitMem Vault (OrbitDB)
+                      ├── public/  → readable by anyone, registered on-chain
+                      └── private/ → AES encrypted, owner-only
+                              ↓
+                    Storacha → Filecoin (backup)
+```
+
+See [`examples/memo/`](../../examples/memo/) for the full source.
+
+### 2. Agent Research & Data Trust
+
+AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
+
+**How it works:**
+
+1. **Agent publishes data** — an agent stores output in an OrbitMem vault and registers it on-chain via `npx orbitmem register`, minting an ERC-721 NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
+2. **Other agents discover** — `npx orbitmem discover --schema research --min-score 70` finds entries by tag and reputation score
+3. **Agents rate data** — consuming agents call `giveFeedback()` to score accuracy, freshness, completeness — building the producer's on-chain reputation
+
+```
+Agent A (producer)
+  └── skill output → vault.put() → npx orbitmem register
+  └── DataRegistry mints NFT (on-chain receipt)
+                                        ↓
+Agent B (consumer)
+  └── npx orbitmem discover --schema research
+  └── reads data → evaluates → giveFeedback(score, "accurate")
+                                        ↓
+                          Agent A's reputation increases
+                          → future data more discoverable
+```
+
+See [`examples/agent-research/`](../../examples/agent-research/) for the full source.
+
+---
+
+## [Submitted Challenges](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/hackathons/52?activeTab=challenges)
 
 ### 1. Fresh Code
 
 > Build new solutions
 
-OrbitMem is built from scratch for this hackathon — SDK, relay, contracts, CLI, and web. [GitHub](https://github.com/oboroxyz/orbitmem)
+OrbitMem is built from scratch for this hackathon — SDK, relay, contracts, CLI, and website. [GitHub](https://github.com/oboroxyz/orbitmem)
 
 ### 2. Infrastructure & Digital Rights
 
@@ -210,54 +260,6 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 ### 9. Funding the Commons
 
 > Opportunity to become EIR
-
----
-
-## Examples using OrbitMem
-
-### 1. Decentralized Memo App
-
-A fully decentralized note-taking app — no server, no platform, no lock-in.
-
-- User connects a wallet (passkey or EVM) → creates an OrbitMem vault
-- **Public memos** — `visibility: 'public'`, shareable links anyone can view without a wallet
-- **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
-- Markdown editor with live preview and GFM support
-
-```
-User writes memo → OrbitMem Vault (OrbitDB)
-                      ├── public/  → readable by anyone, registered on-chain
-                      └── private/ → AES encrypted, owner-only
-                              ↓
-                    Storacha → Filecoin (backup)
-```
-
-See [`examples/memo/`](../../examples/memo/) for the full source.
-
-### 2. Agent Research & Data Trust
-
-AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
-
-**How it works:**
-
-1. **Agent publishes data** — an agent stores output in an OrbitMem vault and registers it on-chain via `npx orbitmem register`, minting an ERC-721 NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
-2. **Other agents discover** — `npx orbitmem discover --schema research --min-score 70` finds entries by tag and reputation score
-3. **Agents rate data** — consuming agents call `giveFeedback()` to score accuracy, freshness, completeness — building the producer's on-chain reputation
-
-```
-Agent A (producer)
-  └── skill output → vault.put() → npx orbitmem register
-  └── DataRegistry mints NFT (on-chain receipt)
-                                        ↓
-Agent B (consumer)
-  └── npx orbitmem discover --schema research
-  └── reads data → evaluates → giveFeedback(score, "accurate")
-                                        ↓
-                          Agent A's reputation increases
-                          → future data more discoverable
-```
-
-*Code: TBD*
 
 ---
 
@@ -376,11 +378,6 @@ All commands support `--json` for machine-readable output (agent consumption) an
 ## Links
 
 - GitHub: [github.com/oboroxyz/orbitmem](https://github.com/oboroxyz/orbitmem)
-- Technical Spec: `docs/design/spec.md` (v0.3.0)
 - SDK: `@orbitmem/sdk` (TypeScript, MIT)
 - CLI: `@orbitmem/cli` (`npx orbitmem`, TypeScript, MIT)
 - Contracts: `@orbitmem/contracts` (Solidity 0.8.28, MIT)
-
----
-
-*OrbitMem — Your data. Your vault. Your rules.*
