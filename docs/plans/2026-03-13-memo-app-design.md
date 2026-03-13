@@ -2,7 +2,7 @@
 
 ## Overview
 
-A minimal decentralized note-taking app under `examples/memo/`. Users connect an EVM wallet via wagmi, create/read/delete memos stored in an OrbitMem vault, and toggle per-memo visibility (public/private). Public memos are plaintext; private memos are AES-256-GCM encrypted client-side. The relay keeps vault data available 24/7 via OrbitDB replication. No server owns the data — the user's OrbitDB address is portable across relays.
+A minimal decentralized note-taking app under `examples/memo/`. Users connect via Porto Passkey (biometric) or EVM wallet through wagmi's connect modal, create/read/delete memos stored in an OrbitMem vault, and toggle per-memo visibility (public/private). Public memos are plaintext; private memos are AES-256-GCM encrypted client-side. The relay keeps vault data available 24/7 via OrbitDB replication. No server owns the data — the user's OrbitDB address is portable across relays.
 
 ## Architecture
 
@@ -10,7 +10,7 @@ A minimal decentralized note-taking app under `examples/memo/`. Users connect an
 ┌──────────────────────────────────────────┐
 │  examples/memo (React + Vite + wagmi)    │
 │                                          │
-│  wagmi        → Wallet connection        │
+│  wagmi+porto  → Passkey + EVM wallets    │
 │  AESEngine    → AES-256-GCM (client)     │
 │  relay API    → read/write/delete/list   │
 │                                          │
@@ -33,7 +33,7 @@ A minimal decentralized note-taking app under `examples/memo/`. Users connect an
 
 ### Data flow
 
-1. User connects EVM wallet via wagmi (MetaMask, WalletConnect, injected)
+1. User connects via wagmi modal — choose Porto Passkey (biometric) or EVM wallet (MetaMask, WalletConnect, injected)
 2. App signs "OrbitMem Vault Key v1" message → derives AES-256 key via SHA-256 (raw import, no HKDF)
 3. **Write:** App encrypts client-side → `POST /v1/vault/write` (ERC-8128 signed) → relay stores in OrbitDB
 4. **Read:** `POST /v1/vault/read` (ERC-8128 signed) → relay returns ciphertext → app decrypts client-side
@@ -47,15 +47,27 @@ A minimal decentralized note-taking app under `examples/memo/`. Users connect an
 - User's OrbitDB address is portable — switch relays anytime, same data
 - Avoids running OrbitDB/libp2p/Helia in the browser (heavy, needs WebRTC)
 
-### Why wagmi (not SDK identity layer directly)
+### Wallet connection: wagmi + Porto connector
 
-The SDK identity layer's `connect()` currently only supports `privateKey`-based EVM connection (CLI/server). There is no browser injected-provider adapter. The existing `apps/web/` also uses wagmi. The memo app follows the same pattern:
+wagmi provides the connect modal with two options:
 
-1. wagmi handles wallet connection (browser provider)
-2. App uses viem's `walletClient.signMessage()` for ERC-8128 headers and AES key derivation
-3. SDK's `AESEngine` is used for encryption (requires adding it to the main SDK export)
+1. **Porto Passkey** — biometric-first (FaceID/TouchID), zero-install, built on WebAuthn P256. Porto is a wagmi connector (`import { porto } from 'wagmi/connectors'`), so it works natively in the wagmi modal alongside EVM wallets.
+2. **EVM wallets** — MetaMask, WalletConnect, injected providers.
 
-Porto Passkey support is a future enhancement (requires implementing the SDK identity layer's passkey adapter).
+Both produce a standard wagmi `walletClient` — the rest of the app (signing, encryption, ERC-8128 headers) works identically regardless of which connector was used.
+
+```typescript
+// lib/wagmi.ts
+import { porto } from 'wagmi/connectors'
+
+export const config = createConfig({
+  chains: [baseSepolia],
+  connectors: [porto(), injected(), walletConnect({ projectId })],
+  transports: { [baseSepolia.id]: http() },
+})
+```
+
+The SDK identity layer is not used for connection — wagmi handles it directly (same pattern as `apps/web/`). SDK's `AESEngine` is used for encryption only.
 
 ### Vault address mapping
 
@@ -148,7 +160,7 @@ Single-page app with three states:
 
 ### 1. Not connected
 - App title, description of what OrbitMem Memo is
-- "Connect Wallet" button (wagmi: MetaMask, WalletConnect, injected)
+- "Connect" button → wagmi modal (Porto Passkey, MetaMask, WalletConnect, injected)
 
 ### 2. Connected — memo list
 - Header: wallet address (truncated), disconnect button
@@ -176,14 +188,15 @@ Single-page app with three states:
 | React | 19 | UI framework |
 | Vite | 6 | Build tool |
 | Tailwind CSS | 4 | Styling |
-| wagmi | 2 | Wallet connection |
+| wagmi | 2 | Wallet connection (modal, hooks) |
+| porto | latest | Porto Passkey wagmi connector |
 | viem | 2 | EVM signing, message hashing |
 | @orbitmem/sdk | workspace | AESEngine for encryption |
 | nanoid | latest | Memo ID generation |
 
 ### wagmi chain config
 
-Same as `apps/web/`: mainnet, base, optimism. Connectors: injected, walletConnect.
+Chain: Base Sepolia (matches contract deployments). Connectors: `porto()`, `injected()`, `walletConnect()`.
 
 ## File Structure
 
@@ -205,7 +218,7 @@ examples/memo/
     hooks/
       useOrbitMem.ts          — React hook: wallet state, memo CRUD operations
     components/
-      ConnectButton.tsx       — wagmi wallet connect
+      ConnectButton.tsx       — wagmi connect (Porto Passkey + EVM wallets)
       MemoList.tsx            — List all memos with delete
       MemoEditor.tsx          — Create/edit memo with visibility toggle
     styles/
@@ -307,7 +320,7 @@ Reuses the same signing pattern as `apps/web/app/lib/erc8128.ts`:
 ## Scope Boundaries
 
 ### In scope
-- Wallet connection (wagmi, EVM only)
+- Wallet connection (wagmi: Porto Passkey + EVM wallets)
 - Create, read, edit, delete memos
 - Per-memo visibility toggle (public/private)
 - Client-side AES-256-GCM encryption for private memos
@@ -318,7 +331,6 @@ Reuses the same signing pattern as `apps/web/app/lib/erc8128.ts`:
 - Relay endpoint additions (write, delete, keys, read update)
 
 ### Out of scope
-- Porto Passkeys (future — requires SDK identity layer work)
 - Folders, tags, search, filtering
 - Markdown rendering
 - On-chain registration (ERC-8004)
