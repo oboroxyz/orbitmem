@@ -187,7 +187,27 @@ OrbitMem uses Lit Protocol as the encryption engine for shared data — reputati
 - **On-chain condition-based decryption** — agents can only decrypt if `FeedbackRegistry` quality score meets threshold
 - **Dynamic access revocation** — reputation drops below minimum → access revoked automatically
 
-### 7. Funding the Commons
+### 7. Agent Only: Let the Agent Cook
+
+> Fully autonomous agent workflows — no human in the loop.
+
+OrbitMem is built for agent-first consumption. The CLI and SDK provide everything an autonomous agent needs:
+
+- **`@orbitmem/cli`** — every command supports `--json` for machine-readable output, `--relay`/`--chain` overrides
+- **`createOrbitMemAgentAdapter()`** — one-call lifecycle: discover → read → score → rate, no UI required
+- **ERC-8128 transport auth** — agents sign their own requests with wallet keys, no OAuth or API keys
+
+### 8. Agents With Receipts — ERC-8004
+
+> Every agent interaction produces an auditable on-chain receipt.
+
+ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFTs as data receipts; `FeedbackRegistry` records per-tag quality scores (`accurate`, `fresh`) for every consumption event. Agents don't just use data — they leave verifiable proof of what they used and how they rated it.
+
+- **`npx orbitmem register`** — register data on-chain, minting a receipt NFT
+- **`npx orbitmem discover`** — search by schema, tags, and minimum quality scores
+- **Agent Adapter** — `discoverData` → `getDataScore` → `rateData` lifecycle, all scored on-chain
+
+### 9. Funding the Commons
 
 > Opportunity to become EIR
 
