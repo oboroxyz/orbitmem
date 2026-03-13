@@ -25,15 +25,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { title: "OrbitMem — Sovereign Data Layer for AI Agents" },
       {
         name: "description",
-        content:
-          "Encrypted P2P vaults, verifiable data quality, and multi-chain identity for the agentic web.",
+        content: "Decentralized data layer for agentic web.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "OrbitMem — Sovereign Data Layer for AI Agents" },
+      { property: "og:title", content: "OrbitMem — Decentralized data layer for agentic web." },
       {
         property: "og:description",
-        content:
-          "Encrypted vaults, verifiable data quality, and multi-chain identity for the agentic web.",
+        content: "Decentralized data layer for agentic web.",
       },
       { property: "og:site_name", content: "OrbitMem" },
       { name: "twitter:card", content: "summary_large_image" },
