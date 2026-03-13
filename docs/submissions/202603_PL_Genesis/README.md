@@ -4,23 +4,23 @@
 
 ---
 
-## 🗣️ One-Liner
+## 🗣️ TL;DR
 
-**OrbitMem gives users a personal, encrypted, P2P data vault that AI agents can discover, evaluate, and consume — without ever uploading personal data to agent servers.**
+**`OrbitMem` is a decentralized data layer for the agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents.**
 
-[🎬 Video](https://youtube.com), [📽️ Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
+Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 signed transport, and ERC-8004 for data discovery and reputation.
+
+[▶️ Video](https://youtube.com) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
 
 ---
 
 ## 🤔 Problem
 
-There is no usable decentralized database. IPFS gives you content-addressable storage — but that's where it stops. Building real applications on top of decentralized infrastructure requires three things that IPFS alone doesn't provide:
+IPFS gives you content-addressable storage — but not a database. Three things are missing:
 
 - **No Encryption.** IPFS stores data in the open. There's no built-in per-record encryption or fine-grained access control. If you want to store private data on a P2P network, you're on your own.
 - **No Authentication.** There's no identity layer, no signed requests, no way to verify who is reading or writing data. Any node can access any content if it has the CID.
-- **No Indexing.** There's no discovery, no search, no quality signal. You need a CID to find anything — there's no way to query by schema, tag, or reputation. Without indexing, decentralized data is invisible.
-
-AI agents, dApps, and user-facing applications all hit the same wall: IPFS is a transport layer, not a database. What's missing is the encryption, authentication, and indexing layer that turns content-addressable storage into a sovereign, queryable data platform.
+- **No Discovery.** No search, no quality signal. You need a CID to find anything — decentralized data is invisible.
 
 ---
 
@@ -39,14 +39,9 @@ AI agents, dApps, and user-facing applications all hit the same wall: IPFS is a 
 └─────────────┘         └──────────────────┘         └─────────────┘
 ```
 
-### How It Works
-
-1. **User stores data** in a local-first OrbitDB Nested vault with per-path encryption
-2. **User registers data** on-chain as discoverable assets via ERC-8004 (ERC-721 NFT = public pointer to private data)
-3. **Agent discovers data** by querying on-chain registries for matching schemas and quality scores
-4. **Agent evaluates quality** before consuming — reputation scores are on-chain and verifiable
-5. **Agent decrypts & executes** via Lit Protocol (reputation-gated) — plaintext is zeroed after use
-6. **Both sides rate each other** — bidirectional feedback loop improves the ecosystem over time
+- **Encryption** — Per-path encryption with fine-grained visibility control (Lit Protocol + AES-256-GCM)
+- **Authentication** — ERC-8128 signed HTTP transport with Passkey, EVM, and Solana wallets
+- **Discovery** — On-chain data discovery and quality scoring via ERC-8004
 
 ---
 
@@ -114,7 +109,8 @@ An agent can read `travel/dietary` instantly, negotiate access to `travel/budget
 
 ## Example apps using OrbitMem
 
-### 1. Decentralized Memo App
+### 1. Decentralized Memo App - [Demo](https://exammple.com), [Source Code](../../examples/memo/)
+
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
@@ -122,9 +118,6 @@ A fully decentralized note-taking app — no server, no platform, no lock-in.
 - **Public memos** — `visibility: 'public'`, shareable links anyone can view without a wallet
 - **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
 - Markdown editor with live preview and GFM support
-
-Demo URL: [https://exammple.com](https://exammple.com),
-Source Code: [`examples/memo/`](../../examples/memo/)
 
 ```
 User writes memo → OrbitMem Vault (OrbitDB)
@@ -134,12 +127,9 @@ User writes memo → OrbitMem Vault (OrbitDB)
                     Storacha → Filecoin (backup)
 ```
 
-### 2. Agent Research & Data Trust
+### 2. Agent Research & Data Trust - [Demo](https://exammple.com), [Source Code](../../examples/agent-researh/)
 
 AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
-
-__Demo URL: [https://exammple.com](https://exammple.com),
-Source Code: [`examples/agent-research/`](../../examples/agent-research/)__
 
 **How it works:**
 
@@ -263,7 +253,17 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 ---
 
-## Technical Stacks
+## What We've Built
+
+| Package | Description |
+| :--- | :--- |
+| **`@orbitmem/sdk`** | 6-layer composable SDK — identity, encryption, vault, transport, discovery, persistence + agent adapter |
+| **`@orbitmem/contracts`** | ERC-8004 Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia |
+| **`@orbitmem/relay`** | Hono HTTP relay with ERC-8128 auth middleware, vault/data/snapshot routes |
+| **`@orbitmem/web`** | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers) |
+| **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` with `--json` output |
+
+### Technical Stacks
 
 | Component            | Technology                      | License          |
 | :------------------- | :------------------------------ | :--------------- |
@@ -280,90 +280,6 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 ---
 
-## What We've Built
-
-OrbitMem is a **fully functional MVP**, not a design document. Every layer is implemented, tested, and integrated end-to-end.
-
-### `@orbitmem/sdk` — Core SDK (~3,500 LoC, 11 test files)
-
-All 6 layers implemented as composable factory functions wired together via `createOrbitMem()`:
-
-- **Identity Layer** — `createIdentityLayer()` with HKDF-SHA256 session key derivation, multi-chain wallet support (EVM, Solana, Passkeys), connection state management
-- **Encryption Layer** — Dual-engine: `AESEngine` (AES-256-GCM with wallet-signature and raw key sources) + `LitEngine` (lazy-loaded client, session sigs, reputation-gated access conditions)
-- **Data Layer** — `createVault()` wrapping OrbitDB Nested with dual databases (primary vault + `-meta` for visibility/encryption metadata), `put`/`get`/`insert`/`delete` with per-path encryption hooks
-- **Transport Layer** — `createTransportLayer()` with ERC-8128 signed request envelopes, SHA-256 payload hashing, nonce-based replay protection (5-min TTL)
-- **Discovery Layer** — `createDiscoveryLayer()` with dual-mode: `OnChainRegistry` (viem integration with DataRegistry + FeedbackRegistry contracts) or `MockRegistry` (in-memory fallback)
-- **Persistence Layer** — `createPersistenceLayer()` with `@storacha/client` for Filecoin/IPFS archival snapshots, CID-based retrieval, deal status checking
-- **Agent Adapter** — `createOrbitMemAgentAdapter()` for autonomous agent workflows: `discoverData` → `readPublicData` → `getDataScore` → `rateData`
-
-### `@orbitmem/contracts` — Solidity Smart Contracts (~400 LoC, 3 test files)
-
-Two ERC-8004 contracts on Solidity 0.8.28 with OpenZeppelin v5:
-
-- **DataRegistry (ERC-721 "OMD")** — `register(dataURI)` mints NFTs as on-chain pointers to off-chain data, with active/inactive toggle and URI updates
-- **FeedbackRegistry (registry-agnostic)** — `giveFeedback(registry, entityId, value, decimals, tag1, tag2, feedbackURI, feedbackHash)` with per-entity global and per-tag scoring, revocation support, self-feedback prevention. Works against **any** ERC-721 registry, not just DataRegistry
-- **Tests** — DataRegistry minting, FeedbackRegistry scoring/revocation, cross-contract integration
-
-### `@orbitmem/relay` — Hono HTTP Server (~2,000 LoC, 6 test files)
-
-Production-ready relay with ERC-8128 auth middleware and 11 API routes:
-
-| Endpoint | Auth | Description |
-| :--- | :--- | :--- |
-| `GET /v1/health` | — | Server health check |
-| `GET /v1/vault/public/:address/keys` | — | Discover public vault entries |
-| `GET /v1/vault/public/:address/:key` | — | Read public vault data |
-| `POST /v1/vault/read` | ERC-8128 | Read encrypted vault data |
-| `POST /v1/vault/sync` | ERC-8128 | Trigger vault sync |
-| `GET /v1/data/search` | — | Search data by schema/tags/quality |
-| `GET /v1/data/:dataId/score` | — | Get reputation score |
-| `POST /v1/data/:dataId/feedback` | ERC-8128 | Submit quality feedback |
-| `GET /v1/data/user/stats` | ERC-8128 | Per-user metrics |
-| `GET /v1/data/stats` | — | Aggregate metrics (60s cache) |
-| `POST /v1/snapshots/archive` | ERC-8128 | Create vault snapshot |
-
-Dual-mode services: mock for development, live (viem + Storacha + on-chain) for production with env var validation.
-
-### `@orbitmem/web` — React Dashboard (~2,400 LoC)
-
-Interactive web app with React 19, Vite, TanStack Router, wagmi, Recharts, Tailwind CSS v4:
-
-- **Landing page** — Hero, pillar cards, interactive trust graph visualization, standards section
-- **Dashboard** — Vault entry explorer with per-user stats (requires wallet connection + ERC-8128 auth)
-- **Data Registry** — Search and filter data entries by schema/tags/verified status, view quality scores
-- **Data Detail** — Score display with feedback submission form
-- **Metrics** — Real-time aggregate stats, quality distribution charts, activity timeline (Recharts)
-- **Snapshot Browser** — Archive and restore vault snapshots via Storacha
-- **Wallet integration** — wagmi ConnectButton with ERC-8128 header generation for authenticated requests
-
-Deployed via Cloudflare Workers (wrangler).
-
-### `@orbitmem/cli` — Command-Line Interface (~500 LoC, 3 test files)
-
-Unified CLI for users and AI agents — `npx orbitmem <command>`, no global install:
-
-- **`init`** — Generate EVM identity via `viem/accounts`, create `~/.orbitmem/` config
-- **`vault store/get/ls`** — Store, read, and list encrypted vault data via SDK
-- **`register`** — Register data on-chain as discoverable assets (ERC-8004)
-- **`discover`** — Search data sources by schema, tags, and quality scores
-- **`snapshot`** — Archive vault to Filecoin via Storacha
-- **`status`** — Show identity, config, and vault info
-- **`dev`** — Start local relay server for development
-
-All commands support `--json` for machine-readable output (agent consumption) and `--relay`/`--chain` overrides.
-
----
-
-## Why OrbitMem Matters
-
-**For Users:** You own your data. You decide what to share, with whom, and under what conditions. Your preferences follow you across platforms and agents — portable, encrypted, sovereign.
-
-**For Agents:** You can discover high-quality, verified data sources without building relationships with individual users. On-chain quality scores let you evaluate data before consuming it. The reputation system rewards reliable behavior.
-
-**For the Ecosystem:** An on-chain data trust protocol where data quality is verifiable creates a foundation for the agentic web that doesn't require trusting centralized intermediaries.
-
----
-
 ## Future Work
 
 - Advanced Lit Protocol reputation conditions — fully wire reputation-gated decryption in vault
@@ -374,10 +290,3 @@ All commands support `--json` for machine-readable output (agent consumption) an
 - Multi-signature vault support and delegation patterns
 
 ---
-
-## Links
-
-- GitHub: [github.com/oboroxyz/orbitmem](https://github.com/oboroxyz/orbitmem)
-- SDK: `@orbitmem/sdk` (TypeScript, MIT)
-- CLI: `@orbitmem/cli` (`npx orbitmem`, TypeScript, MIT)
-- Contracts: `@orbitmem/contracts` (Solidity 0.8.28, MIT)
