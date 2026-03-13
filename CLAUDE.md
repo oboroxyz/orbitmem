@@ -4,12 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Is
 
-OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust. It's a Bun monorepo with three packages and one app:
+OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust. It's a Bun monorepo with three packages, one app, and examples:
 
-- `@orbitmem/sdk` — Core SDK with six composable layers (identity, encryption, data, transport, discovery, persistence) plus an agent adapter
+- `@orbitmem/sdk` — Core SDK with six composable layers (identity, encryption, data, transport, discovery, persistence) plus a client facade
 - `@orbitmem/relay` — Hono HTTP server with ERC-8128 auth middleware, vault/discovery/snapshot routes
 - `@orbitmem/contracts` — Foundry/Solidity smart contracts implementing ERC-8004 for Data — on-chain data discovery & reputation
 - `@orbitmem/web` — React dashboard (Vite + TanStack Router + wagmi + Tailwind) deployed via Cloudflare Workers
+- `examples/memo, examples/agent-research` — Example apps demonstrating OrbitMem usage
 
 ## Commands
 
@@ -84,7 +85,7 @@ The SDK is composed of six independent layers, each created by a factory functio
 | Transport | `createTransportLayer` | `transport/transport-layer.ts` |
 | Discovery | `createDiscoveryLayer` | `discovery/discovery-layer.ts`, `discovery/on-chain-registry.ts`, `discovery/mock-registry.ts` |
 | Persistence | `createPersistenceLayer` | `persistence/persistence-layer.ts` |
-| Agent Adapter | `createOrbitMemAgentAdapter` | `agent/agent-adapter.ts` |
+| Client | `createOrbitMemClient` | `agent/client.ts` |
 
 All layers implement `I*` interfaces defined in `types.ts`.
 
@@ -99,8 +100,8 @@ All layers implement `I*` interfaces defined in `types.ts`.
 ### Web App Structure (`apps/web/`)
 
 - React + Vite + TanStack Router + Tailwind CSS
-- `app/routes/` — file-based routing (landing, dashboard, vault, trust, settings)
-- `app/components/` — shared UI components (TrustGraph, DataScore, VaultExplorer, etc.)
+- `app/routes/` — file-based routing: landing (`/`), dashboard (`/dashboard`), explore (`/explore`, `/explore/$dataId`, `/explore/snapshots`)
+- `app/components/` — ConnectButton, DataTable, FeedbackForm, Layout, ScoreBadge, ScoreCard, SearchBar, TrustGraph
 - wagmi + viem for wallet connection and on-chain interactions
 - Deployed via Cloudflare Workers (wrangler)
 
@@ -151,7 +152,7 @@ Signed HTTP requests use headers: `X-OrbitMem-Signer`, `-Family`, `-Algorithm`, 
 - **`export type` / `import type`** for type-only imports
 - **Test files** live in `src/**/__tests__/*.test.ts` using `bun:test` (`describe`, `test`, `expect`)
 - **Integration tests** in relay use Hono's `app.request()` without starting an HTTP server
-- **SDK exports** three entry points: `.` (main), `./agent`, `./types`
+- **SDK exports** six entry points: `.` (main), `./agent`, `./discovery`, `./transport`, `./contracts`, `./types`
 - **Solidity** uses `forge fmt` (4-space indent, 100-char line width), optimizer enabled with 200 runs
 - **Contract tests** in `test/*.t.sol` follow Foundry conventions (`test_` prefix, `setUp()`, `vm.expectRevert`)
 - **CI** runs 4 parallel jobs: lint (biome), test (bun test), contracts (forge build/test/fmt --check), typecheck (tsc --noEmit)
