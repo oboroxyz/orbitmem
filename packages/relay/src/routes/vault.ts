@@ -28,8 +28,9 @@ export function createVaultRoutes(vault: IVaultService): Hono<ERC8128Env> {
 
   // Encrypted read — requires ERC-8128
   routes.post("/vault/read", erc8128(), async (c) => {
-    const body = await c.req.json<{ vaultAddress: string; path: string }>();
-    const entry = await vault.getEncrypted(body.vaultAddress, body.path);
+    const body = await c.req.json<{ vaultAddress?: string; path: string }>();
+    const address = body.vaultAddress ?? c.get("signer");
+    const entry = await vault.getEncrypted(address, body.path);
 
     if (!entry) {
       return c.json({ error: "Entry not found" }, 404);
@@ -65,6 +66,30 @@ export function createVaultRoutes(vault: IVaultService): Hono<ERC8128Env> {
     }>();
     const count = await vault.seed(body.address, body.entries);
     return c.json({ status: "ok", count });
+  });
+
+  // Write vault entry — requires ERC-8128
+  routes.post("/vault/write", erc8128(), async (c) => {
+    const body = await c.req.json<{ path: string; value: unknown; visibility: string }>();
+    const signer = c.get("signer");
+    const result = await vault.write(signer, body.path, body.value, body.visibility);
+    return c.json({ ok: true, hash: result.hash });
+  });
+
+  // Delete vault entry — requires ERC-8128
+  routes.post("/vault/delete", erc8128(), async (c) => {
+    const body = await c.req.json<{ path: string }>();
+    const signer = c.get("signer");
+    await vault.delete(signer, body.path);
+    return c.json({ ok: true });
+  });
+
+  // List vault keys — requires ERC-8128
+  routes.post("/vault/keys", erc8128(), async (c) => {
+    const body = await c.req.json<{ prefix?: string }>();
+    const signer = c.get("signer");
+    const keys = await vault.getKeys(signer, body.prefix);
+    return c.json({ keys });
   });
 
   return routes;

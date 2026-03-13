@@ -52,4 +52,27 @@ export class MockVaultService implements IVaultService {
   async sync(_address: string): Promise<{ status: string; timestamp: number }> {
     return { status: "synced", timestamp: Date.now() };
   }
+
+  async write(address: string, path: string, value: unknown, visibility: string): Promise<{ hash: string }> {
+    const vault = this.getOrCreate(address);
+    vault.set(path, { value, visibility });
+    return { hash: `mock-hash-${Date.now()}` };
+  }
+
+  async delete(address: string, path: string): Promise<void> {
+    const vault = this.store.get(address);
+    if (vault) {
+      vault.delete(path);
+    }
+  }
+
+  async getKeys(address: string, prefix?: string): Promise<string[]> {
+    const vault = this.store.get(address);
+    if (!vault) return [];
+    let keys = Array.from(vault.keys());
+    if (prefix) {
+      keys = keys.filter((k) => k.startsWith(prefix));
+    }
+    return keys;
+  }
 }

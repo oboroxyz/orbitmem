@@ -82,3 +82,112 @@ describe("Relay Vault Routes", () => {
     expect(body.message).toContain("OrbitMem Authentication");
   });
 });
+
+describe("Vault Write/Delete/Keys", () => {
+  test("POST /v1/vault/write stores entry", async () => {
+    const res = await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xWRITER" }),
+      body: JSON.stringify({
+        path: "memos/abc/title",
+        value: "My First Memo",
+        visibility: "public",
+      }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.ok).toBe(true);
+    expect(body.hash).toBeTruthy();
+
+    const read = await app.request("/v1/vault/public/0xWRITER/memos/abc/title");
+    expect(read.status).toBe(200);
+    const readBody = (await read.json()) as any;
+    expect(readBody.value).toBe("My First Memo");
+  });
+
+  test("POST /v1/vault/write requires auth", async () => {
+    const res = await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: "x", value: "y", visibility: "public" }),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test("POST /v1/vault/keys returns all keys for signer", async () => {
+    await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xKEYS_USER" }),
+      body: JSON.stringify({ path: "memos/a/title", value: "A", visibility: "public" }),
+    });
+    await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xKEYS_USER" }),
+      body: JSON.stringify({ path: "memos/a/body", value: "Body A", visibility: "private" }),
+    });
+    await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xKEYS_USER" }),
+      body: JSON.stringify({ path: "other/x", value: "X", visibility: "public" }),
+    });
+
+    const res = await app.request("/v1/vault/keys", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xKEYS_USER" }),
+      body: JSON.stringify({ prefix: "memos/" }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.keys).toContain("memos/a/title");
+    expect(body.keys).toContain("memos/a/body");
+    expect(body.keys).not.toContain("other/x");
+  });
+
+  test("POST /v1/vault/keys without prefix returns all keys", async () => {
+    const res = await app.request("/v1/vault/keys", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xKEYS_USER" }),
+      body: JSON.stringify({}),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.keys).toContain("memos/a/title");
+    expect(body.keys).toContain("other/x");
+  });
+
+  test("POST /v1/vault/delete removes entry", async () => {
+    await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xDELETER" }),
+      body: JSON.stringify({ path: "temp/data", value: "gone", visibility: "public" }),
+    });
+    const del = await app.request("/v1/vault/delete", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xDELETER" }),
+      body: JSON.stringify({ path: "temp/data" }),
+    });
+    expect(del.status).toBe(200);
+    const delBody = (await del.json()) as any;
+    expect(delBody.ok).toBe(true);
+
+    const read = await app.request("/v1/vault/public/0xDELETER/temp/data");
+    expect(read.status).toBe(404);
+  });
+
+  test("POST /v1/vault/read falls back to signer when vaultAddress omitted", async () => {
+    await app.request("/v1/vault/write", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xREADER" }),
+      body: JSON.stringify({ path: "notes/x", value: "CIPHER", visibility: "private" }),
+    });
+
+    const res = await app.request("/v1/vault/read", {
+      method: "POST",
+      headers: makeERC8128Headers({ "X-OrbitMem-Signer": "0xREADER" }),
+      body: JSON.stringify({ path: "notes/x" }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.value).toBe("CIPHER");
+  });
+});
