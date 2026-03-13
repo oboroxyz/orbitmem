@@ -56,4 +56,25 @@ export class LiveVaultService implements IVaultService {
     await this.getDB(address);
     return { status: "synced", timestamp: Date.now() };
   }
+
+  async write(address: string, path: string, value: unknown, _visibility: string): Promise<{ hash: string }> {
+    const db = await this.getDB(address);
+    const hash = await db.put(path, value);
+    return { hash: hash ?? `live-${Date.now()}` };
+  }
+
+  async delete(address: string, path: string): Promise<void> {
+    const db = await this.getDB(address);
+    await db.del(path);
+  }
+
+  async getKeys(address: string, prefix?: string): Promise<string[]> {
+    const db = await this.getDB(address);
+    const all: Record<string, unknown> = await db.all();
+    let keys = Object.keys(all);
+    if (prefix) {
+      keys = keys.filter((k) => k.startsWith(prefix));
+    }
+    return keys;
+  }
 }
