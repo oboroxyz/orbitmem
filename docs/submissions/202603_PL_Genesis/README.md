@@ -268,7 +268,7 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 | **`@orbitmem/contracts`** | ERC-8004 Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia |
 | **`@orbitmem/relay`** | Hono HTTP relay with ERC-8128 auth middleware, vault/data/snapshot routes |
 | **`@orbitmem/web`** | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers) |
-| **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` with `--json` output |
+| **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` with `--json` output. Includes Claude Code skill for natural language operation |
 
 ---
 
@@ -280,5 +280,3 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 - Filecoin deal status tracking (live Storacha integration)
 - Backup/restore UI in the web dashboard
 - Multi-signature vault support and delegation patterns
-
----
