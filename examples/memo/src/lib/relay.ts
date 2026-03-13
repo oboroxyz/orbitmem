@@ -58,7 +58,7 @@ export async function readPublic(
   address: string,
   key: string,
 ): Promise<{ key: string; value: unknown; visibility: string } | null> {
-  const res = await fetch(`${RELAY}/v1/vault/public/${address}/${encodeURIComponent(key)}`);
+  const res = await fetch(`${RELAY}/v1/vault/public/${address}/${key}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Public read failed: ${res.status}`);
   return res.json();

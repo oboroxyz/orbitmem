@@ -105,6 +105,13 @@ export function useOrbitMem() {
     }
   }, [address, getHeaders, loadSingleMemo]);
 
+  // Keep a stable ref to loadMemos so the effect doesn't re-trigger
+  const loadMemosRef = useRef(loadMemos);
+  loadMemosRef.current = loadMemos;
+
+  const signMessageRef = useRef(signMessageAsync);
+  signMessageRef.current = signMessageAsync;
+
   // Derive vault key on connect
   useEffect(() => {
     if (!isConnected || !address) {
@@ -115,17 +122,17 @@ export function useOrbitMem() {
 
     (async () => {
       try {
-        const sig = await signMessageAsync({ message: "OrbitMem Vault Key v1" });
+        const sig = await signMessageRef.current({ message: "OrbitMem Vault Key v1" });
         const sigBytes = new Uint8Array(
           (sig.slice(2).match(/.{2}/g) ?? []).map((b) => parseInt(b, 16)),
         );
         vaultKeyRef.current = await deriveVaultKey(sigBytes);
-        await loadMemos();
+        await loadMemosRef.current();
       } catch (e) {
         setError(`Key derivation failed: ${e}`);
       }
     })();
-  }, [isConnected, address, signMessageAsync, loadMemos]);
+  }, [isConnected, address]);
 
   const saveMemo = useCallback(
     async (memo: {

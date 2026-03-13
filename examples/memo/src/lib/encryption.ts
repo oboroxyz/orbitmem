@@ -50,7 +50,11 @@ export async function decryptValue<T>(blob: string, key: CryptoKey): Promise<T> 
 }
 
 function uint8ToBase64(arr: Uint8Array): string {
-  return btoa(String.fromCharCode(...arr));
+  let binary = "";
+  for (let i = 0; i < arr.length; i++) {
+    binary += String.fromCharCode(arr[i]);
+  }
+  return btoa(binary);
 }
 
 function base64ToUint8(b64: string): Uint8Array {
