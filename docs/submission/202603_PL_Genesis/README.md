@@ -8,7 +8,7 @@
 
 **OrbitMem gives users a personal, encrypted, P2P data vault that AI agents can discover, evaluate, and consume — without ever uploading personal data to agent servers.**
 
-[🎬 Video](https://youtube.com), [📽️ Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submission/202603_PL_Genesis/slides.html)
+[🎬 Video](https://youtube.com), [📽️ Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
 
 ---
 
@@ -16,11 +16,9 @@
 
 There is no usable decentralized database. IPFS gives you content-addressable storage — but that's where it stops. Building real applications on top of decentralized infrastructure requires three things that IPFS alone doesn't provide:
 
-**No Encryption.** IPFS stores data in the open. There's no built-in per-record encryption or fine-grained access control. If you want to store private data on a P2P network, you're on your own.
-
-**No Authentication.** There's no identity layer, no signed requests, no way to verify who is reading or writing data. Any node can access any content if it has the CID.
-
-**No Indexing.** There's no discovery, no search, no quality signal. You need a CID to find anything — there's no way to query by schema, tag, or reputation. Without indexing, decentralized data is invisible.
+- **No Encryption.** IPFS stores data in the open. There's no built-in per-record encryption or fine-grained access control. If you want to store private data on a P2P network, you're on your own.
+- **No Authentication.** There's no identity layer, no signed requests, no way to verify who is reading or writing data. Any node can access any content if it has the CID.
+- **No Indexing.** There's no discovery, no search, no quality signal. You need a CID to find anything — there's no way to query by schema, tag, or reputation. Without indexing, decentralized data is invisible.
 
 AI agents, dApps, and user-facing applications all hit the same wall: IPFS is a transport layer, not a database. What's missing is the encryption, authentication, and indexing layer that turns content-addressable storage into a sovereign, queryable data platform.
 
@@ -114,7 +112,7 @@ An agent can read `travel/dietary` instantly, negotiate access to `travel/budget
 
 ---
 
-## UseCase example using OrbitMem
+## Example apps using OrbitMem
 
 ### 1. Decentralized Memo App
 
@@ -125,6 +123,9 @@ A fully decentralized note-taking app — no server, no platform, no lock-in.
 - **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
 - Markdown editor with live preview and GFM support
 
+Demo URL: [https://exammple.com](https://exammple.com),
+Source Code: [`examples/memo/`](../../examples/memo/)
+
 ```
 User writes memo → OrbitMem Vault (OrbitDB)
                       ├── public/  → readable by anyone, registered on-chain
@@ -133,11 +134,12 @@ User writes memo → OrbitMem Vault (OrbitDB)
                     Storacha → Filecoin (backup)
 ```
 
-See [`examples/memo/`](../../examples/memo/) for the full source.
-
 ### 2. Agent Research & Data Trust
 
 AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
+
+__Demo URL: [https://exammple.com](https://exammple.com),
+Source Code: [`examples/agent-research/`](../../examples/agent-research/)__
 
 **How it works:**
 
@@ -157,8 +159,6 @@ Agent B (consumer)
                           Agent A's reputation increases
                           → future data more discoverable
 ```
-
-See [`examples/agent-research/`](../../examples/agent-research/) for the full source.
 
 ---
 
