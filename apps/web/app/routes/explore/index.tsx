@@ -3,15 +3,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 import { DataTable } from "../../components/DataTable";
 import { SearchBar } from "../../components/SearchBar";
-import { type DataRegistration, searchData } from "../../lib/api";
+import { type DataRegistration, getDataStats, searchData } from "../../lib/api";
 
-export const Route = createFileRoute("/data/")({
+export const Route = createFileRoute("/explore/")({
   component: DataPage,
 });
 
 function DataPage() {
   const [schema, setSchema] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["dataStats"],
+    queryFn: getDataStats,
+    refetchInterval: 60_000,
+  });
 
   const { data: result, isLoading } = useQuery({
     queryKey: ["dataSearch", schema, verifiedOnly],
@@ -29,8 +35,23 @@ function DataPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-stone-900 mb-1">Data Registry</h1>
+        <h1 className="text-2xl font-bold text-stone-900 mb-1">Explore</h1>
         <p className="text-sm">Browse data entries with quality scores and tags</p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div className="rounded-xl bg-stone-100 p-5">
+          <p className="text-xs text-stone-900 mb-1">Data Entries</p>
+          <p className="text-2xl font-bold">{statsLoading ? "—" : (stats?.totalEntries ?? 0)}</p>
+        </div>
+        <div className="rounded-xl bg-stone-100 p-5">
+          <p className="text-xs text-stone-900 mb-1">Feedback Submitted</p>
+          <p className="text-2xl font-bold">{statsLoading ? "—" : (stats?.totalFeedback ?? 0)}</p>
+        </div>
+        <div className="rounded-xl bg-stone-100 p-5">
+          <p className="text-xs text-stone-900 mb-1">Avg Quality</p>
+          <p className="text-2xl font-bold">{statsLoading ? "—" : (stats?.avgQuality ?? 0)}</p>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">

@@ -4,7 +4,7 @@ import { FeedbackForm } from "../../components/FeedbackForm";
 import { ScoreCard } from "../../components/ScoreCard";
 import { getDataScore } from "../../lib/api";
 
-export const Route = createFileRoute("/data/$dataId")({
+export const Route = createFileRoute("/explore/$dataId")({
   component: DataDetailPage,
 });
 
@@ -21,7 +21,7 @@ function DataDetailPage() {
     <div className="space-y-8">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-stone-500">
-        <Link to="/data" className="hover:text-stone-700 transition-colors">
+        <Link to="/explore" className="hover:text-stone-700 transition-colors">
           Data
         </Link>
         <span>/</span>

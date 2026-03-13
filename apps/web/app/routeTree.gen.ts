@@ -10,25 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as MetricsIndexRouteImport } from './routes/metrics/index'
-import { Route as DataIndexRouteImport } from './routes/data/index'
+import { Route as ExploreIndexRouteImport } from './routes/explore/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as MetricsSnapshotsRouteImport } from './routes/metrics/snapshots'
-import { Route as DataDataIdRouteImport } from './routes/data/$dataId'
+import { Route as ExploreSnapshotsRouteImport } from './routes/explore/snapshots'
+import { Route as ExploreDataIdRouteImport } from './routes/explore/$dataId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MetricsIndexRoute = MetricsIndexRouteImport.update({
-  id: '/metrics/',
-  path: '/metrics/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DataIndexRoute = DataIndexRouteImport.update({
-  id: '/data/',
-  path: '/data/',
+const ExploreIndexRoute = ExploreIndexRouteImport.update({
+  id: '/explore/',
+  path: '/explore/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -36,76 +30,69 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MetricsSnapshotsRoute = MetricsSnapshotsRouteImport.update({
-  id: '/metrics/snapshots',
-  path: '/metrics/snapshots',
+const ExploreSnapshotsRoute = ExploreSnapshotsRouteImport.update({
+  id: '/explore/snapshots',
+  path: '/explore/snapshots',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DataDataIdRoute = DataDataIdRouteImport.update({
-  id: '/data/$dataId',
-  path: '/data/$dataId',
+const ExploreDataIdRoute = ExploreDataIdRouteImport.update({
+  id: '/explore/$dataId',
+  path: '/explore/$dataId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/data/$dataId': typeof DataDataIdRoute
-  '/metrics/snapshots': typeof MetricsSnapshotsRoute
+  '/explore/$dataId': typeof ExploreDataIdRoute
+  '/explore/snapshots': typeof ExploreSnapshotsRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/data/': typeof DataIndexRoute
-  '/metrics/': typeof MetricsIndexRoute
+  '/explore/': typeof ExploreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/data/$dataId': typeof DataDataIdRoute
-  '/metrics/snapshots': typeof MetricsSnapshotsRoute
+  '/explore/$dataId': typeof ExploreDataIdRoute
+  '/explore/snapshots': typeof ExploreSnapshotsRoute
   '/dashboard': typeof DashboardIndexRoute
-  '/data': typeof DataIndexRoute
-  '/metrics': typeof MetricsIndexRoute
+  '/explore': typeof ExploreIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/data/$dataId': typeof DataDataIdRoute
-  '/metrics/snapshots': typeof MetricsSnapshotsRoute
+  '/explore/$dataId': typeof ExploreDataIdRoute
+  '/explore/snapshots': typeof ExploreSnapshotsRoute
   '/dashboard/': typeof DashboardIndexRoute
-  '/data/': typeof DataIndexRoute
-  '/metrics/': typeof MetricsIndexRoute
+  '/explore/': typeof ExploreIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/data/$dataId'
-    | '/metrics/snapshots'
+    | '/explore/$dataId'
+    | '/explore/snapshots'
     | '/dashboard/'
-    | '/data/'
-    | '/metrics/'
+    | '/explore/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/data/$dataId'
-    | '/metrics/snapshots'
+    | '/explore/$dataId'
+    | '/explore/snapshots'
     | '/dashboard'
-    | '/data'
-    | '/metrics'
+    | '/explore'
   id:
     | '__root__'
     | '/'
-    | '/data/$dataId'
-    | '/metrics/snapshots'
+    | '/explore/$dataId'
+    | '/explore/snapshots'
     | '/dashboard/'
-    | '/data/'
-    | '/metrics/'
+    | '/explore/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DataDataIdRoute: typeof DataDataIdRoute
-  MetricsSnapshotsRoute: typeof MetricsSnapshotsRoute
+  ExploreDataIdRoute: typeof ExploreDataIdRoute
+  ExploreSnapshotsRoute: typeof ExploreSnapshotsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DataIndexRoute: typeof DataIndexRoute
-  MetricsIndexRoute: typeof MetricsIndexRoute
+  ExploreIndexRoute: typeof ExploreIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -117,18 +104,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/metrics/': {
-      id: '/metrics/'
-      path: '/metrics'
-      fullPath: '/metrics/'
-      preLoaderRoute: typeof MetricsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/data/': {
-      id: '/data/'
-      path: '/data'
-      fullPath: '/data/'
-      preLoaderRoute: typeof DataIndexRouteImport
+    '/explore/': {
+      id: '/explore/'
+      path: '/explore'
+      fullPath: '/explore/'
+      preLoaderRoute: typeof ExploreIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -138,18 +118,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/metrics/snapshots': {
-      id: '/metrics/snapshots'
-      path: '/metrics/snapshots'
-      fullPath: '/metrics/snapshots'
-      preLoaderRoute: typeof MetricsSnapshotsRouteImport
+    '/explore/snapshots': {
+      id: '/explore/snapshots'
+      path: '/explore/snapshots'
+      fullPath: '/explore/snapshots'
+      preLoaderRoute: typeof ExploreSnapshotsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/data/$dataId': {
-      id: '/data/$dataId'
-      path: '/data/$dataId'
-      fullPath: '/data/$dataId'
-      preLoaderRoute: typeof DataDataIdRouteImport
+    '/explore/$dataId': {
+      id: '/explore/$dataId'
+      path: '/explore/$dataId'
+      fullPath: '/explore/$dataId'
+      preLoaderRoute: typeof ExploreDataIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -157,11 +137,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DataDataIdRoute: DataDataIdRoute,
-  MetricsSnapshotsRoute: MetricsSnapshotsRoute,
+  ExploreDataIdRoute: ExploreDataIdRoute,
+  ExploreSnapshotsRoute: ExploreSnapshotsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DataIndexRoute: DataIndexRoute,
-  MetricsIndexRoute: MetricsIndexRoute,
+  ExploreIndexRoute: ExploreIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

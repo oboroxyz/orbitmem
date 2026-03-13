@@ -53,8 +53,8 @@ function HomePage() {
           <Link to="/dashboard" className="btn px-6 py-3">
             Get Started &rarr;
           </Link>
-          <Link to="/data" className="btn-outline px-6 py-3">
-            Browse Data &rarr;
+          <Link to="/explore" className="btn-outline px-6 py-3">
+            Explore &rarr;
           </Link>
         </div>
       </section>
