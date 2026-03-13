@@ -1,1 +1,1 @@
-export { createOrbitMemAgentAdapter } from "./agent-adapter.js";
+export { createOrbitMemAgentAdapter, createOrbitMemClient } from "./client.js";

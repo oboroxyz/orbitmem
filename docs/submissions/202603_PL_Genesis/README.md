@@ -182,8 +182,8 @@ OrbitMem gives users self-custodial, encrypted data with access control — no c
 
 OrbitMem provides the data layer for autonomous AI agents — on-chain data discovery, verifiable quality scores, and auditable receipts for every interaction.
 
-- **Agent Adapter** — `createOrbitMemAgentAdapter()` provides a one-call lifecycle: `discoverData` → `readPublicData` → `getDataScore` → `rateData`
-- **ERC-8004 on-chain trust** — `DataRegistry` (ERC-721) mints data as discoverable assets; `FeedbackRegistry` scores data quality with per-tag reputation (`accurate`, `fresh`)
+- **Client** — `createOrbitMemClient()` provides a one-call lifecycle: `discoverData` → `readPublicData` → `getDataScore` → `rateData`
+- **`ERC-`8004` on-chain trust** — `DataRegistry` (ERC-721) mints data as discoverable assets; `FeedbackRegistry` scores data quality with per-tag reputation (`accurate`, `fresh`)
 - **Agents with receipts** — every data interaction produces an auditable on-chain receipt via `giveFeedback()`
 
 ```
@@ -208,7 +208,7 @@ OrbitMem addresses **4 of 7** Filecoin challenge ideas:
 | :--- | :--- |
 | **Onchain Agent Registry** | `DataRegistry` (ERC-721) — `register(dataURI)` mints on-chain pointers to off-chain data |
 | **Agent Reputation & Portable Identity** | `FeedbackRegistry` — registry-agnostic reputation with per-tag scoring, bidirectional feedback |
-| **Agent-Generated Data Marketplace** | Agent Adapter lifecycle: discover → evaluate → consume → rate |
+| **Agent-Generated Data Marketplace** | Client lifecycle: discover → evaluate → consume → rate |
 | **Agent Storage SDK** | `@orbitmem/sdk` + `@orbitmem/cli` — encrypted vault, Storacha persistence, `--json` output |
 
 **Storacha integration:** encrypted vault snapshots archived to Filecoin via `@storacha/client` — immutable backups, CID-based retrieval, verifiable storage deals. No plaintext exposure (encryption before upload).
@@ -240,7 +240,7 @@ OrbitMem uses Lit Protocol as the encryption engine for shared data — reputati
 OrbitMem is built for agent-first consumption. The CLI, SDK, and Claude Code skill provide everything an autonomous agent needs:
 
 - **`@orbitmem/cli`** — every command supports `--json` for machine-readable output, `--relay`/`--chain` overrides
-- **`createOrbitMemAgentAdapter()`** — one-call lifecycle: discover → read → score → rate, no UI required
+- **`createOrbitMemClient()`** — one-call lifecycle: discover → read → score → rate, no UI required
 - **Claude Code Skill** — AI agents operate OrbitMem via natural language (e.g. "store my travel preferences in the vault")
 - **ERC-8128 transport auth** — agents sign their own requests with wallet keys, no OAuth or API keys
 
@@ -252,7 +252,7 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 - **`npx orbitmem register`** — register data on-chain, minting a receipt NFT
 - **`npx orbitmem discover`** — search by schema, tags, and minimum quality scores
-- **Agent Adapter** — `discoverData` → `getDataScore` → `rateData` lifecycle, all scored on-chain
+- **Interface** — `discoverData` → `getDataScore` → `rateData` lifecycle, all scored on-chain
 
 ### 9. Funding the Commons
 
@@ -264,9 +264,9 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 | Package | Description |
 | :--- | :--- |
-| **`@orbitmem/sdk`** | 6-layer composable SDK — identity, encryption, vault, transport, discovery, persistence + agent adapter |
-| **`@orbitmem/contracts`** | ERC-8004 Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia |
-| **`@orbitmem/relay`** | Hono HTTP relay with ERC-8128 auth middleware, vault/data/snapshot routes |
+| **`@orbitmem/sdk`** | Composable SDK — identity, encryption, vault, transport, discovery, persistence + client |
+| **`@orbitmem/contracts`** | `ERC-8004` Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia |
+| **`@orbitmem/relay`** | Hono HTTP relay with `ERC-8128` auth middleware, vault/data/snapshot routes |
 | **`@orbitmem/web`** | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers) |
 | **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` with `--json` output. Includes Claude Code skill for natural language operation |
 

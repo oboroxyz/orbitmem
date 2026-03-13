@@ -41,7 +41,7 @@
 <section class="slide flex-col items-center justify-center px-16" data-slide="2">
   <div class="fade-in w-full max-w-5xl">
     <h2 class="text-4xl font-semibold mb-4 text-center">Problem</h2>
-    <p class="text-2xl text-stone-700 text-center mb-14">There is no usable decentralized database.<br>IPFS gives you content-addressable storage — but that's where it stops.</p>
+    <p class="text-2xl text-stone-700 text-center mb-14">IPFS gives you content-addressable storage — but not a database.<br>Three things are missing:</p>
     <div class="grid grid-cols-3 gap-12 text-center">
       <div class="space-y-4">
         <div class="text-5xl">🔓</div>
@@ -79,12 +79,12 @@
       <div class="space-y-4">
         <div class="text-4xl">🔑</div>
         <h3 class="text-xl font-semibold">Authentication</h3>
-        <p class="text-base text-stone-500">Signed HTTP transport with Passkey, EVM, and Solana wallets</p>
+        <p class="text-base text-stone-500">Signed HTTP transport with Passkey, EVM, and Solana wallets via <span class="whitespace-nowrap bg-stone-200 px-2">ERC-8128</span></p>
       </div>
       <div class="space-y-4">
         <div class="text-4xl">📡</div>
         <h3 class="text-xl font-semibold">Discovery & Trust</h3>
-        <p class="text-base text-stone-500">On-chain data discovery and quality scoring via ERC-8004</p>
+        <p class="text-base text-stone-500">On-chain data discovery and quality scoring via <span class="whitespace-nowrap bg-stone-200 px-2">ERC-8004</span></p>
       </div>
     </div>
   </div>
@@ -107,13 +107,13 @@
       </div>
       <div class="space-y-4">
         <div class="text-4xl">✅</div>
-        <h3 class="text-xl font-semibold">On-chain Trust</h3>
-        <p class="text-base text-stone-500 leading-relaxed">Quality scoring via ERC-8004. Every data entry is rated by humans and agents, building a decentralized reputation layer.</p>
+        <h3 class="text-xl font-semibold">Discovery & Trust</h3>
+        <p class="text-base text-stone-500 leading-relaxed">On-chain data discovery and quality scoring via <span class="whitespace-nowrap bg-stone-200 px-2">ERC-8004</span>. Every data entry is rated by humans and agents.</p>
       </div>
       <div class="space-y-4">
         <div class="text-4xl">✍️</div>
         <h3 class="text-xl font-semibold">Signed Transport</h3>
-        <p class="text-base text-stone-500 leading-relaxed">ERC-8128 signed HTTP with Passkey, ETH or Solana Wallet. Every request is cryptographically verified across chains.</p>
+        <p class="text-base text-stone-500 leading-relaxed"><span class="whitespace-nowrap bg-stone-200 px-2">ERC-8128</span> signed HTTP with Passkey, ETH or Solana Wallet. Every request is cryptographically verified across chains.</p>
       </div>
     </div>
   </div>
@@ -127,28 +127,28 @@
       <div class="flex items-center gap-6">
         <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">1</span>
         <div>
-          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem init</code>
+          <code class="text-lg font-mono bg-stone-200 px-3 py-1.5 rounded">npx orbitmem init</code>
           <p class="text-base text-stone-500 mt-2">Generate keys and create config</p>
         </div>
       </div>
       <div class="flex items-center gap-6">
         <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">2</span>
         <div>
-          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem vault store &lt;path&gt; &lt;value&gt;</code>
+          <code class="text-lg font-mono bg-stone-200 px-3 py-1.5 rounded">npx orbitmem vault store &lt;path&gt; &lt;value&gt;</code>
           <p class="text-base text-stone-500 mt-2">Store data in your encrypted vault</p>
         </div>
       </div>
       <div class="flex items-center gap-6">
         <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">3</span>
         <div>
-          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem register</code>
+          <code class="text-lg font-mono bg-stone-200 px-3 py-1.5 rounded">npx orbitmem register</code>
           <p class="text-base text-stone-500 mt-2">Register data on-chain (ERC-8004)</p>
         </div>
       </div>
       <div class="flex items-center gap-6">
         <span class="flex shrink-0 w-12 h-12 bg-stone-900 text-stone-50 rounded-full items-center justify-center font-semibold text-lg">4</span>
         <div>
-          <code class="text-lg font-mono bg-stone-100 px-3 py-1.5 rounded">npx orbitmem discover</code>
+          <code class="text-lg font-mono bg-stone-200 px-3 py-1.5 rounded">npx orbitmem discover</code>
           <p class="text-base text-stone-500 mt-2">Search data sources by quality and tags</p>
         </div>
       </div>
@@ -190,14 +190,14 @@
           <td class="py-4 text-stone-700">Immutable archival snapshots, disaster recovery</td>
         </tr>
         <tr class="border-b border-stone-200">
-          <td class="py-4 pr-4 font-semibold">Trust & Discovery</td>
+          <td class="py-4 pr-4 font-semibold">Data Discovery & Trust</td>
           <td class="py-4 pr-4 text-stone-600">ERC-8004 (ERC-721 + Reputation)</td>
           <td class="py-4 text-stone-700">On-chain data discovery & reputation scoring</td>
         </tr>
         <tr>
-          <td class="py-4 pr-4 font-semibold">Agent Adapter</td>
-          <td class="py-4 pr-4 text-stone-600">TypeScript SDK</td>
-          <td class="py-4 text-stone-700">Discover → decrypt → execute → rate lifecycle</td>
+          <td class="py-4 pr-4 font-semibold">Interface</td>
+          <td class="py-4 pr-4 text-stone-600">TypeScript SDK + CLI + Claude Code Skill</td>
+          <td class="py-4 text-stone-700">One-call lifecycle for users and AI agents</td>
         </tr>
       </tbody>
     </table>

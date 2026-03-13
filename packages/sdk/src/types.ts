@@ -1271,7 +1271,7 @@ export declare function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMe
  * This is what an OpenClaw agent (or any framework) would use
  * to fetch and decrypt user data from the Relay Node.
  */
-export interface IOrbitMemAgentAdapter {
+export interface IOrbitMemClient {
   // ── Data Discovery & Evaluation ──
 
   /**
@@ -1401,8 +1401,11 @@ export interface IOrbitMemAgentAdapter {
   ): Promise<R>;
 }
 
-/** Agent adapter configuration */
-export interface AgentAdapterConfig {
+/** @deprecated Use IOrbitMemClient instead */
+export type IOrbitMemAgentAdapter = IOrbitMemClient;
+
+/** Client configuration */
+export interface ClientConfig {
   /** The agent's wallet connection (for signing requests & Lit auth) */
   wallet: {
     family: ChainFamily;
@@ -1424,10 +1427,14 @@ export interface AgentAdapterConfig {
   };
 }
 
-/** Factory for agent adapter */
-export declare function createOrbitMemAgentAdapter(
-  config: AgentAdapterConfig,
-): IOrbitMemAgentAdapter;
+/** @deprecated Use ClientConfig instead */
+export type AgentAdapterConfig = ClientConfig;
+
+/** Factory for client */
+export declare function createOrbitMemClient(config: ClientConfig): IOrbitMemClient;
+
+/** @deprecated Use createOrbitMemClient instead */
+export declare function createOrbitMemAgentAdapter(config: ClientConfig): IOrbitMemClient;
 
 // ────────────────────────────────────────────────────────────
 //  10. EVENT TYPES — Observable Patterns
