@@ -26,7 +26,7 @@ describe("config", () => {
 
   test("loadConfig returns defaults when no file exists", () => {
     const config = loadConfig();
-    expect(config.relay).toBe("https://relay.orbitmem.0x7.sh");
+    expect(config.relay).toBe("https://orbitmem-relay.fly.dev");
     expect(config.chain).toBe("base-sepolia");
   });
 

@@ -36,7 +36,7 @@ describe("CLI integration", () => {
     const result = JSON.parse(text);
     expect(result.address).toMatch(/^0x[0-9a-fA-F]{40}$/);
     expect(result.network).toBe("base-sepolia");
-    expect(result.relay).toBe("https://relay.orbitmem.0x7.sh");
+    expect(result.relay).toBe("https://orbitmem-relay.fly.dev");
   });
 
   test("status --json after init shows config", async () => {

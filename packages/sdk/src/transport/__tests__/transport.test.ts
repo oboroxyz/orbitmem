@@ -13,7 +13,7 @@ describe("TransportLayer", () => {
     });
 
     const signed = await transport.createSignedRequest({
-      url: "https://relay.orbitmem.0x7.sh/v1/vault/read",
+      url: "https://orbitmem-relay.fly.dev/v1/vault/read",
       method: "POST",
       body: { key: "preferences" },
     });
@@ -47,7 +47,7 @@ describe("TransportLayer", () => {
     });
 
     const signed = await transport.createSignedRequest({
-      url: "https://relay.orbitmem.0x7.sh/v1/vault/read",
+      url: "https://orbitmem-relay.fly.dev/v1/vault/read",
       method: "POST",
       body: { key: "test" },
     });
@@ -70,7 +70,7 @@ describe("TransportLayer", () => {
     });
 
     const signed = await transport.createSignedRequest({
-      url: "https://relay.orbitmem.0x7.sh/v1/health",
+      url: "https://orbitmem-relay.fly.dev/v1/health",
       method: "GET",
     });
 

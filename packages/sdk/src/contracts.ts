@@ -21,7 +21,7 @@ export const NETWORKS: Record<NetworkId, NetworkConfig> = {
     chain: "base-sepolia",
     chainId: 84532,
     rpcUrl: "https://sepolia.base.org",
-    relayUrl: "https://relay.orbitmem.0x7.sh",
+    relayUrl: "https://orbitmem-relay.fly.dev",
     deployBlock: 38728995n,
   },
   base: {
@@ -30,7 +30,7 @@ export const NETWORKS: Record<NetworkId, NetworkConfig> = {
     chain: "base",
     chainId: 8453,
     rpcUrl: "https://mainnet.base.org",
-    relayUrl: "https://relay.orbitmem.0x7.sh",
+    relayUrl: "https://orbitmem-relay.fly.dev",
     deployBlock: 0n,
   },
 };
