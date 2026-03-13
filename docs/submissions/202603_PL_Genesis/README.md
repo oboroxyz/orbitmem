@@ -1,6 +1,6 @@
 # OrbitMem — Decentralized data layer for agentic web
 
-[PL_Genesis: Frontiers of Collaboration Hackathon Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101)
+[PL_Genesis: Frontiers of Collaboration Hackathon](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/)
 
 ---
 
@@ -10,7 +10,7 @@
 
 Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 signed transport, and ERC-8004 for data discovery and reputation.
 
-[▶️ Video](https://youtube.com) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
+[📝 Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101) | [▶️ Video](https://youtube.com) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
 
 ---
 
@@ -45,7 +45,7 @@ IPFS gives you content-addressable storage — but not a database. Three things 
 
 ---
 
-## 📐 Architecture — 6 Layers
+## 📐 Architecture
 
 | Layer                 | Technology                            | Role                                                           |
 | :-------------------- | :------------------------------------ | :------------------------------------------------------------- |
@@ -53,38 +53,20 @@ IPFS gives you content-addressable storage — but not a database. Three things 
 | **Data Vault**        | OrbitDB Nested (`@orbitdb/nested-db`) | Local-first P2P storage with hierarchical JSON paths           |
 | **Encryption**        | **Lit Protocol** + AES-256-GCM        | Reputation-gated access control, per-path encryption           |
 | **Persistence**       | **Storacha** (Filecoin/IPFS)          | Immutable archival snapshots, disaster recovery                |
-| **Trust & Discovery** | ERC-8004 for Data (ERC-721 + Reputation) | On-chain data discovery & reputation — data is a scored asset |
-| **Agent Adapter**     | TypeScript SDK                        | Fetch → decrypt → execute → forget → rate (one-call lifecycle) |
+| **Data Discovery & Trust** | ERC-8004 for Data (ERC-721 + Reputation) | On-chain data discovery & reputation — data is a scored asset |
+| **Interface**         | TypeScript SDK + CLI + Claude Code Skill   | One-call lifecycle for users and AI agents — SDK, `npx orbitmem`, or natural language via Claude Code |
 
 ---
 
-## Key Feature: ERC-8004 for Data
+## ✨ Features
 
-Most data systems have no quality signal. OrbitMem asks: **"Is this data trustworthy?"**
+### Fully Decentralized
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                  On-Chain (Base L2)                      │
-│                                                         │
-│  Data Registry (ERC-721)                                │
-│  "Is this data accurate?"                               │
-│           │                                             │
-│           ▼                                             │
-│  Feedback Registry (registry-agnostic)                  │
-│  giveFeedback(targetId, score, tag)                     │
-│                                                         │
-│  Agent rates data: ★ 90, tag: "accurate"                │
-│  Agent rates data: ★ 95, tag: "fresh"                   │
-└─────────────────────────────────────────────────────────┘
-```
+Built on IPFS and OrbitDB — no central servers, no single point of failure. Local-first, offline-capable, censorship resistant.
 
-This creates a **virtuous cycle**: high-quality data attracts more agent consumption, which produces more feedback, which improves data scores.
+### Encrypted Vaults
 
----
-
-## Per-Path Visibility — Fine-Grained Access Control
-
-Using `@orbitdb/nested-db`, the same data tree can have different visibility per path:
+P2P data vaults with per-path visibility control. The same data tree can have different access levels:
 
 ```typescript
 // Public — any agent reads freely
@@ -103,7 +85,31 @@ await vault.put('travel/passport', { number: 'XX123' }, {
 });
 ```
 
-An agent can read `travel/dietary` instantly, negotiate access to `travel/budget` through reputation, and **never see** `travel/passport`.
+### Signed Transport
+
+ERC-8128 signed HTTP with Passkey, EVM, or Solana wallets. Every request is cryptographically verified — no OAuth, no API keys.
+
+### Discovery & Trust
+
+On-chain data discovery and quality scoring via ERC-8004. Every data entry is rated by humans and agents, building a decentralized reputation layer.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  On-Chain (Base L2)                      │
+│                                                         │
+│  Data Registry (ERC-721)                                │
+│  "Is this data accurate?"                               │
+│           │                                             │
+│           ▼                                             │
+│  Feedback Registry (registry-agnostic)                  │
+│  giveFeedback(targetId, score, tag)                     │
+│                                                         │
+│  Agent rates data: ★ 90, tag: "accurate"                │
+│  Agent rates data: ★ 95, tag: "fresh"                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+High-quality data attracts more agent consumption → more feedback → higher scores. A **virtuous cycle**.
 
 ---
 
@@ -231,10 +237,11 @@ OrbitMem uses Lit Protocol as the encryption engine for shared data — reputati
 
 > Fully autonomous agent workflows — no human in the loop.
 
-OrbitMem is built for agent-first consumption. The CLI and SDK provide everything an autonomous agent needs:
+OrbitMem is built for agent-first consumption. The CLI, SDK, and Claude Code skill provide everything an autonomous agent needs:
 
 - **`@orbitmem/cli`** — every command supports `--json` for machine-readable output, `--relay`/`--chain` overrides
 - **`createOrbitMemAgentAdapter()`** — one-call lifecycle: discover → read → score → rate, no UI required
+- **Claude Code Skill** — AI agents operate OrbitMem via natural language (e.g. "store my travel preferences in the vault")
 - **ERC-8128 transport auth** — agents sign their own requests with wallet keys, no OAuth or API keys
 
 ### 8. Agents With Receipts — ERC-8004
@@ -262,21 +269,6 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 | **`@orbitmem/relay`** | Hono HTTP relay with ERC-8128 auth middleware, vault/data/snapshot routes |
 | **`@orbitmem/web`** | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers) |
 | **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` with `--json` output |
-
-### Technical Stacks
-
-| Component            | Technology                      | License          |
-| :------------------- | :------------------------------ | :--------------- |
-| P2P Data Store       | OrbitDB + `@orbitdb/nested-db`  | AGPL-3.0         |
-| Content Addressing   | Helia (IPFS)                    | Apache-2.0 / MIT |
-| Encryption (shared)  | **Lit Protocol**                | Apache-2.0       |
-| Encryption (private) | AES-256-GCM                     | —                |
-| Archival Storage     | **Storacha** → **Filecoin**     | Apache-2.0       |
-| On-Chain Trust       | ERC-8004 (ERC-721 + Reputation) | MIT              |
-| Registry Chain       | Base L2 (EVM)                   | —                |
-| Identity             | Porto Passkeys + EVM + Solana   | —                |
-| CLI                  | TypeScript (`@orbitmem/cli`)    | MIT              |
-| SDK                  | TypeScript (`@orbitmem/sdk`)    | MIT              |
 
 ---
 
