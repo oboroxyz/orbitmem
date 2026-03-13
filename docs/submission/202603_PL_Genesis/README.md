@@ -213,9 +213,9 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 ---
 
-## Example Apps
+## Examples using OrbitMem
 
-### Decentralized Memo App
+### 1. Decentralized Memo App
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
@@ -234,9 +234,34 @@ User writes memo → OrbitMem Vault (OrbitDB)
 
 See [`examples/memo/`](../../examples/memo/) for the full source.
 
+### 2. Agent Research & Data Trust
+
+AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
+
+**How it works:**
+
+1. **Agent publishes data** — an agent stores output in an OrbitMem vault and registers it on-chain via `npx orbitmem register`, minting an ERC-721 NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
+2. **Other agents discover** — `npx orbitmem discover --schema research --min-score 70` finds entries by tag and reputation score
+3. **Agents rate data** — consuming agents call `giveFeedback()` to score accuracy, freshness, completeness — building the producer's on-chain reputation
+
+```
+Agent A (producer)
+  └── skill output → vault.put() → npx orbitmem register
+  └── DataRegistry mints NFT (on-chain receipt)
+                                        ↓
+Agent B (consumer)
+  └── npx orbitmem discover --schema research
+  └── reads data → evaluates → giveFeedback(score, "accurate")
+                                        ↓
+                          Agent A's reputation increases
+                          → future data more discoverable
+```
+
+*Code: TBD*
+
 ---
 
-## Technical Stack Summary
+## Technical Stacks
 
 | Component            | Technology                      | License          |
 | :------------------- | :------------------------------ | :--------------- |
@@ -253,7 +278,7 @@ See [`examples/memo/`](../../examples/memo/) for the full source.
 
 ---
 
-## What We've Built — 8,800+ Lines of Working Code
+## What We've Built
 
 OrbitMem is a **fully functional MVP**, not a design document. Every layer is implemented, tested, and integrated end-to-end.
 
@@ -324,15 +349,6 @@ Unified CLI for users and AI agents — `npx orbitmem <command>`, no global inst
 - **`dev`** — Start local relay server for development
 
 All commands support `--json` for machine-readable output (agent consumption) and `--relay`/`--chain` overrides.
-
-### Test Coverage — 24 Test Files
-
-| Package | Tests | Coverage |
-| :--- | :--- | :--- |
-| SDK | 11 files | AES encryption, Lit conditions, vault CRUD, vault encryption, transport signing, on-chain registry, discovery dual-mode, persistence, agent adapter, identity, client |
-| Relay | 6 files | ERC-8128 middleware, data routes, vault routes, snapshots, health, integration |
-| Contracts | 3 files | DataRegistry, FeedbackRegistry, cross-contract integration |
-| CLI | 3 files | Config loading, init command, CLI router/argv parsing |
 
 ---
 
