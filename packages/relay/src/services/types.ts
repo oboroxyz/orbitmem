@@ -12,7 +12,12 @@ export interface IVaultService {
     entries: { key: string; value: unknown; visibility: string }[],
   ): Promise<number>;
   sync(address: string): Promise<{ status: string; timestamp: number }>;
-  write(address: string, path: string, value: unknown, visibility: string): Promise<{ hash: string }>;
+  write(
+    address: string,
+    path: string,
+    value: unknown,
+    visibility: string,
+  ): Promise<{ hash: string }>;
   delete(address: string, path: string): Promise<void>;
   getKeys(address: string, prefix?: string): Promise<string[]>;
 }

@@ -53,7 +53,12 @@ export class MockVaultService implements IVaultService {
     return { status: "synced", timestamp: Date.now() };
   }
 
-  async write(address: string, path: string, value: unknown, visibility: string): Promise<{ hash: string }> {
+  async write(
+    address: string,
+    path: string,
+    value: unknown,
+    visibility: string,
+  ): Promise<{ hash: string }> {
     const vault = this.getOrCreate(address);
     vault.set(path, { value, visibility });
     return { hash: `mock-hash-${Date.now()}` };

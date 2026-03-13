@@ -57,7 +57,12 @@ export class LiveVaultService implements IVaultService {
     return { status: "synced", timestamp: Date.now() };
   }
 
-  async write(address: string, path: string, value: unknown, _visibility: string): Promise<{ hash: string }> {
+  async write(
+    address: string,
+    path: string,
+    value: unknown,
+    _visibility: string,
+  ): Promise<{ hash: string }> {
     const db = await this.getDB(address);
     const hash = await db.put(path, value);
     return { hash: hash ?? `live-${Date.now()}` };
