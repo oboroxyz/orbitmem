@@ -1,0 +1,15 @@
+{
+  "name": "@orbitmem/agent-research-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "store": "bun run tools/store-research.ts",
+    "search": "bun run tools/search-research.ts",
+    "feedback": "bun run tools/submit-feedback.ts"
+  },
+  "dependencies": {
+    "@orbitmem/sdk": "workspace:*",
+    "viem": "^2.0.0"
+  }
+}
