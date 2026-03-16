@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
+
 import { createPersistenceLayer } from "../persistence-layer.js";
 
 // ── Mode detection ───────────────────────────────────────────

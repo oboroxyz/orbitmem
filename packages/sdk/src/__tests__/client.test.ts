@@ -1,12 +1,9 @@
 import { describe, expect, test } from "bun:test";
 
-// Skip if native OrbitDB dependencies (node-datachannel) are unavailable (e.g. CI)
-let orbitdbAvailable = true;
-try {
-  require.resolve("@ipshipyard/node-datachannel");
-} catch {
-  orbitdbAvailable = false;
-}
+import { hasOrbitDbNativeSupport } from "./orbitdb-availability.js";
+
+// Skip if native OrbitDB dependencies are unavailable (e.g. CI without the compiled binary)
+const orbitdbAvailable = hasOrbitDbNativeSupport();
 
 describe.skipIf(!orbitdbAvailable)("createOrbitMem", () => {
   test("initializes all layers", async () => {

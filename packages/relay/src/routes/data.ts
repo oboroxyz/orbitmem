@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 import type { IDiscoveryService } from "../services/types.js";
 

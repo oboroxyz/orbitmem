@@ -17,9 +17,10 @@ OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi
 ```bash
 bun install              # Install dependencies
 bun test                 # Run all tests across all packages
-bun run lint             # Lint check (biome check .)
-bun run lint:fix         # Lint autofix (biome check --write .)
-bun run format           # Format (biome format --write .)
+bun run lint             # Lint check (Vite+ / Oxlint)
+bun run lint:fix         # Lint autofix + format write (Vite+)
+bun run format           # Format write (Vite+ / Oxfmt)
+bun run format:check     # Format check without writing
 bun run typecheck        # Typecheck all packages (tsc --noEmit)
 bun run build            # Build all packages
 bun run dev              # Start relay + web concurrently
@@ -146,7 +147,7 @@ Signed HTTP requests use headers: `X-OrbitMem-Signer`, `-Family`, `-Algorithm`, 
 ## Code Conventions
 
 - **TypeScript strict mode** with `noUnusedLocals` and `noUnusedParameters`
-- **Biome** for linting and formatting: 2-space indent, 100-char line width, organized imports
+- **Vite+** for linting and formatting (Oxlint + Oxfmt): 2-space indent, 100-char line width, organized imports
 - **Interface prefix** — all layer interfaces use `I` prefix (e.g., `IDataLayer`, `IEncryptionLayer`)
 - **ESM imports** — use `.js` extension in import paths (bundler module resolution)
 - **`export type` / `import type`** for type-only imports
@@ -155,7 +156,7 @@ Signed HTTP requests use headers: `X-OrbitMem-Signer`, `-Family`, `-Algorithm`, 
 - **SDK exports** six entry points: `.` (main), `./agent`, `./discovery`, `./transport`, `./contracts`, `./types`
 - **Solidity** uses `forge fmt` (4-space indent, 100-char line width), optimizer enabled with 200 runs
 - **Contract tests** in `test/*.t.sol` follow Foundry conventions (`test_` prefix, `setUp()`, `vm.expectRevert`)
-- **CI** runs 4 parallel jobs: lint (biome), test (bun test), contracts (forge build/test/fmt --check), typecheck (tsc --noEmit)
+- **CI** runs 4 parallel jobs: lint (Vite+ / Oxlint + Oxfmt), test (bun test), contracts (forge build/test/fmt --check), typecheck (tsc --noEmit)
 
 ## Worktrees
 

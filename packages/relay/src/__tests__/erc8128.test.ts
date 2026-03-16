@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
+
 import { Hono } from "hono";
 import { privateKeyToAccount } from "viem/accounts";
+
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 
 describe("ERC-8128 Middleware", () => {

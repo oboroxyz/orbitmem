@@ -1,12 +1,9 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 
-// Skip if native OrbitDB dependencies (node-datachannel) are unavailable (e.g. CI)
-let orbitdbAvailable = true;
-try {
-  require.resolve("@ipshipyard/node-datachannel");
-} catch {
-  orbitdbAvailable = false;
-}
+import { hasOrbitDbNativeSupport } from "../../__tests__/orbitdb-availability.js";
+
+// Skip if native OrbitDB dependencies are unavailable (e.g. CI without the compiled binary)
+const orbitdbAvailable = hasOrbitDbNativeSupport();
 
 describe.skipIf(!orbitdbAvailable)("DataLayer — Vault", () => {
   let vault: any;
@@ -20,8 +17,8 @@ describe.skipIf(!orbitdbAvailable)("DataLayer — Vault", () => {
   });
 
   afterAll(async () => {
-    await vault.close();
-    await cleanup();
+    await vault?.close?.();
+    await cleanup?.();
   });
 
   test("put and get a public value", async () => {

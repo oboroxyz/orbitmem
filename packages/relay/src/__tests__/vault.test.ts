@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
+
 import { app } from "../app.js";
 
 function makeERC8128Headers(overrides?: Record<string, string>) {

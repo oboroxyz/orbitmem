@@ -1,4 +1,5 @@
 import { MockRegistry } from "@orbitmem/sdk/discovery";
+
 import type { DataStats, IDiscoveryService, UserStats } from "./types.js";
 
 export class MockDiscoveryService implements IDiscoveryService {

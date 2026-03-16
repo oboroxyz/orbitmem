@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { createEncryptionLayer } from "../encryption-layer.js";
 
 describe("EncryptionLayer", () => {

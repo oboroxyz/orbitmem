@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 bun x vp build",
     "preview": "vite preview",
-    "deploy": "vite build && wrangler deploy",
+    "deploy": "bun run build && wrangler deploy",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

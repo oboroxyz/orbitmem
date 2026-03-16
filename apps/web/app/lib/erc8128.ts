@@ -1,5 +1,6 @@
 import { type SignMessageReturnType, signMessage } from "@wagmi/core";
 import { sha256 } from "viem";
+
 import { wagmiConfig } from "./wagmi";
 
 /**

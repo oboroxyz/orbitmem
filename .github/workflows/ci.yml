@@ -16,7 +16,8 @@ jobs:
         with:
           bun-version: "1.3.10"
       - run: bun install --frozen-lockfile
-      - run: bunx biome check .
+      - run: bun run lint
+      - run: bun run format:check
 
   test:
     name: Test

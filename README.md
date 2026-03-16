@@ -1,6 +1,7 @@
 # OrbitMem
 
-Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust.
+Decentralized data layer for agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents
+
 
 ## Architecture
 

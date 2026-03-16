@@ -1,0 +1,22 @@
+{
+  "ignorePatterns": [
+    "packages/contracts/**",
+    "apps/web/.wrangler/**",
+    "apps/web/dist/**",
+    "apps/web/app/routeTree.gen.ts",
+    "**/dist/**",
+    "**/orbitdb/**",
+    "**/.test-orbitdb/**",
+    "**/*.css",
+    "**/*.html",
+    "**/*.json",
+    "**/*.md",
+    "**/*.toml",
+    "**/*.yaml",
+    "**/*.yml"
+  ],
+  "printWidth": 100,
+  "sortImports": {},
+  "tabWidth": 2,
+  "useTabs": false
+}
