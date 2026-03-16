@@ -1,3 +1,9 @@
+// oxlint-disable-next-line typescript/triple-slash-reference
+/// <reference path="../types/orbitdb.d.ts" />
+
+import { useDatabaseType } from "@orbitdb/core";
+import { Nested } from "@orbitdb/nested-db";
+
 import type { AESEngine } from "../encryption/aes.js";
 import type {
   AESEncryptedData,
@@ -16,6 +22,9 @@ import {
   isSerializedEncrypted,
   serializeEncrypted,
 } from "./serialization.js";
+
+// Register the Nested database type at the point of use so callers do not depend on setup order.
+useDatabaseType(Nested);
 
 function normalizePath(path: VaultPath): string {
   return Array.isArray(path) ? path.join("/") : path;

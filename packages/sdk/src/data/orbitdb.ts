@@ -1,3 +1,6 @@
+// oxlint-disable-next-line typescript/triple-slash-reference
+/// <reference path="../types/orbitdb.d.ts" />
+
 import { gossipsub } from "@chainsafe/libp2p-gossipsub";
 import { noise } from "@chainsafe/libp2p-noise";
 import { yamux } from "@chainsafe/libp2p-yamux";
