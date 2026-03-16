@@ -1,4 +1,5 @@
 import type { Address } from "viem";
+
 import type { DataRegistration, DiscoveryConfig, IDiscoveryLayer } from "../types.js";
 import { MockRegistry } from "./mock-registry.js";
 import { OnChainRegistry } from "./on-chain-registry.js";

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { AESEngine } from "../../encryption/aes.js";
 import { isSerializedEncrypted } from "../serialization.js";
 import { createVault } from "../vault.js";

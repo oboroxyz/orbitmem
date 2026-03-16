@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+
 import { createDataRoutes } from "./routes/data.js";
 import { healthRoutes } from "./routes/health.js";
 import { createSnapshotRoutes } from "./routes/snapshots.js";

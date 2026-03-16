@@ -1,4 +1,5 @@
 import { privateKeyToAccount } from "viem/accounts";
+
 import { getConfigDir, loadConfig, loadKey } from "../config.js";
 import { error, output } from "../utils/output.js";
 

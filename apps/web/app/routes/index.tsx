@@ -43,7 +43,7 @@ function HomePage() {
       {/* Hero */}
       <section className="min-h-[36vh] flex flex-col items-center justify-center text-center">
         <h1 className="font-mono text-xxs sm:text-xs tracking-tight">
-          {/* biome-ignore format: preserve ASCII art alignment */}
+          {/* prettier-ignore */}
           <pre>▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄   <br />██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██   <br />▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██ <span className="animate-pulse-0">██</span><br /></pre>
         </h1>
         <p className="mt-6 text-lg text-stone-700 max-w-md leading-relaxed">
@@ -132,7 +132,10 @@ function HomePage() {
             <span className="text-xs text-stone-400 ml-auto">IPFS + OrbitDB, offline-first</span>
           </div>
           {FEATURES.map((f) => (
-            <div key={f.title} className="rounded-lg border border-stone-200 px-5 py-3 flex items-center gap-3">
+            <div
+              key={f.title}
+              className="rounded-lg border border-stone-200 px-5 py-3 flex items-center gap-3"
+            >
               <f.icon className="text-base text-stone-400 shrink-0" />
               <span className="text-sm font-semibold text-stone-900">{f.title}</span>
               <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5 ml-auto">

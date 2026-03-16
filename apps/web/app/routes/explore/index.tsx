@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
+
 import { DataTable } from "../../components/DataTable";
 import { SearchBar } from "../../components/SearchBar";
 import { type DataRegistration, getDataStats, searchData } from "../../lib/api";

@@ -9,9 +9,11 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
+
 import { Layout } from "../components/Layout";
-import appCss from "../index.css?url";
 import { wagmiConfig } from "../lib/wagmi";
+
+import appCss from "../index.css?url";
 
 interface RouterContext {
   queryClient: QueryClient;

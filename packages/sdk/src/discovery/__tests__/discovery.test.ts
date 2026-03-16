@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { createDiscoveryLayer } from "../discovery-layer.js";
 
 describe("DiscoveryLayer (mock)", () => {

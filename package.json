@@ -19,14 +19,15 @@
     "test:contracts": "bun run --filter @orbitmem/contracts test",
     "deploy:web": "bun run --filter @orbitmem/web deploy",
     "deploy:relay": "fly deploy --config packages/relay/fly.toml --dockerfile packages/relay/Dockerfile",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
+    "lint": "vp lint packages apps",
+    "lint:fix": "vp lint --fix packages apps && vp fmt --write packages apps",
+    "format": "vp fmt --write packages apps",
+    "format:check": "vp fmt --check packages apps",
     "typecheck": "bun run --filter '*' typecheck",
     "cli": "bun packages/cli/src/index.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.4",
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "vite-plus": "^0.1.11"
   }
 }
