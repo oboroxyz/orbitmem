@@ -11,9 +11,8 @@ import type { ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 
 import { Layout } from "../components/Layout";
-import { wagmiConfig } from "../lib/wagmi";
-
 import appCss from "../index.css?url";
+import { wagmiConfig } from "../lib/wagmi";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -24,7 +23,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "OrbitMem — Sovereign Data Layer for AI Agents" },
+      { title: "OrbitMem — Decentralized data layer for agentic web." },
       {
         name: "description",
         content: "Decentralized data layer for agentic web.",

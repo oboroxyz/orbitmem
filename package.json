@@ -15,6 +15,7 @@
     "dev": "concurrently -n relay,web -c blue,magenta \"bun run dev:relay\" \"bun run dev:web\"",
     "dev:relay": "bun run --filter @orbitmem/relay dev",
     "dev:web": "bun run --filter @orbitmem/web dev",
+    "build:web": "bun run --filter @orbitmem/web build",
     "build:contracts": "bun run --filter @orbitmem/contracts build",
     "test:contracts": "bun run --filter @orbitmem/contracts test",
     "deploy:web": "bun run --filter @orbitmem/web deploy",
