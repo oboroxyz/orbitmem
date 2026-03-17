@@ -1,10 +1,10 @@
-# OrbitMem
-
 ```
 ▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄
 ██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██
 ▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██
 ```
+
+# OrbitMem
 
 Decentralized data layer for agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents
 
@@ -22,7 +22,7 @@ Decentralized data layer for agentic web — encrypted vaults, on-chain discover
 │  │ (OrbitDB)│ │(ERC-8004)│ │ (Storacha)   │ │
 │  └──────────┘ └──────────┘ └──────────────┘ │
 │  ┌──────────────────────────────────────────┐│
-│  │         Agent Adapter                    ││
+│  │         Client                           ││
 │  │  discover → evaluate → fetch → rate      ││
 │  └──────────────────────────────────────────┘│
 └──────────────────────────────────────────────┘
@@ -115,28 +115,28 @@ await orbit.vault.put('travel/dietary', { vegan: true }, {
 const prefs = await orbit.vault.get('travel/dietary');
 ```
 
-## Agent Adapter
+## Client
 
 ```typescript
-import { createOrbitMemAgentAdapter } from '@orbitmem/sdk/agent';
+import { createOrbitMemClient } from '@orbitmem/sdk/agent';
 
-const agent = createOrbitMemAgentAdapter({ orbit });
+const client = createOrbitMemClient({ orbit });
 
 // Full lifecycle: discover → evaluate → fetch → decrypt → rate
-const datasets = await agent.discoverData({ schema: 'orbitmem:dietary:v1' });
-const score = await agent.evaluateData(datasets[0].dataId);
-const data = await agent.fetchUserData({
+const datasets = await client.discoverData({ schema: 'orbitmem:dietary:v1' });
+const score = await client.evaluateData(datasets[0].dataId);
+const data = await client.fetchUserData({
   dataId: datasets[0].dataId,
   userAddress: '0x...',
 });
-await agent.rateData(datasets[0].dataId, 95);
+await client.rateData(datasets[0].dataId, 95);
 ```
 
 ## Packages
 
 | Package | Description |
 |---------|-------------|
-| `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, agent adapter |
+| `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, client |
 | `@orbitmem/relay` | Hono relay server — vault routes, discovery, snapshots, ERC-8128 auth |
 | `@orbitmem/contracts` | Solidity contracts — DataRegistry (ERC-721), FeedbackRegistry (reputation) |
 | `@orbitmem/cli` | CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots |
