@@ -1,7 +1,12 @@
 # OrbitMem
 
-Decentralized data layer for agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents
+```
+▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄
+██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██
+▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██
+```
 
+Decentralized data layer for agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents
 
 ## Architecture
 
@@ -72,12 +77,12 @@ npx orbitmem --help                  # Show all commands
 
 ### Contracts
 
-Deployed on **Base Sepolia**:
+Deployed on **Base, Base Sepolia**:
 
-| Contract | Address |
-|----------|---------|
-| DataRegistry | [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
-| FeedbackRegistry | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
+| Contract | Base | Base Sepolia |
+|----------|---------|---------|
+| DataRegistry | _TBD_ |  [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
+| FeedbackRegistry | _TBD_ | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
 
 ```bash
 cd packages/contracts
