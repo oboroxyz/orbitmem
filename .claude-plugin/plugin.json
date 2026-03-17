@@ -11,6 +11,21 @@
       "name": "orbitmem-cli",
       "path": ".claude/skills/orbitmem-cli",
       "description": "Develops and extends the OrbitMem CLI (npx orbitmem). Use when adding commands, modifying CLI behavior, debugging CLI issues, or working on packages/cli/."
+    },
+    {
+      "name": "orbitmem-research",
+      "path": ".claude/skills/orbitmem-research",
+      "description": "Research a topic, summarize findings, and store them in an OrbitMem vault with on-chain registration."
+    },
+    {
+      "name": "orbitmem-discover",
+      "path": ".claude/skills/orbitmem-discover",
+      "description": "Search for research memos stored by other agents in OrbitMem by tags, keywords, or quality score."
+    },
+    {
+      "name": "orbitmem-feedback",
+      "path": ".claude/skills/orbitmem-feedback",
+      "description": "Rate a research memo's quality on-chain via OrbitMem FeedbackRegistry."
     }
   ]
 }

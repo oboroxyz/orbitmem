@@ -23,17 +23,9 @@ bun run cli init
 bun run cli status
 ```
 
-## Usage with OpenClaw
+## Usage with Claude Code Skills
 
-Copy the skills into your OpenClaw workspace:
-
-```bash
-cp -r skills/* ~/.openclaw/skills/
-# or symlink
-ln -s $(pwd)/skills/* ~/.openclaw/skills/
-```
-
-Then chat naturally:
+The skills are registered in `.claude/skills/` and `.claude-plugin/plugin.json`. Claude Code auto-detects them — just chat naturally:
 
 ```
 You: 「Bun vs Deno 2026を調べて保存して」
@@ -82,16 +74,17 @@ bun run tools/submit-feedback.ts 1 4 --dimension accuracy --tags accurate,fresh
 ## File Structure
 
 ```
+.claude/skills/                        # Claude Code skills (auto-detected)
+├── orbitmem-research/SKILL.md         # Research → store → register
+├── orbitmem-discover/SKILL.md         # Search for research memos
+└── orbitmem-feedback/SKILL.md         # Rate research quality
+
 examples/agent-research/
-├── skills/                          # OpenClaw skills
-│   ├── orbitmem-research/SKILL.md   # Research → store → register
-│   ├── orbitmem-discover/SKILL.md   # Search for research memos
-│   └── orbitmem-feedback/SKILL.md   # Rate research quality
-├── tools/                           # TS scripts (invoked by skills or directly)
-│   ├── shared.ts                    # Client bootstrap (reuses ~/.orbitmem config)
-│   ├── store-research.ts            # Vault put + DataRegistry register
-│   ├── search-research.ts           # Discovery findData query
-│   └── submit-feedback.ts           # FeedbackRegistry rateData
+├── tools/                             # TS scripts (invoked by skills or directly)
+│   ├── shared.ts                      # Client bootstrap (reuses ~/.orbitmem config)
+│   ├── store-research.ts              # Vault put + DataRegistry register
+│   ├── search-research.ts             # Discovery findData query
+│   └── submit-feedback.ts             # FeedbackRegistry rateData
 ├── package.json
 └── README.md
 ```

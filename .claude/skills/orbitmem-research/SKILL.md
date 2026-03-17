@@ -1,19 +1,15 @@
 ---
-name: OrbitMem Research Store
-slug: orbitmem-research
-version: 0.1.0
+name: orbitmem-research
 description: >
-  Research a topic, summarize findings, and store them in an OrbitMem vault
-  with on-chain registration. Use when the user asks to research a topic and
-  persist the results for other agents.
+  Research a topic, summarize findings, and store them in an OrbitMem vault with
+  on-chain registration. Use when the user asks to research a topic and persist
+  the results, or to store research notes in OrbitMem for other agents to discover.
 ---
 
-## When to Use
+# OrbitMem Research Store
 
-Activate when the user asks to:
-- Research a topic and save the findings
-- Store research notes in OrbitMem
-- Create a shareable research memo
+Researches a topic, creates a structured summary, stores it in an encrypted vault,
+and registers it on-chain via DataRegistry for discovery by other agents.
 
 ## Workflow
 
@@ -36,13 +32,21 @@ cd examples/agent-research && bun run tools/store-research.ts "<topic-slug>" "<s
 | `--tags` | no | Comma-separated tags for discovery (default: `research`) |
 | `--visibility` | no | `public` (default) or `private` |
 
-## Output Format
+## OrbitMem Layers Used
 
-The tool prints JSON with `path`, `dataId`, `txHash`, and `tags`. Report these back to the user.
+| Step | Layer |
+|------|-------|
+| Encrypt + store memo | Encryption + Data (Vault) |
+| Register on-chain | Discovery (DataRegistry) |
 
-## Rules
+## Conventions
 
 - Always include at least 2 relevant tags for discoverability.
 - Use `public` visibility unless the user explicitly requests private.
 - Keep the summary under 2000 characters for on-chain description limits.
 - Slugify the topic for the path (lowercase, hyphens, no spaces).
+- The tool outputs JSON with `path`, `dataId`, `txHash`, and `tags` — report these to the user.
+
+## Tool Implementation
+
+See [examples/agent-research/tools/store-research.ts](../../examples/agent-research/tools/store-research.ts) for the full implementation. Uses `shared.ts` to bootstrap the SDK client from `~/.orbitmem` config.
