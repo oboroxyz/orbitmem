@@ -30,7 +30,7 @@ Decentralized data layer for agentic web — encrypted vaults, on-chain discover
 ┌──────────────────────────────────────────────┐
 │  @orbitmem/relay                             │
 │  Hono server · ERC-8128 middleware           │
-│  Vault routes · Discovery routes · Snapshots │
+│  Vault · Discovery · Snapshots · Plan tiers  │
 └──────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────┐
@@ -137,7 +137,7 @@ await client.rateData(datasets[0].dataId, 95);
 | Package | Description |
 |---------|-------------|
 | `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, client |
-| `@orbitmem/relay` | Hono relay server — vault routes, discovery, snapshots, ERC-8128 auth |
+| `@orbitmem/relay` | Hono relay server — vault, discovery, snapshots, plan tiers, ERC-8128 auth |
 | `@orbitmem/contracts` | Solidity contracts — DataRegistry (ERC-721), FeedbackRegistry (reputation) |
 | `@orbitmem/cli` | CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots |
 | `@orbitmem/web` | React dashboard — data explorer, vault manager, trust graph, wallet connection |

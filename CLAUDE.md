@@ -97,7 +97,14 @@ All layers implement `I*` interfaces defined in `types.ts`.
 - `index.ts` — Server entry point
 - `middleware/erc8128.ts` — ERC-8128 signed request verification (extracts `X-OrbitMem-*` headers, checks timestamp ±30s, nonce replay)
 - `routes/` — `health.ts`, `vault.ts`, `data.ts`, `snapshots.ts`
-- `services/orbitdb-peer.ts` — OrbitDB peer service for relay
+- `services/` — Service layer with interface-driven live/mock pairs:
+  - `types.ts` — Service interfaces (`IVaultService`, `ISnapshotService`, `IDiscoveryService`, `IPlanService`, `RelayServices`)
+  - `live-vault.ts` / `mock-vault.ts` — Vault read/write/sync/seed operations
+  - `live-discovery.ts` / `mock-discovery.ts` — Data search, scoring, and stats
+  - `live-snapshot.ts` / `mock-snapshot.ts` — Snapshot archival and listing
+  - `plan.ts` — `PlanService` — tiered storage quotas (free/starter/pro/enterprise)
+  - `orbitdb-peer.ts` — OrbitDB peer service for relay
+  - `index.ts` — Barrel export
 
 ### Web App Structure (`apps/web/`)
 
@@ -141,6 +148,7 @@ Signed HTTP requests use headers: `X-OrbitMem-Signer`, `-Family`, `-Algorithm`, 
 - **Dual-mode discovery** — `createDiscoveryLayer` auto-selects `OnChainRegistry` (viem `PublicClient`/`WalletClient` provided) or `MockRegistry` (fallback); both implement `IDiscoveryLayer`
 - **Contracts → SDK bridge** — `@orbitmem/contracts` exports TypeScript ABIs (`abi/`) consumed by the SDK's `OnChainRegistry` via workspace dependency
 - **Mock-first development** — external dependencies (Storacha, Lit Protocol, on-chain registries) have in-memory mocks for testing; persistence has a `mock: true` flag
+- **Interface-driven relay services** — relay uses `IVaultService`/`ISnapshotService`/`IDiscoveryService`/`IPlanService` interfaces with live/mock implementations, wired via `RelayServices`
 - **Lazy imports** — Lit Protocol uses dynamic `import()` for heavy dependencies
 - **Dual-database vault** — each vault has a primary `nested` OrbitDB for data and a `-meta` OrbitDB for visibility/encryption metadata
 - **Nonce-based replay protection** — both SDK transport and relay middleware maintain in-memory nonce caches with 5-minute TTL
