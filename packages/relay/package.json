@@ -43,6 +43,7 @@
     "@orbitdb/nested-db": "^2.0.4",
     "@orbitmem/contracts": "workspace:*",
     "@orbitmem/sdk": "workspace:*",
+    "@slicekit/erc8128": "0.3.2",
     "@storacha/client": "^1.0.0",
     "blockstore-level": "^2.0.0",
     "helia": "^5.5.1",

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useSignMessage } from "wagmi";
 import { decryptValue, deriveVaultKey, encryptValue } from "../lib/encryption";
-import { createErc8128Headers } from "../lib/erc8128";
+import { initSignerClient, resetSignerClient } from "../lib/erc8128";
 import * as relay from "../lib/relay";
 
 export interface Memo {
@@ -14,75 +14,57 @@ export interface Memo {
 }
 
 export function useOrbitMem() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, status } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const [memos, setMemos] = useState<Memo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const vaultKeyRef = useRef<CryptoKey | null>(null);
 
-  const getHeaders = useCallback(
-    async (method: string, url: string, body?: string) => {
-      return createErc8128Headers(method, url, body);
-    },
-    [],
-  );
+  const loadSingleMemo = useCallback(async (id: string): Promise<Memo | null> => {
+    const [titleRes, bodyRes, createdRes, updatedRes] = await Promise.all([
+      relay.readEntry(`memos/${id}/title`),
+      relay.readEntry(`memos/${id}/body`),
+      relay.readEntry(`memos/${id}/created`),
+      relay.readEntry(`memos/${id}/updated`),
+    ]);
 
-  const loadSingleMemo = useCallback(
-    async (id: string): Promise<Memo | null> => {
-      const readField = async (field: string) => {
-        const readBody = JSON.stringify({ path: `memos/${id}/${field}` });
-        const readHeaders = await getHeaders("POST", "/v1/vault/read", readBody);
-        return relay.readEntry(`memos/${id}/${field}`, readHeaders);
-      };
+    const isPrivate = titleRes.visibility === "private";
+    const key = vaultKeyRef.current;
 
-      const [titleRes, bodyRes, createdRes, updatedRes] = await Promise.all([
-        readField("title"),
-        readField("body"),
-        readField("created"),
-        readField("updated"),
-      ]);
+    const title =
+      isPrivate && key
+        ? await decryptValue<string>(titleRes.value as string, key)
+        : (titleRes.value as string);
+    const memoBody =
+      isPrivate && key
+        ? await decryptValue<string>(bodyRes.value as string, key)
+        : (bodyRes.value as string);
+    const created =
+      isPrivate && key
+        ? await decryptValue<number>(createdRes.value as string, key)
+        : (createdRes.value as number);
+    const updated =
+      isPrivate && key
+        ? await decryptValue<number>(updatedRes.value as string, key)
+        : (updatedRes.value as number);
 
-      const isPrivate = titleRes.visibility === "private";
-      const key = vaultKeyRef.current;
-
-      const title =
-        isPrivate && key
-          ? await decryptValue<string>(titleRes.value as string, key)
-          : (titleRes.value as string);
-      const memoBody =
-        isPrivate && key
-          ? await decryptValue<string>(bodyRes.value as string, key)
-          : (bodyRes.value as string);
-      const created =
-        isPrivate && key
-          ? await decryptValue<number>(createdRes.value as string, key)
-          : (createdRes.value as number);
-      const updated =
-        isPrivate && key
-          ? await decryptValue<number>(updatedRes.value as string, key)
-          : (updatedRes.value as number);
-
-      return {
-        id,
-        title,
-        body: memoBody,
-        visibility: isPrivate ? "private" : "public",
-        created,
-        updated,
-      };
-    },
-    [getHeaders],
-  );
+    return {
+      id,
+      title,
+      body: memoBody,
+      visibility: isPrivate ? "private" : "public",
+      created,
+      updated,
+    };
+  }, []);
 
   const loadMemos = useCallback(async () => {
     if (!address) return;
     setLoading(true);
     setError(null);
     try {
-      const body = JSON.stringify({ prefix: "memos/" });
-      const headers = await getHeaders("POST", "/v1/vault/keys", body);
-      const { keys } = await relay.listKeys(headers, "memos/");
+      const { keys } = await relay.listKeys("memos/");
 
       const ids = [...new Set(keys.map((k) => k.split("/")[1]).filter(Boolean))];
 
@@ -103,7 +85,7 @@ export function useOrbitMem() {
     } finally {
       setLoading(false);
     }
-  }, [address, getHeaders, loadSingleMemo]);
+  }, [address, loadSingleMemo]);
 
   // Keep a stable ref to loadMemos so the effect doesn't re-trigger
   const loadMemosRef = useRef(loadMemos);
@@ -112,27 +94,34 @@ export function useOrbitMem() {
   const signMessageRef = useRef(signMessageAsync);
   signMessageRef.current = signMessageAsync;
 
-  // Derive vault key on connect
+  // Initialize signer client + derive vault key on connect
   useEffect(() => {
-    if (!isConnected || !address) {
+    if (status !== "connected" || !address) {
       vaultKeyRef.current = null;
+      resetSignerClient();
       setMemos([]);
       return;
     }
 
     (async () => {
       try {
+        // 1. Init ERC-8128 signer (class-bound, replayable — signs once via wallet)
+        initSignerClient();
+
+        // 2. Derive AES vault key from a separate signature
         const sig = await signMessageRef.current({ message: "OrbitMem Vault Key v1" });
         const sigBytes = new Uint8Array(
           (sig.slice(2).match(/.{2}/g) ?? []).map((b) => parseInt(b, 16)),
         );
         vaultKeyRef.current = await deriveVaultKey(sigBytes);
+
+        // 3. Load memos
         await loadMemosRef.current();
       } catch (e) {
-        setError(`Key derivation failed: ${e}`);
+        setError(`Initialization failed: ${e}`);
       }
     })();
-  }, [isConnected, address]);
+  }, [status, address]);
 
   const saveMemo = useCallback(
     async (memo: {
@@ -148,13 +137,7 @@ export function useOrbitMem() {
 
       const writeField = async (field: string, value: unknown) => {
         const stored = isPrivate && key ? await encryptValue(value, key) : value;
-        const writeBody = JSON.stringify({
-          path: `memos/${memo.id}/${field}`,
-          value: stored,
-          visibility: memo.visibility,
-        });
-        const headers = await getHeaders("POST", "/v1/vault/write", writeBody);
-        return relay.writeEntry(`memos/${memo.id}/${field}`, stored, memo.visibility, headers);
+        return relay.writeEntry(`memos/${memo.id}/${field}`, stored, memo.visibility);
       };
 
       await Promise.all([
@@ -166,23 +149,17 @@ export function useOrbitMem() {
 
       await loadMemos();
     },
-    [getHeaders, loadMemos],
+    [loadMemos],
   );
 
   const deleteMemo = useCallback(
     async (id: string) => {
       if (!confirm("Delete this memo?")) return;
       const fields = ["title", "body", "created", "updated"];
-      await Promise.all(
-        fields.map(async (field) => {
-          const delBody = JSON.stringify({ path: `memos/${id}/${field}` });
-          const headers = await getHeaders("POST", "/v1/vault/delete", delBody);
-          return relay.deleteEntry(`memos/${id}/${field}`, headers);
-        }),
-      );
+      await Promise.all(fields.map((field) => relay.deleteEntry(`memos/${id}/${field}`)));
       await loadMemos();
     },
-    [getHeaders, loadMemos],
+    [loadMemos],
   );
 
   return {
