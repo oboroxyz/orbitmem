@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { ed25519 } from "@noble/curves/ed25519.js";
 
 import { verifyEd25519 } from "../middleware/ed25519-verify.js";

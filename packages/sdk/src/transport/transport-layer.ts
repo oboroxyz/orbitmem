@@ -1,5 +1,6 @@
 import { createSignerClient } from "@slicekit/erc8128";
 import type { EthHttpSigner } from "@slicekit/erc8128";
+
 import type { ChainFamily, ITransportLayer, SignatureAlgorithm, WalletAddress } from "../types.js";
 
 interface TransportConfig {
@@ -164,9 +165,7 @@ export function createErc8128TransportLayer(config: {
 
   return {
     client,
-    signRequest: (input: RequestInfo, init?: RequestInit) =>
-      client.signRequest(input, init),
-    fetch: (input: RequestInfo, init?: RequestInit) =>
-      client.fetch(input, init),
+    signRequest: (input: RequestInfo, init?: RequestInit) => client.signRequest(input, init),
+    fetch: (input: RequestInfo, init?: RequestInit) => client.fetch(input, init),
   };
 }
