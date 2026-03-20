@@ -1,10 +1,8 @@
+import { type NonceStore, type VerifyResult, createVerifierClient } from "@slicekit/erc8128";
 import type { MiddlewareHandler } from "hono";
-import {
-  type NonceStore,
-  type VerifyResult,
-  createVerifierClient,
-} from "@slicekit/erc8128";
 import { getAddress, verifyMessage } from "viem";
+
+import { verifyEd25519 } from "./ed25519-verify.js";
 
 export type ERC8128Env = {
   Variables: {
@@ -51,7 +49,7 @@ const nonceStore = createMemoryNonceStore();
  * - `replayable` — allow replayable (nonce-less) class-bound signatures (default false)
  */
 export function erc8128(opts?: {
-  verify?: "evm";
+  verify?: "evm" | "auto";
   verifier?: (payload: Uint8Array, signature: Uint8Array, algorithm: string) => Promise<boolean>;
   required?: boolean;
   replayable?: boolean;
@@ -107,7 +105,10 @@ export function erc8128(opts?: {
   };
 }
 
-async function verifyWithLibrary(request: Request, allowReplayable: boolean): Promise<VerifyResult> {
+async function verifyWithLibrary(
+  request: Request,
+  allowReplayable: boolean,
+): Promise<VerifyResult> {
   const verifier = createVerifierClient({
     verifyMessage: async ({ address, message, signature }) => {
       return verifyMessage({ address, message, signature });
@@ -160,7 +161,7 @@ async function handleLegacy(
   c: any,
   next: () => Promise<void>,
   opts?: {
-    verify?: "evm";
+    verify?: "evm" | "auto";
     verifier?: (payload: Uint8Array, signature: Uint8Array, algorithm: string) => Promise<boolean>;
     required?: boolean;
   },
@@ -187,7 +188,7 @@ async function handleLegacy(
     return c.json({ error: "Replay detected: nonce already used" }, 401);
   }
 
-  const shouldVerify = opts?.verify === "evm" || opts?.verifier;
+  const shouldVerify = opts?.verify === "evm" || opts?.verify === "auto" || opts?.verifier;
   if (shouldVerify) {
     const body = c.req.method !== "GET" ? await c.req.text() : undefined;
     const bodyHash = body
@@ -206,10 +207,14 @@ async function handleLegacy(
     );
 
     let valid: boolean;
-    if (opts?.verify === "evm") {
+    if (opts?.verify === "evm" || (opts?.verify === "auto" && family === "evm")) {
       valid = await evmVerify(payload, signature, signer);
+    } else if (opts?.verify === "auto" && family === "solana" && algorithm === "ed25519") {
+      valid = await verifyEd25519(payload, signature, signer);
+    } else if (opts?.verifier) {
+      valid = await opts.verifier(payload, signature, algorithm);
     } else {
-      valid = await opts!.verifier!(payload, signature, algorithm);
+      valid = false;
     }
 
     if (!valid) {
