@@ -3,6 +3,7 @@ import type { MiddlewareHandler } from "hono";
 import { getAddress, verifyMessage } from "viem";
 
 import { verifyEd25519 } from "./ed25519-verify.js";
+import { verifySessionToken } from "./session.js";
 
 export type ERC8128Env = {
   Variables: {
@@ -58,6 +59,27 @@ export function erc8128(opts?: {
   const allowReplayable = opts?.replayable ?? true;
 
   return async (c, next) => {
+    // --- Bearer session token path (fastest, no signature check) ---
+    const authHeader = c.req.header("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      const session = await verifySessionToken(token);
+      if (session) {
+        c.set("signer", session.address);
+        c.set("signerFamily", "session");
+        c.set("signerAlgorithm", "hmac-sha256");
+        await next();
+        return;
+      }
+      // Invalid/expired bearer — check for ERC-8128 fallback headers
+      const hasLegacy = !!c.req.header("X-OrbitMem-Signer");
+      const hasRfc = !!c.req.header("Signature-Input");
+      if (!hasLegacy && !hasRfc) {
+        return c.json({ error: "Invalid or expired session token" }, 401);
+      }
+      // Fall through to ERC-8128 verification below
+    }
+
     // Check if this is a legacy X-OrbitMem-* request or RFC 9421 Signature request
     const hasLegacyHeaders = !!c.req.header("X-OrbitMem-Signer");
     const hasRfc9421Headers = !!c.req.header("Signature-Input");

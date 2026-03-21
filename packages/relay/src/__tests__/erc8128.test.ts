@@ -5,6 +5,7 @@ import { Hono } from "hono";
 import { privateKeyToAccount } from "viem/accounts";
 
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
+import { createSessionToken } from "../middleware/session.js";
 
 describe("ERC-8128 Middleware", () => {
   function createTestApp(opts?: Parameters<typeof erc8128>[0]) {
@@ -177,6 +178,34 @@ describe("ERC-8128 Middleware", () => {
 
     const second = await app.request("/protected/test", { headers });
     expect(second.status).toBe(200);
+  });
+
+  test("accepts valid Bearer session token", async () => {
+    const app = createTestApp();
+    const token = await createSessionToken("0xSESSION_USER", 1800);
+    const res = await app.request("/protected/test", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.signer).toBe("0xSESSION_USER");
+  });
+
+  test("rejects expired Bearer token", async () => {
+    const app = createTestApp();
+    const token = await createSessionToken("0xSESSION_USER", -1);
+    const res = await app.request("/protected/test", {
+      headers: { Authorization: "Bearer " + token },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test("rejects invalid Bearer token", async () => {
+    const app = createTestApp();
+    const res = await app.request("/protected/test", {
+      headers: { Authorization: "Bearer invalid.token" },
+    });
+    expect(res.status).toBe(401);
   });
 
   test("verify: 'evm' rejects forged signature", async () => {
