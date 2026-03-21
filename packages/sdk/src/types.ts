@@ -1249,6 +1249,9 @@ export interface IOrbitMem {
   /** Discovery layer — ERC-8004 agent trust & reputation */
   readonly discovery: IDiscoveryLayer;
 
+  /** Vault pricing CRUD (MPP pay-per-read) */
+  readonly pricing: IVaultPricing;
+
   // ── Convenience methods (delegate to sub-layers) ──
 
   /**
