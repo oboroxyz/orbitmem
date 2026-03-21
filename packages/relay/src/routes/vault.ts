@@ -85,7 +85,7 @@ export function createVaultRoutes(vault: IVaultService, mppConfig?: MPPConfig): 
 
   // Issue session token — requires ERC-8128 auth
   routes.post("/auth/session", erc8128(), async (c) => {
-    const body = await c.req.json<{ ttl?: number }>().catch(() => ({}));
+    const body = await c.req.json<{ ttl?: number }>().catch(() => ({}) as { ttl?: number });
     const ttl = Math.min(body.ttl ?? DEFAULT_SESSION_TTL, MAX_SESSION_TTL);
     const address = c.get("signer");
     const token = await createSessionToken(address, ttl);
