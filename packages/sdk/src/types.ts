@@ -365,6 +365,30 @@ export interface SyncStatus {
   connectedPeers: number;
 }
 
+// ────────────────────────────────────────────────────────────
+//  VAULT PRICING — MPP Pay-Per-Read
+// ────────────────────────────────────────────────────────────
+
+/** Per-path read pricing for MPP monetization */
+export interface VaultPricing {
+  /** Price amount as decimal string (e.g. "0.005") */
+  amount: string;
+  /** Currency identifier (e.g. "USDC") */
+  currency: string;
+}
+
+/** Pricing CRUD for vault data monetization */
+export interface IVaultPricing {
+  /** Set per-read price for a vault path. Use "_default" as path for vault-wide fallback. */
+  setPrice(path: string, pricing: VaultPricing): Promise<void>;
+  /** Get price for a path. Falls back to "_default" pricing if no per-path price. Returns null if free. */
+  getPrice(path: string): Promise<VaultPricing | null>;
+  /** Remove price for a path (reverts to _default or free). */
+  removePrice(path: string): Promise<void>;
+  /** List all explicitly priced paths. */
+  listPrices(): Promise<Array<{ path: string } & VaultPricing>>;
+}
+
 /** Data Layer interface — backed by @orbitdb/nested-db */
 export interface IDataLayer {
   /**
