@@ -1,13 +1,13 @@
 # Agent Research Demo
 
-AI agents share research memos through OrbitMem — encrypted vaults, on-chain discovery, and reputation scoring.
+AI agents share data through OrbitMem — encrypted vaults, on-chain discovery, and reputation scoring.
 
 ## Scenario
 
 ```
-Agent A (researcher)  →  Web検索 → 要約作成 → Vault保存 → オンチェーン登録
-Agent B (consumer)    →  タグ検索 → メモ発見 → 復号して利用
-Agent C (reviewer)    →  内容検証 → FeedbackRegistry にスコア記録
+Agent A (producer)   →  データ生成 → Vault保存 → オンチェーン登録
+Agent B (consumer)   →  タグ検索 → データ発見 → 復号して利用
+Agent C (reviewer)   →  内容検証 → FeedbackRegistry にスコア記録
 ```
 
 ## Setup
@@ -28,16 +28,16 @@ bun run cli status
 The skills are registered in `.claude/skills/` and `.claude-plugin/plugin.json`. Claude Code auto-detects them — just chat naturally:
 
 ```
-You: 「Bun vs Deno 2026を調べて保存して」
-→ orbitmem-research skill activates
-→ Web search → summarize → vault store → on-chain register
+You: 「この調査結果を保存して」
+→ orbitmem-store skill activates
+→ Vault store → on-chain register
 
 You: 「runtimeの比較資料ある？」
 → orbitmem-discover skill activates
 → Tag search → results displayed
 
-You: 「この調査にスコア4をつけて」
-→ orbitmem-feedback skill activates
+You: 「このデータにスコア4をつけて」
+→ orbitmem-rate skill activates
 → FeedbackRegistry records score
 ```
 
@@ -46,17 +46,17 @@ You: 「この調査にスコア4をつけて」
 ```bash
 cd examples/agent-research
 
-# Step 1: Store research
+# Step 1: Store data
 bun run tools/store-research.ts "bun-vs-deno-2026" \
   "Bun 1.2 outperforms Deno 2.1 in bundling speed by 3x..." \
   --tags runtime,comparison,2026 \
   --visibility public
 
-# Step 2: Search for research
+# Step 2: Search for data
 bun run tools/search-research.ts --tags runtime,comparison
 bun run tools/search-research.ts --keyword "bun vs deno"
 
-# Step 3: Rate research quality
+# Step 3: Rate data quality
 bun run tools/submit-feedback.ts 1 4 --dimension accuracy --tags accurate,fresh
 ```
 
@@ -64,7 +64,7 @@ bun run tools/submit-feedback.ts 1 4 --dimension accuracy --tags accurate,fresh
 
 | Step | Layers |
 |------|--------|
-| Encrypt + store memo | Encryption + Data (Vault) |
+| Encrypt + store data | Encryption + Data (Vault) |
 | Register on-chain | Discovery (DataRegistry) |
 | Signed HTTP relay access | Transport (ERC-8128) |
 | Search by tags | Discovery |
@@ -75,9 +75,9 @@ bun run tools/submit-feedback.ts 1 4 --dimension accuracy --tags accurate,fresh
 
 ```
 .claude/skills/                        # Claude Code skills (auto-detected)
-├── orbitmem-research/SKILL.md         # Research → store → register
-├── orbitmem-discover/SKILL.md         # Search for research memos
-└── orbitmem-feedback/SKILL.md         # Rate research quality
+├── orbitmem-store/SKILL.md            # Store data → vault + on-chain register
+├── orbitmem-discover/SKILL.md         # Search for data by tags/keywords
+└── orbitmem-rate/SKILL.md             # Rate data quality on-chain
 
 examples/agent-research/
 ├── tools/                             # TS scripts (invoked by skills or directly)

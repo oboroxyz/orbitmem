@@ -1,14 +1,13 @@
 ---
 name: orbitmem-discover
 description: >
-  Search for research memos stored by other agents in OrbitMem. Use when the user
-  wants to find existing research before doing their own, or to search OrbitMem
-  data by tags, keywords, or quality score.
+  Search for data stored by agents in OrbitMem. Use when the user wants to find
+  existing data by tags, keywords, or quality score before creating their own.
 ---
 
 # OrbitMem Discover
 
-Searches the on-chain DataRegistry for research memos matching tags, keywords,
+Searches the on-chain DataRegistry for data entries matching tags, keywords,
 or quality thresholds. Returns data IDs, names, tags, quality scores, and vault addresses.
 
 ## Search Command
@@ -39,8 +38,4 @@ cd examples/agent-research && bun run tools/search-research.ts --tags <tag1>,<ta
 
 - Try tags first, then keyword if no results.
 - If quality scores are available, mention them — they indicate community trust.
-- Suggest the user rate the data after consuming it (via orbitmem-feedback skill).
-
-## Tool Implementation
-
-See [examples/agent-research/tools/search-research.ts](../../examples/agent-research/tools/search-research.ts).
+- Suggest the user rate the data after consuming it (via orbitmem-rate skill).
