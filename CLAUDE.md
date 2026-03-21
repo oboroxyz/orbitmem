@@ -167,6 +167,11 @@ Signed HTTP requests use headers: `X-OrbitMem-Signer`, `-Family`, `-Algorithm`, 
 - **Contract tests** in `test/*.t.sol` follow Foundry conventions (`test_` prefix, `setUp()`, `vm.expectRevert`)
 - **CI** runs 4 parallel jobs: lint (Vite+ / Oxlint + Oxfmt), test (bun test), contracts (forge build/test/fmt --check), typecheck (tsc --noEmit)
 
+## Documentation
+
+- **Design specs** go in `docs/design/`
+- **Implementation plans** go in `docs/plans/` (not `docs/superpowers/plans/`)
+
 ## Worktrees
 
 Worktree directory: .worktrees/
