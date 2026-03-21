@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: foundry-rs/foundry-toolchain@v1
+      - uses: foundry-rs/foundry-toolchain@v1.7.0
       - working-directory: packages/contracts
         run: forge install foundry-rs/forge-std OpenZeppelin/openzeppelin-contracts --no-git
       - working-directory: packages/contracts
