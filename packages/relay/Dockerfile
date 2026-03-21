@@ -11,6 +11,7 @@ COPY packages/sdk/package.json packages/sdk/
 COPY packages/contracts/package.json packages/contracts/
 COPY packages/cli/package.json packages/cli/
 COPY apps/web/package.json apps/web/
+COPY examples/memo/package.json examples/memo/
 
 RUN bun install --frozen-lockfile
 
