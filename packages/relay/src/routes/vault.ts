@@ -2,7 +2,11 @@ import { Hono } from "hono";
 
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 import { type MPPConfig, mppPricing } from "../middleware/mpp.js";
+import { createSessionToken } from "../middleware/session.js";
 import type { IVaultService } from "../services/types.js";
+
+const DEFAULT_SESSION_TTL = 1800; // 30 minutes
+const MAX_SESSION_TTL = 86400; // 24 hours
 
 export function createVaultRoutes(vault: IVaultService, mppConfig?: MPPConfig): Hono<ERC8128Env> {
   const routes = new Hono<ERC8128Env>();
@@ -77,6 +81,16 @@ export function createVaultRoutes(vault: IVaultService, mppConfig?: MPPConfig): 
     const timestamp = Date.now();
     const message = `OrbitMem Authentication\nTimestamp: ${timestamp}\nNonce: ${nonce}`;
     return c.json({ message, nonce, timestamp });
+  });
+
+  // Issue session token — requires ERC-8128 auth
+  routes.post("/auth/session", erc8128(), async (c) => {
+    const body = await c.req.json<{ ttl?: number }>().catch(() => ({}));
+    const ttl = Math.min(body.ttl ?? DEFAULT_SESSION_TTL, MAX_SESSION_TTL);
+    const address = c.get("signer");
+    const token = await createSessionToken(address, ttl);
+    const expiresAt = Date.now() + ttl * 1000;
+    return c.json({ token, expiresAt, address });
   });
 
   // Internal: seed vault data (for testing / initial sync)

@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from "bun:test";
 
 import { buildApp } from "../app.js";
 import type { MPPConfig } from "../middleware/mpp.js";
+import { verifySessionToken } from "../middleware/session.js";
 import { createMockServices } from "../services/index.js";
 import { MockVaultService } from "../services/mock-vault.js";
 import { getTestVaultService, setTestVaultService } from "../services/test-helpers.js";
@@ -120,6 +121,73 @@ describe("Relay Vault Routes", () => {
 
     const res = await app.request("/v1/vault/public/test-vault-001/keys");
     expect(res.status).toBe(200);
+  });
+
+  test("POST /v1/auth/session returns valid token after ERC-8128 auth", async () => {
+    const res = await app.request("/v1/auth/session", {
+      method: "POST",
+      headers: makeERC8128Headers(),
+      body: JSON.stringify({}),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.token).toBeTruthy();
+    expect(body.expiresAt).toBeGreaterThan(Date.now());
+    expect(body.address).toBe("0xTEST_SIGNER");
+
+    const verified = await verifySessionToken(body.token);
+    expect(verified).not.toBeNull();
+    expect(verified!.address).toBe("0xTEST_SIGNER");
+  });
+
+  test("POST /v1/auth/session accepts custom ttl", async () => {
+    const res = await app.request("/v1/auth/session", {
+      method: "POST",
+      headers: makeERC8128Headers(),
+      body: JSON.stringify({ ttl: 60 }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.expiresAt).toBeLessThanOrEqual(Date.now() + 62_000);
+  });
+
+  test("POST /v1/auth/session caps ttl at max", async () => {
+    const res = await app.request("/v1/auth/session", {
+      method: "POST",
+      headers: makeERC8128Headers(),
+      body: JSON.stringify({ ttl: 999999 }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.expiresAt).toBeLessThanOrEqual(Date.now() + 86_400_000 + 2000);
+  });
+
+  test("POST /v1/auth/session rejects unauthenticated request", async () => {
+    const res = await app.request("/v1/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test("Bearer token from /auth/session works on protected routes", async () => {
+    const sessionRes = await app.request("/v1/auth/session", {
+      method: "POST",
+      headers: makeERC8128Headers(),
+      body: JSON.stringify({}),
+    });
+    const { token } = (await sessionRes.json()) as any;
+
+    const keysRes = await app.request("/v1/vault/keys", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+    expect(keysRes.status).toBe(200);
   });
 });
 
