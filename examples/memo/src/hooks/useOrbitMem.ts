@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useSignMessage } from "wagmi";
 import { decryptValue, deriveVaultKey, encryptValue } from "../lib/encryption";
-import { initSignerClient, resetSignerClient } from "../lib/erc8128";
+import { clearSessionCache, initSignerClient, resetSignerClient } from "../lib/erc8128";
 import * as relay from "../lib/relay";
 
 export interface Memo {
@@ -99,6 +99,7 @@ export function useOrbitMem() {
     if (status !== "connected" || !address) {
       vaultKeyRef.current = null;
       resetSignerClient();
+      clearSessionCache();
       setMemos([]);
       return;
     }
@@ -109,7 +110,12 @@ export function useOrbitMem() {
         initSignerClient();
 
         // 2. Derive AES vault key from a separate signature
-        const sig = await signMessageRef.current({ message: "OrbitMem Vault Key v1" });
+        const vaultSigCacheKey = `orbitmem:vault-sig:${address}`;
+        let sig = sessionStorage.getItem(vaultSigCacheKey);
+        if (!sig) {
+          sig = await signMessageRef.current({ message: "OrbitMem Vault Key v1" });
+          sessionStorage.setItem(vaultSigCacheKey, sig);
+        }
         const sigBytes = new Uint8Array(
           (sig.slice(2).match(/.{2}/g) ?? []).map((b) => parseInt(b, 16)),
         );

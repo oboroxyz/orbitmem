@@ -1,13 +1,13 @@
-import { signedFetch } from "./erc8128";
+import { sessionFetch } from "./erc8128";
 
-const RELAY = import.meta.env.VITE_RELAY_URL ?? "http://localhost:3000";
+const RELAY = import.meta.env.VITE_RELAY_URL ?? "https://orbitmem-relay.fly.dev";
 
 export async function writeEntry(
   path: string,
   value: unknown,
   visibility: string,
 ): Promise<{ ok: boolean; hash: string }> {
-  const res = await signedFetch("/v1/vault/write", {
+  const res = await sessionFetch("/v1/vault/write", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, value, visibility }),
@@ -19,7 +19,7 @@ export async function writeEntry(
 export async function readEntry(
   path: string,
 ): Promise<{ key: string; value: unknown; visibility: string }> {
-  const res = await signedFetch("/v1/vault/read", {
+  const res = await sessionFetch("/v1/vault/read", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path }),
@@ -29,7 +29,7 @@ export async function readEntry(
 }
 
 export async function listKeys(prefix?: string): Promise<{ keys: string[] }> {
-  const res = await signedFetch("/v1/vault/keys", {
+  const res = await sessionFetch("/v1/vault/keys", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prefix }),
@@ -39,7 +39,7 @@ export async function listKeys(prefix?: string): Promise<{ keys: string[] }> {
 }
 
 export async function deleteEntry(path: string): Promise<{ ok: boolean }> {
-  const res = await signedFetch("/v1/vault/delete", {
+  const res = await sessionFetch("/v1/vault/delete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path }),
