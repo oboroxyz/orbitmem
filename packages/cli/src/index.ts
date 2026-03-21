@@ -41,6 +41,10 @@ Commands:
   vault store <path> <value> Store data in vault
   vault get <path>           Read data from vault
   vault ls [prefix]          List vault keys
+  vault price set <path> <amount>  Set per-read price (USDC)
+  vault price get <path>           Show price for path
+  vault price ls                   List all priced paths
+  vault price rm <path>            Remove pricing (free)
   register <path>            Register data on-chain (ERC-8004)
   discover [query]           Search on-chain registries
   snapshot                   Persist vault to Storacha
