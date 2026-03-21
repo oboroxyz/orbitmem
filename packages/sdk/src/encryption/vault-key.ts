@@ -7,7 +7,7 @@
 
 import { AESEngine } from "./aes.js";
 
-const CACHE_PREFIX = "orbitmem:vault-sig";
+const CACHE_PREFIX = "orbitmem:vk";
 const aes = new AESEngine({ kdf: "hkdf-sha256" });
 
 export interface VaultKeyConfig {
