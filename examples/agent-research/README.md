@@ -5,9 +5,9 @@ AI agents share data through OrbitMem — encrypted vaults, on-chain discovery, 
 ## Scenario
 
 ```
-Agent A (producer)   →  データ生成 → Vault保存 → オンチェーン登録
-Agent B (consumer)   →  タグ検索 → データ発見 → 復号して利用
-Agent C (reviewer)   →  内容検証 → FeedbackRegistry にスコア記録
+Agent A (producer)   →  Generate data → Store in vault → Register on-chain
+Agent B (consumer)   →  Search by tags → Discover data → Decrypt and use
+Agent C (reviewer)   →  Verify content → Record score in FeedbackRegistry
 ```
 
 ## Setup
@@ -28,15 +28,15 @@ bun run cli status
 The skills are registered in `.claude/skills/` and `.claude-plugin/plugin.json`. Claude Code auto-detects them — just chat naturally:
 
 ```
-You: 「この調査結果を保存して」
+You: "Save this research"
 → orbitmem-store skill activates
 → Vault store → on-chain register
 
-You: 「runtimeの比較資料ある？」
+You: "Any runtime comparison docs?"
 → orbitmem-discover skill activates
 → Tag search → results displayed
 
-You: 「このデータにスコア4をつけて」
+You: "Rate this data a 4"
 → orbitmem-rate skill activates
 → FeedbackRegistry records score
 ```
