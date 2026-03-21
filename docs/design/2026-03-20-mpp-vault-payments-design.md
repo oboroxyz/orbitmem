@@ -45,23 +45,27 @@ Producers set per-read prices using the existing `-meta` OrbitDB store attached 
 
 ```
 Key:   pricing/<path>
-Value: { amount: string, currency: string, network: string }
+Value: { amount: string, currency: string }
 ```
+
+The `network` field is not stored — it is derived from the relay's `MPPConfig.network` at runtime.
 
 Example:
 
 ```
-pricing/agent/memory  → { amount: "0.005", currency: "USDC", network: "base" }
-pricing/agent/context → { amount: "0.001", currency: "USDC", network: "base" }
-pricing/_default      → { amount: "0.002", currency: "USDC", network: "base" }
+pricing/agent/memory  → { amount: "0.005", currency: "USDC" }
+pricing/agent/context → { amount: "0.001", currency: "USDC" }
+pricing/_default      → { amount: "0.002", currency: "USDC" }
 ```
 
 **Rules:**
 
-- No price set → free access (backward compatible, existing behavior unchanged)
-- Price set → MPP-gated (middleware returns 402 unless valid payment credential)
-- `pricing/_default` sets a vault-wide default, overridden by per-path pricing
-- Removing a pricing key makes that path free again
+- No explicit price AND no `pricing/_default` → free access (backward compatible)
+- Explicit per-path price → MPP-gated (middleware returns 402 unless valid payment credential)
+- `pricing/_default` sets a vault-wide fallback; any path without an explicit price inherits `_default`
+- Per-path pricing overrides `_default`
+- Removing a pricing key causes that path to fall back to `_default` (or free if no `_default`)
+- Only the vault owner (authenticated via ERC-8128) can set or modify pricing
 
 ### 2. MPP Middleware
 
@@ -76,27 +80,34 @@ type MPPConfig = {
 }
 ```
 
+**Pricing lookup:**
+
+The middleware resolves pricing via a new `getVaultPricing(address: string, path: string)` method on `IVaultService`, which reads the `-meta` OrbitDB store. To avoid per-request OrbitDB latency, the relay maintains an **in-memory LRU cache** for pricing metadata (TTL: 60s, invalidated on pricing writes via the SDK).
+
 **Request flow:**
 
-1. Request arrives at `GET /v1/vault/public/:address/:key`
-2. Middleware looks up `pricing/<key>` from the producer's vault metadata
+1. Request arrives at a vault read endpoint
+2. Middleware resolves the **producer address**:
+   - `GET /vault/public/:address/:key` → from `:address` route param
+   - `POST /vault/read` → from `vaultAddress` in request body (or `c.get("signer")` fallback)
+3. Middleware looks up `pricing/<key>` via `getVaultPricing(address, path)`
    - Falls back to `pricing/_default` if no per-path price exists
-3. **No price found** → `next()` (free access)
-4. **Price found** → Check for `Authorization: Payment` header
-   - **No credential** → Return `402 Payment Required` with `WWW-Authenticate: Payment` header containing:
-     - Intent: `charge`
-     - Amount: producer's set price
-     - Recipient: producer's wallet address (from the `:address` route param)
-     - Accepted methods: from relay config
+4. **No price found** → `next()` (free access)
+5. **Price found** → Check for `Authorization: Payment` header
+   - **No credential** → Return `402 Payment Required` with:
+     - `WWW-Authenticate: Payment` header (charge intent, amount, recipient, accepted methods)
+     - JSON body: `{ error: "payment_required", amount, currency, recipient, methods: [...] }`
    - **Has credential** → Verify payment via `mppx`
-     - **Invalid** → `402` with error details
+     - **Invalid** → `402` with body: `{ error: "payment_invalid", detail: "..." }`
      - **Valid** → Set `c.set("mppPayment", { producer, amount, method })` on Hono context, attach `Payment-Receipt` header to response, call `next()`
 
 **Route integration:**
 
 ```ts
-// Only vault public reads are MPP-gated
-routes.get("/vault/public/:address/keys", mppPricing(), async (c) => { ... })
+// Key listing is always free (agents need to discover paths before paying)
+routes.get("/vault/public/:address/keys", async (c) => { ... })
+
+// Public data reads are MPP-gated
 routes.get("/vault/public/:address/:key{.+}", mppPricing(), async (c) => { ... })
 
 // Encrypted reads require ERC-8128 auth AND MPP payment
@@ -105,9 +116,12 @@ routes.post("/vault/read", erc8128(), mppPricing(), async (c) => { ... })
 
 **Middleware does NOT apply to:**
 
+- `/vault/public/:address/keys` — key listing is always free for price discovery
 - `/vault/sync`, `/vault/write`, `/vault/delete`, `/vault/keys`, `/vault/seed` — write/admin operations
 - `/data/*` — discovery and search routes remain free
 - `/health` — health check
+
+**Risk:** The `mppx` SDK's Hono middleware may assume static per-route pricing. If it does not support dynamic per-request pricing resolution, we will wrap `mppx`'s core verification logic in a custom Hono middleware rather than using its built-in middleware directly.
 
 ### 3. Payment Flow
 
@@ -144,13 +158,20 @@ Agent                          Relay                         Producer Wallet
 New methods on the client facade (`createOrbitMemClient`), implemented as thin wrappers over the existing `-meta` OrbitDB store:
 
 ```ts
+interface VaultPricing {
+  amount: string;
+  currency: string;
+}
+
 interface IVaultPricing {
-  setPrice(path: string, pricing: { amount: string; currency: string }): Promise<void>;
-  getPrice(path: string): Promise<{ amount: string; currency: string } | null>;
+  setPrice(path: string, pricing: VaultPricing): Promise<void>;
+  getPrice(path: string): Promise<VaultPricing | null>;
   removePrice(path: string): Promise<void>;
-  listPrices(): Promise<Array<{ path: string; amount: string; currency: string }>>;
+  listPrices(): Promise<Array<{ path: string } & VaultPricing>>;
 }
 ```
+
+The `network` field is intentionally excluded — it is derived from the relay's `MPPConfig.network` at runtime, not stored per-entry.
 
 - `setPrice` writes to `pricing/<path>` in the `-meta` store
 - `getPrice` reads `pricing/<path>`, falls back to `pricing/_default`
@@ -168,10 +189,9 @@ bun run cli vault price set <path> <amount>    # Set per-read price (USDC)
 bun run cli vault price get <path>             # Show current price for path
 bun run cli vault price ls                     # List all priced paths
 bun run cli vault price rm <path>              # Remove pricing (free access)
-bun run cli vault earnings                     # Show accumulated earnings
 ```
 
-`vault earnings` queries the producer's wallet for incoming MPP payment transactions — this is read-only chain data, no new indexing needed.
+`vault earnings` is deferred to post-v1 — it requires on-chain event indexing (filtering `Transfer` events by MPP facilitator address) which is better built alongside the web dashboard.
 
 ### 6. Relay Configuration
 
@@ -191,14 +211,16 @@ No `relayFeePercent` or `splitterContract` in v1. These will be added when `Paym
 
 | Package | File | Change |
 |---------|------|--------|
-| `@orbitmem/relay` | `src/middleware/mpp.ts` | New MPP pricing middleware |
-| `@orbitmem/relay` | `src/routes/vault.ts` | Add `mppPricing()` to read routes |
+| `@orbitmem/relay` | `src/middleware/mpp.ts` | New MPP pricing middleware (with LRU cache) |
+| `@orbitmem/relay` | `src/routes/vault.ts` | Add `mppPricing()` to data read routes; keep key listing free |
+| `@orbitmem/relay` | `src/services/types.ts` | Add `getVaultPricing(address, path)` to `IVaultService` |
+| `@orbitmem/relay` | `src/services/live-vault.ts` | Implement `getVaultPricing` reading from `-meta` OrbitDB |
+| `@orbitmem/relay` | `src/services/mock-vault.ts` | Implement mock `getVaultPricing` |
 | `@orbitmem/relay` | `src/app.ts` | Wire MPP config |
 | `@orbitmem/sdk` | `src/data/vault.ts` | Add `setPrice`, `getPrice`, `removePrice`, `listPrices` |
-| `@orbitmem/sdk` | `src/types.ts` | Add `IVaultPricing` interface |
+| `@orbitmem/sdk` | `src/types.ts` | Add `IVaultPricing` and `VaultPricing` interfaces |
 | `@orbitmem/sdk` | `src/agent/client.ts` | Expose pricing methods on client facade |
 | `@orbitmem/cli` | `src/commands/vault.ts` | Add `price` subcommand group |
-| `@orbitmem/cli` | `src/commands/vault.ts` | Add `earnings` subcommand |
 | root | `package.json` | Add `mppx` dependency |
 
 ## Testing Strategy
