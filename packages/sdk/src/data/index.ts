@@ -5,3 +5,4 @@ export {
   serializeEncrypted,
 } from "./serialization.js";
 export { createVault } from "./vault.js";
+export { createVaultPricing } from "./pricing.js";
