@@ -322,6 +322,51 @@ export interface ITransportLayer {
 }
 
 // ────────────────────────────────────────────────────────────
+//  3b. RELAY SESSION TRANSPORT — Bearer Token Auth
+// ────────────────────────────────────────────────────────────
+
+/** Configuration for relay session transport */
+export interface RelaySessionConfig {
+  /** Relay server URL (e.g. "https://orbitmem-relay.fly.dev") */
+  relayUrl: string;
+  /** Wallet address (checksummed) */
+  address: EvmAddress;
+  /** Chain ID (default: 84532 = Base Sepolia) */
+  chainId?: number;
+  /** Wallet signMessage function */
+  signMessage: (message: Uint8Array) => Promise<`0x${string}`>;
+  /** Session TTL in seconds (default: 1800 = 30 min) */
+  ttl?: number;
+  /** Storage adapter for caching (default: sessionStorage if available) */
+  storage?: {
+    getItem(key: string): string | null;
+    setItem(key: string, value: string): void;
+    removeItem(key: string): void;
+  };
+}
+
+/**
+ * Relay session transport.
+ *
+ * Acquires a bearer token via one ERC-8128 signed request and caches it.
+ * Subsequent requests use the cached bearer token — no wallet prompts.
+ *
+ * ```ts
+ * const relay = createRelaySession({ relayUrl, address, signMessage });
+ * await relay.fetch("/v1/vault/keys", { method: "POST", body: ... });
+ * relay.clear(); // on disconnect
+ * ```
+ */
+export interface IRelaySession {
+  /** Make an authenticated fetch using a cached bearer token. */
+  fetch(path: string, init?: RequestInit): Promise<Response>;
+  /** Clear the cached session token. Call on disconnect. */
+  clear(): void;
+}
+
+export declare function createRelaySession(config: RelaySessionConfig): IRelaySession;
+
+// ────────────────────────────────────────────────────────────
 //  4. DATA LAYER — OrbitDB Nested P2P Vault
 // ────────────────────────────────────────────────────────────
 
@@ -525,7 +570,33 @@ export interface IDataLayer {
 }
 
 // ────────────────────────────────────────────────────────────
-//  4b. VAULT PRICING — MPP Pay-per-Read
+//  4b. VAULT KEY DERIVATION — Cached AES Key
+// ────────────────────────────────────────────────────────────
+
+/** Configuration for vault key derivation with caching */
+export interface VaultKeyConfig {
+  /** Wallet address (used as cache key discriminator) */
+  address: string;
+  /** Wallet signMessage function — returns hex signature */
+  signMessage: (message: string) => Promise<string>;
+  /** Storage adapter for caching (default: sessionStorage if available) */
+  storage?: {
+    getItem(key: string): string | null;
+    setItem(key: string, value: string): void;
+    removeItem(key: string): void;
+  };
+}
+
+/**
+ * Derive a vault encryption key, caching the wallet signature
+ * in storage to avoid re-prompting on page reload.
+ */
+export declare function deriveVaultKeyWithCache(
+  config: VaultKeyConfig,
+): Promise<{ key: CryptoKey; clear: () => void }>;
+
+// ────────────────────────────────────────────────────────────
+//  4c. VAULT PRICING — MPP Pay-per-Read
 // ────────────────────────────────────────────────────────────
 
 /** Per-read pricing for a vault path */

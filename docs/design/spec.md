@@ -21,6 +21,7 @@ Version 0.4.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit
 12. [CLI — `npx orbitmem`](#12-cli)
 13. [SDK Quick Start](#13-quick-start)
 14. [Payments Layer — MPP Pay-per-Read](#14-payments-layer)
+15. [Session Tokens — Stateless Relay Auth](#15-session-tokens)
 
 ---
 
@@ -1207,6 +1208,45 @@ npx orbitmem vault price rm <path>              # Remove pricing (free access)
 - **Relay operators** earn from `PlanService` storage tiers (free/starter/pro/enterprise)
 
 See [MPP Vault Payments Design](./2026-03-20-mpp-vault-payments-design.md) for the full design spec.
+
+---
+
+## 15. Session Tokens — Stateless Relay Auth
+
+The relay issues stateless HMAC-SHA256 bearer tokens after a successful ERC-8128 authenticated request. This eliminates repeated wallet signing on page reload.
+
+### Flow
+
+1. Client authenticates once via ERC-8128 signed `POST /auth/session`
+2. Relay returns `{ token, expiresAt, address }`
+3. Subsequent requests use `Authorization: Bearer <token>` — no signatures needed
+4. Token is stateless (HMAC-verified, no server-side store)
+5. Tokens invalidate on relay restart (random per-process secret)
+
+### Configuration
+
+- Default TTL: 30 minutes
+- Max TTL: 24 hours
+- Custom TTL via `{ ttl: seconds }` in request body
+- Override default via `SESSION_TTL_SECONDS` env var
+
+### SDK Helpers
+
+The SDK provides two browser-oriented helpers that handle caching in `sessionStorage`:
+
+```typescript
+import { createRelaySession, deriveVaultKeyWithCache } from '@orbitmem/sdk';
+
+// Session transport — acquires and caches bearer token
+const relay = createRelaySession({ relayUrl, address, signMessage });
+await relay.fetch("/v1/vault/keys", { method: "POST", body: ... });
+relay.clear(); // on disconnect
+
+// Vault key — derives AES key, caches wallet signature
+const { key, clear } = await deriveVaultKeyWithCache({ address, signMessage });
+```
+
+Both accept a `storage` adapter for non-browser environments (defaults to `sessionStorage`).
 
 ---
 

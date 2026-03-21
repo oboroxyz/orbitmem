@@ -7,7 +7,7 @@ The SDK is composed of six independent layers, each created by a factory functio
 | Identity | `createIdentityLayer` | `identity/identity-layer.ts`, `identity/session.ts` |
 | Encryption | `createEncryptionLayer` | `encryption/encryption-layer.ts`, `encryption/aes.ts`, `encryption/lit.ts` |
 | Data | `createOrbitDBInstance` + `createVault` | `data/orbitdb.ts`, `data/vault.ts` |
-| Transport | `createTransportLayer` | `transport/transport-layer.ts` |
+| Transport | `createTransportLayer` + `createRelaySession` | `transport/transport-layer.ts`, `transport/relay-session.ts` |
 | Discovery | `createDiscoveryLayer` | `discovery/discovery-layer.ts`, `discovery/on-chain-registry.ts`, `discovery/mock-registry.ts` |
 | Persistence | `createPersistenceLayer` | `persistence/persistence-layer.ts` |
 | Client | `createOrbitMemClient` | `agent/client.ts` |
@@ -18,7 +18,8 @@ All layers implement `I*` interfaces defined in `types.ts`.
 
 - `app.ts` — Hono app setup with CORS/logger, mounts route groups under `/v1`
 - `index.ts` — Server entry point
-- `middleware/erc8128.ts` — ERC-8128 signed request verification (extracts `X-OrbitMem-*` headers, checks timestamp ±30s, nonce replay)
+- `middleware/erc8128.ts` — ERC-8128 signed request verification (extracts `X-OrbitMem-*` headers, checks timestamp ±30s, nonce replay) + bearer session token auth
+- `middleware/session.ts` — HMAC-SHA256 stateless session token create/verify
 - `routes/` — `health.ts`, `vault.ts`, `data.ts`, `snapshots.ts`
 - `services/` — Service layer with interface-driven live/mock pairs:
   - `types.ts` — Service interfaces (`IVaultService`, `ISnapshotService`, `IDiscoveryService`, `IPlanService`, `RelayServices`)

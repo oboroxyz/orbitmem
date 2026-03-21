@@ -118,6 +118,7 @@ High-quality data attracts more agent consumption → more feedback → higher s
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
 - User connects a wallet (passkey or EVM) → creates an OrbitMem vault
+- **Session tokens** — sign once, relay issues a bearer token cached in `sessionStorage` — zero wallet prompts on reload
 - **Public memos** — `visibility: 'public'`, shareable links anyone can view without a wallet
 - **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
 - Markdown editor with live preview and GFM support
