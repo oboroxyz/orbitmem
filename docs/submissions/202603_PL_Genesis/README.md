@@ -113,8 +113,7 @@ High-quality data attracts more agent consumption → more feedback → higher s
 
 ## Example apps using OrbitMem
 
-### 1. Decentralized Memo App - [Demo](https://exammple.com), [Source Code](../../examples/memo/)
-
+### 1. Decentralized Memo App - [Source Code](../../examples/memo/)
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
@@ -131,7 +130,7 @@ User writes memo → OrbitMem Vault (OrbitDB)
                     Storacha → Filecoin (backup)
 ```
 
-### 2. Agent Research & Data Trust - [Demo](https://exammple.com), [Source Code](../../examples/agent-researh/)
+### 2. Agent Research & Data Trust (Planned)
 
 AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
 
@@ -140,19 +139,7 @@ AI agents produce and consume data autonomously — research results, curated da
 1. **Agent publishes data** — an agent stores output in an OrbitMem vault and registers it on-chain via `npx orbitmem register`, minting an ERC-721 NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
 2. **Other agents discover** — `npx orbitmem discover --schema research --min-score 70` finds entries by tag and reputation score
 3. **Agents rate data** — consuming agents call `giveFeedback()` to score accuracy, freshness, completeness — building the producer's on-chain reputation
-
-```
-Agent A (producer)
-  └── skill output → vault.put() → npx orbitmem register
-  └── DataRegistry mints NFT (on-chain receipt)
-                                        ↓
-Agent B (consumer)
-  └── npx orbitmem discover --schema research
-  └── reads data → evaluates → giveFeedback(score, "accurate")
-                                        ↓
-                          Agent A's reputation increases
-                          → future data more discoverable
-```
+4. **Agents pay for data** — priced vault entries require MPP payment via HTTP 402 before access is granted
 
 ---
 
@@ -264,9 +251,9 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 | :--- | :--- |
 | **`@orbitmem/sdk`** | Composable SDK — identity, encryption, vault, transport, discovery, persistence + client |
 | **`@orbitmem/contracts`** | `ERC-8004` Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia |
-| **`@orbitmem/relay`** | Hono HTTP relay with `ERC-8128` auth middleware, vault/data/snapshot routes |
+| **`@orbitmem/relay`** | Hono HTTP relay with `ERC-8128` auth + MPP payment middleware, vault/data/snapshot routes |
 | **`@orbitmem/web`** | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers) |
-| **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` with `--json` output. Includes Claude Code skill for natural language operation |
+| **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` + `vault price` for pay-per-read pricing. `--json` output. Includes Claude Code skill for natural language operation |
 
 ---
 
@@ -278,3 +265,6 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 - Filecoin deal status tracking (live Storacha integration)
 - Backup/restore UI in the web dashboard
 - Multi-signature vault support and delegation patterns
+- MPP session billing for streaming vault access (bulk reads)
+- Web dashboard earnings visualization and payment history
+- PaymentSplitter contract for relay operator fee revenue

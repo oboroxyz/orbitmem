@@ -1,7 +1,7 @@
 # OrbitMem — Technical Specification
 
 **The Sovereign Data Layer for the Agentic Web**
-Version 0.3.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit / AES) · ERC-8004 for Data
+Version 0.4.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit / AES) · ERC-8004 for Data · MPP Payments
 
 ---
 
@@ -20,6 +20,7 @@ Version 0.3.0 · Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption (Lit
 11. [Relay Node Specification](#11-relay-node)
 12. [CLI — `npx orbitmem`](#12-cli)
 13. [SDK Quick Start](#13-quick-start)
+14. [Payments Layer — MPP Pay-per-Read](#14-payments-layer)
 
 ---
 
@@ -1132,6 +1133,80 @@ const booking = await adapter.withUserData(
 // Data quality feedback (auto-submitted if autoRate is set, or manually)
 // Already submitted via autoRate in withUserData() above
 ```
+
+---
+
+## 14. Payments Layer — MPP Pay-per-Read
+
+OrbitMem integrates the Machine Payments Protocol (MPP) for pay-per-read vault monetization. Data producers set per-path prices; AI agents pay directly via HTTP 402 challenge–credential–receipt flow.
+
+### Pricing Model
+
+Producers set per-read prices using the vault's `-meta` OrbitDB store:
+
+```
+pricing/agent/memory  → { amount: "0.005", currency: "USDC" }
+pricing/agent/context → { amount: "0.001", currency: "USDC" }
+pricing/_default      → { amount: "0.002", currency: "USDC" }
+```
+
+- No explicit price AND no `pricing/_default` → free access (backward compatible)
+- `pricing/_default` sets a vault-wide fallback
+- Per-path pricing overrides `_default`
+
+### Payment Flow
+
+```
+Agent                          Relay                         Producer Wallet
+  |                              |                                |
+  |  GET /vault/public/0xABC/k   |                                |
+  |----------------------------->|                                |
+  |                              |  lookup pricing/k from meta    |
+  |                              |  price found: 0.005 USDC       |
+  |  402 + WWW-Authenticate      |                                |
+  |<-----------------------------|                                |
+  |                              |                                |
+  |  (agent pays 0.005 USDC)     |                                |
+  |  ----------------------------------------------------------->|
+  |                              |                                |
+  |  GET + Authorization: Payment|                                |
+  |----------------------------->|                                |
+  |                              |  verify via mppx               |
+  |  200 + data + Payment-Receipt|                                |
+  |<-----------------------------|                                |
+```
+
+### SDK Pricing API
+
+```typescript
+// Set per-read price
+await orbit.pricing.setPrice('travel/dietary', { amount: '0.005', currency: 'USDC' });
+
+// Get price for a path
+const price = await orbit.pricing.getPrice('travel/dietary');
+
+// List all priced paths
+const prices = await orbit.pricing.listPrices();
+
+// Remove pricing (make path free again)
+await orbit.pricing.removePrice('travel/dietary');
+```
+
+### CLI
+
+```bash
+npx orbitmem vault price set <path> <amount>    # Set per-read price (USDC)
+npx orbitmem vault price get <path>             # Show current price for path
+npx orbitmem vault price ls                     # List all priced paths
+npx orbitmem vault price rm <path>              # Remove pricing (free access)
+```
+
+### Revenue Model
+
+- **Producers** earn directly from vault reads via MPP
+- **Relay operators** earn from `PlanService` storage tiers (free/starter/pro/enterprise)
+
+See [MPP Vault Payments Design](./2026-03-20-mpp-vault-payments-design.md) for the full design spec.
 
 ---
 

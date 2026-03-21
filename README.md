@@ -29,7 +29,7 @@ Decentralized data layer for agentic web — encrypted vaults, on-chain discover
 
 ┌──────────────────────────────────────────────┐
 │  @orbitmem/relay                             │
-│  Hono server · ERC-8128 middleware           │
+│  Hono server · ERC-8128 + MPP middleware     │
 │  Vault · Discovery · Snapshots · Plan tiers  │
 └──────────────────────────────────────────────┘
 
@@ -71,6 +71,10 @@ npx orbitmem status                  # Show identity and vault info
 npx orbitmem vault store <path> <v>  # Store data in vault
 npx orbitmem vault get <path>        # Read data from vault
 npx orbitmem vault ls                # List vault keys
+npx orbitmem vault price set <p> <a> # Set per-read price (USDC)
+npx orbitmem vault price get <path>  # Show current price for path
+npx orbitmem vault price ls          # List all priced paths
+npx orbitmem vault price rm <path>   # Remove pricing (free access)
 npx orbitmem discover --schema dietary  # Search data sources
 npx orbitmem --help                  # Show all commands
 ```
@@ -113,6 +117,9 @@ await orbit.vault.put('travel/dietary', { vegan: true }, {
 
 // Read data
 const prefs = await orbit.vault.get('travel/dietary');
+
+// Set per-read pricing (MPP pay-per-read)
+await orbit.pricing.setPrice('travel/dietary', { amount: '0.005', currency: 'USDC' });
 ```
 
 ## Client
@@ -147,7 +154,8 @@ await client.rateData(datasets[0].dataId, 95);
 - **Runtime:** Bun
 - **Data:** OrbitDB + @orbitdb/nested-db (CRDT P2P)
 - **Encryption:** AES-256-GCM (Web Crypto), Lit Protocol
-- **Transport:** ERC-8128 signed HTTP requests
+- **Transport:** ERC-8128 signed HTTP requests (ECDSA, Ed25519, P256)
+- **Payments:** MPP (Machine Payments Protocol) — per-read vault monetization via HTTP 402
 - **Discovery:** ERC-8004 for Data — on-chain data discovery & reputation
 - **Persistence:** Storacha (Filecoin/IPFS)
 - **Contracts:** Solidity 0.8.28, Foundry, OpenZeppelin v5

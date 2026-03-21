@@ -1,7 +1,7 @@
 // ════════════════════════════════════════════════════════════
 //  OrbitMem SDK — Type Definitions & Interfaces
 //  The Sovereign Data Layer for the Agentic Web
-//  v0.3.0 — Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption · ERC-8004 for Data
+//  v0.4.0 — Multi-Chain (Porto + EVM + Solana) · Pluggable Encryption · ERC-8004 for Data · MPP Payments
 // ════════════════════════════════════════════════════════════
 
 // ────────────────────────────────────────────────────────────
@@ -522,6 +522,38 @@ export interface IDataLayer {
    * Import a snapshot into the vault (merge with CRDT).
    */
   importSnapshot(data: Uint8Array): Promise<{ merged: number; conflicts: number }>;
+}
+
+// ────────────────────────────────────────────────────────────
+//  4b. VAULT PRICING — MPP Pay-per-Read
+// ────────────────────────────────────────────────────────────
+
+/** Per-read pricing for a vault path */
+export interface VaultPricing {
+  /** Amount in the specified currency (e.g. "0.005") */
+  amount: string;
+  /** Currency identifier (e.g. "USDC") */
+  currency: string;
+}
+
+/**
+ * Vault pricing interface — MPP pay-per-read monetization.
+ *
+ * Producers set per-path prices stored in the vault's `-meta` OrbitDB store.
+ * The relay's MPP middleware reads these prices and gates access via HTTP 402.
+ */
+export interface IVaultPricing {
+  /** Set a per-read price for a vault path */
+  setPrice(path: string, pricing: VaultPricing): Promise<void>;
+
+  /** Get the current price for a path (falls back to `_default`) */
+  getPrice(path: string): Promise<VaultPricing | null>;
+
+  /** Remove pricing for a path (makes it free again) */
+  removePrice(path: string): Promise<void>;
+
+  /** List all priced paths */
+  listPrices(): Promise<Array<{ path: string } & VaultPricing>>;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -1230,6 +1262,9 @@ export interface IOrbitMem {
   /** Discovery layer — ERC-8004 agent trust & reputation */
   readonly discovery: IDiscoveryLayer;
 
+  /** Pricing — MPP pay-per-read vault monetization */
+  readonly pricing: IVaultPricing;
+
   // ── Convenience methods (delegate to sub-layers) ──
 
   /**
@@ -1447,6 +1482,7 @@ export type OrbitMemEvent =
   | { type: "snapshot:restored"; cid: CID; merged: number }
   | { type: "discovery:dataRegistered"; data: DataRegistration }
   | { type: "discovery:dataRated"; dataId: number; txHash: string }
+  | { type: "pricing:updated"; path: string; pricing: VaultPricing | null }
   | { type: "discovery:validationComplete"; agentId: number; taskId: string; status: string }
   | { type: "error"; layer: string; error: Error };
 
