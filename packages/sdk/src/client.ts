@@ -1,5 +1,5 @@
 import { getNetwork } from "./contracts.js";
-import { createOrbitDBInstance, createVault } from "./data/index.js";
+import { createOrbitDBInstance, createVault, createVaultPricing } from "./data/index.js";
 import { createDiscoveryLayer } from "./discovery/index.js";
 import { createEncryptionLayer } from "./encryption/index.js";
 import { createIdentityLayer } from "./identity/index.js";
@@ -28,6 +28,7 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
     aesEngine: encryption.aes,
     encryptionLayer: encryption,
   });
+  const pricing = createVaultPricing(vault.metaDb);
 
   // Initialize transport layer with a placeholder signer
   // (gets wired to identity layer when a wallet connects)
@@ -72,6 +73,7 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
     transport,
     persistence,
     discovery,
+    pricing,
 
     async connect(opts) {
       const result = await identity.connect(opts);

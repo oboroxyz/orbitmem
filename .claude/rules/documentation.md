@@ -1,0 +1,2 @@
+- Design specs go in `docs/design/`
+- Implementation plans go in `docs/plans/` (not `docs/superpowers/plans/`)

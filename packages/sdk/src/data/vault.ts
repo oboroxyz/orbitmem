@@ -45,6 +45,7 @@ export async function createVault(
   IDataLayer & {
     close: () => Promise<void>;
     db: any;
+    metaDb: any;
     setDefaultKey: (key: CryptoKey) => void;
     setAuthSig: (authSig: LitAuthSig) => void;
   }
@@ -155,10 +156,12 @@ export async function createVault(
   const vaultImpl: IDataLayer & {
     close: () => Promise<void>;
     db: any;
+    metaDb: any;
     setDefaultKey: (key: CryptoKey) => void;
     setAuthSig: (authSig: LitAuthSig) => void;
   } = {
     db,
+    metaDb,
 
     setDefaultKey(key: CryptoKey) {
       defaultKey = key;

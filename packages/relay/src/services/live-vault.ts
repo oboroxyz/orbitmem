@@ -82,4 +82,12 @@ export class LiveVaultService implements IVaultService {
     }
     return keys;
   }
+
+  async getVaultPricing(
+    _address: string,
+    _path: string,
+  ): Promise<{ amount: string; currency: string } | null> {
+    // TODO: Implement live pricing lookup from OrbitDB -meta store
+    return null;
+  }
 }
