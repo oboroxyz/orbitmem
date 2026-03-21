@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@orbitmem/sdk": "file:../../packages/sdk",
+    "@orbitmem/sdk": "workspace:*",
     "@slicekit/erc8128": "0.3.2",
     "nanoid": "^5.0.0",
     "porto": "^0.2.37",
