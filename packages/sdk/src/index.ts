@@ -7,5 +7,6 @@ export { createDiscoveryLayer, MockRegistry, OnChainRegistry } from "./discovery
 export { AESEngine, createEncryptionLayer } from "./encryption/index.js";
 export { createIdentityLayer } from "./identity/index.js";
 export { createPersistenceLayer } from "./persistence/index.js";
-export { createTransportLayer } from "./transport/index.js";
+export { createRelaySession, createTransportLayer } from "./transport/index.js";
+export { deriveVaultKeyWithCache } from "./encryption/vault-key.js";
 export * from "./types.js";

@@ -1,13 +1,11 @@
-import { sessionFetch } from "./erc8128";
-
-const RELAY = import.meta.env.VITE_RELAY_URL ?? "https://orbitmem-relay.fly.dev";
+import { relayFetch } from "./erc8128";
 
 export async function writeEntry(
   path: string,
   value: unknown,
   visibility: string,
 ): Promise<{ ok: boolean; hash: string }> {
-  const res = await sessionFetch("/v1/vault/write", {
+  const res = await relayFetch("/v1/vault/write", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, value, visibility }),
@@ -19,7 +17,7 @@ export async function writeEntry(
 export async function readEntry(
   path: string,
 ): Promise<{ key: string; value: unknown; visibility: string }> {
-  const res = await sessionFetch("/v1/vault/read", {
+  const res = await relayFetch("/v1/vault/read", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path }),
@@ -29,7 +27,7 @@ export async function readEntry(
 }
 
 export async function listKeys(prefix?: string): Promise<{ keys: string[] }> {
-  const res = await sessionFetch("/v1/vault/keys", {
+  const res = await relayFetch("/v1/vault/keys", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prefix }),
@@ -39,21 +37,11 @@ export async function listKeys(prefix?: string): Promise<{ keys: string[] }> {
 }
 
 export async function deleteEntry(path: string): Promise<{ ok: boolean }> {
-  const res = await sessionFetch("/v1/vault/delete", {
+  const res = await relayFetch("/v1/vault/delete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path }),
   });
   if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
-  return res.json();
-}
-
-export async function readPublic(
-  address: string,
-  key: string,
-): Promise<{ key: string; value: unknown; visibility: string } | null> {
-  const res = await fetch(`${RELAY}/v1/vault/public/${address}/${key}`);
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Public read failed: ${res.status}`);
   return res.json();
 }

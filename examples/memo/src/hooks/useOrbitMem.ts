@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useSignMessage } from "wagmi";
-import { decryptValue, deriveVaultKey, encryptValue } from "../lib/encryption";
-import { clearSessionCache, initSignerClient, resetSignerClient } from "../lib/erc8128";
+import { deriveVaultKeyWithCache } from "@orbitmem/sdk";
+import { decryptValue, encryptValue } from "../lib/encryption";
+import { initRelay, resetRelay } from "../lib/erc8128";
 import * as relay from "../lib/relay";
 
 export interface Memo {
@@ -20,6 +21,7 @@ export function useOrbitMem() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const vaultKeyRef = useRef<CryptoKey | null>(null);
+  const clearVaultKeyRef = useRef<(() => void) | null>(null);
 
   const loadSingleMemo = useCallback(async (id: string): Promise<Memo | null> => {
     const [titleRes, bodyRes, createdRes, updatedRes] = await Promise.all([
@@ -94,32 +96,31 @@ export function useOrbitMem() {
   const signMessageRef = useRef(signMessageAsync);
   signMessageRef.current = signMessageAsync;
 
-  // Initialize signer client + derive vault key on connect
+  // Initialize relay session + derive vault key on connect
   useEffect(() => {
     if (status !== "connected" || !address) {
       vaultKeyRef.current = null;
-      resetSignerClient();
-      clearSessionCache();
+      if (status === "disconnected") {
+        resetRelay();
+        clearVaultKeyRef.current?.();
+        clearVaultKeyRef.current = null;
+      }
       setMemos([]);
       return;
     }
 
     (async () => {
       try {
-        // 1. Init ERC-8128 signer (class-bound, replayable — signs once via wallet)
-        initSignerClient();
+        // 1. Init relay session transport (ERC-8128 → bearer token, cached)
+        initRelay();
 
-        // 2. Derive AES vault key from a separate signature
-        const vaultSigCacheKey = `orbitmem:vault-sig:${address}`;
-        let sig = sessionStorage.getItem(vaultSigCacheKey);
-        if (!sig) {
-          sig = await signMessageRef.current({ message: "OrbitMem Vault Key v1" });
-          sessionStorage.setItem(vaultSigCacheKey, sig);
-        }
-        const sigBytes = new Uint8Array(
-          (sig.slice(2).match(/.{2}/g) ?? []).map((b) => parseInt(b, 16)),
-        );
-        vaultKeyRef.current = await deriveVaultKey(sigBytes);
+        // 2. Derive vault key (signature cached in sessionStorage by SDK)
+        const { key, clear } = await deriveVaultKeyWithCache({
+          address,
+          signMessage: (msg) => signMessageRef.current({ message: msg }),
+        });
+        vaultKeyRef.current = key;
+        clearVaultKeyRef.current = clear;
 
         // 3. Load memos
         await loadMemosRef.current();
