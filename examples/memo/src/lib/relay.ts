@@ -1,5 +1,7 @@
 import { relayFetch } from "./erc8128";
 
+const RELAY = import.meta.env.VITE_RELAY_URL ?? "https://orbitmem-relay.fly.dev";
+
 export async function writeEntry(
   path: string,
   value: unknown,
@@ -43,5 +45,15 @@ export async function deleteEntry(path: string): Promise<{ ok: boolean }> {
     body: JSON.stringify({ path }),
   });
   if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
+  return res.json();
+}
+
+export async function readPublic(
+  address: string,
+  key: string,
+): Promise<{ key: string; value: unknown; visibility: string } | null> {
+  const res = await fetch(`${RELAY}/v1/vault/public/${address}/${key}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Public read failed: ${res.status}`);
   return res.json();
 }

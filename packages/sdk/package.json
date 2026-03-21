@@ -12,34 +12,34 @@
   "types": "./src/index.ts",
   "exports": {
     ".": {
+      "types": "./src/index.ts",
       "bun": "./src/index.ts",
-      "import": "./dist/index.js",
-      "types": "./src/index.ts"
+      "import": "./dist/index.js"
     },
     "./agent": {
+      "types": "./src/agent/index.ts",
       "bun": "./src/agent/index.ts",
-      "import": "./dist/agent/index.js",
-      "types": "./src/agent/index.ts"
+      "import": "./dist/agent/index.js"
     },
     "./discovery": {
+      "types": "./src/discovery/index.ts",
       "bun": "./src/discovery/index.ts",
-      "import": "./dist/discovery/index.js",
-      "types": "./src/discovery/index.ts"
+      "import": "./dist/discovery/index.js"
     },
     "./transport": {
+      "types": "./src/transport/index.ts",
       "bun": "./src/transport/index.ts",
-      "import": "./dist/transport/index.js",
-      "types": "./src/transport/index.ts"
+      "import": "./dist/transport/index.js"
     },
     "./contracts": {
+      "types": "./src/contracts.ts",
       "bun": "./src/contracts.ts",
-      "import": "./dist/contracts.js",
-      "types": "./src/contracts.ts"
+      "import": "./dist/contracts.js"
     },
     "./types": {
+      "types": "./src/types.ts",
       "bun": "./src/types.ts",
-      "import": "./dist/types.js",
-      "types": "./src/types.ts"
+      "import": "./dist/types.js"
     }
   },
   "files": [
