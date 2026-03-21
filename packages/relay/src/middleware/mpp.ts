@@ -26,9 +26,7 @@ const pricingCache = new Map<
 const CACHE_TTL = 60_000;
 const MAX_CACHE_SIZE = 1000;
 
-function getCachedPricing(
-  key: string,
-): { amount: string; currency: string } | undefined {
+function getCachedPricing(key: string): { amount: string; currency: string } | undefined {
   const entry = pricingCache.get(key);
   if (!entry) return undefined;
   if (Date.now() > entry.expiry) {
@@ -38,10 +36,7 @@ function getCachedPricing(
   return entry.value;
 }
 
-function setCachedPricing(
-  key: string,
-  value: { amount: string; currency: string },
-): void {
+function setCachedPricing(key: string, value: { amount: string; currency: string }): void {
   if (pricingCache.size >= MAX_CACHE_SIZE) {
     const keys = Array.from(pricingCache.keys());
     for (let i = 0; i < keys.length / 2; i++) {

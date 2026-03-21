@@ -131,10 +131,11 @@ describe("ERC-8128 Middleware", () => {
       { preferReplayable: true, ttlSeconds: 60 },
     );
 
-    const signed = await client.signRequest(
-      new Request("http://localhost/protected/test"),
-      { binding: "class-bound", replay: "replayable", components: ["@authority"] },
-    );
+    const signed = await client.signRequest(new Request("http://localhost/protected/test"), {
+      binding: "class-bound",
+      replay: "replayable",
+      components: ["@authority"],
+    });
 
     const res = await app.request("/protected/test", {
       headers: Object.fromEntries(signed.headers.entries()),
@@ -163,10 +164,11 @@ describe("ERC-8128 Middleware", () => {
       { preferReplayable: true, ttlSeconds: 60 },
     );
 
-    const signed = await client.signRequest(
-      new Request("http://localhost/protected/test"),
-      { binding: "class-bound", replay: "replayable", components: ["@authority"] },
-    );
+    const signed = await client.signRequest(new Request("http://localhost/protected/test"), {
+      binding: "class-bound",
+      replay: "replayable",
+      components: ["@authority"],
+    });
     const headers = Object.fromEntries(signed.headers.entries());
 
     // Same signature should work for multiple requests (replayable = no nonce)

@@ -2,10 +2,7 @@ import type { IVaultService, VaultEntry } from "./types.js";
 
 export class MockVaultService implements IVaultService {
   private store = new Map<string, Map<string, VaultEntry>>();
-  private pricingStore = new Map<
-    string,
-    Map<string, { amount: string; currency: string }>
-  >();
+  private pricingStore = new Map<string, Map<string, { amount: string; currency: string }>>();
 
   private getOrCreate(address: string) {
     if (!this.store.has(address)) {
@@ -86,11 +83,7 @@ export class MockVaultService implements IVaultService {
   }
 
   /** Seed pricing data for testing */
-  seedPricing(
-    address: string,
-    path: string,
-    pricing: { amount: string; currency: string },
-  ): void {
+  seedPricing(address: string, path: string, pricing: { amount: string; currency: string }): void {
     if (!this.pricingStore.has(address)) {
       this.pricingStore.set(address, new Map());
     }

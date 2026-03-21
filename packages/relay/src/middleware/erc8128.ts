@@ -1,9 +1,5 @@
+import { type NonceStore, type VerifyResult, createVerifierClient } from "@slicekit/erc8128";
 import type { MiddlewareHandler } from "hono";
-import {
-  type NonceStore,
-  type VerifyResult,
-  createVerifierClient,
-} from "@slicekit/erc8128";
 import { getAddress, verifyMessage } from "viem";
 
 export type ERC8128Env = {
@@ -107,7 +103,10 @@ export function erc8128(opts?: {
   };
 }
 
-async function verifyWithLibrary(request: Request, allowReplayable: boolean): Promise<VerifyResult> {
+async function verifyWithLibrary(
+  request: Request,
+  allowReplayable: boolean,
+): Promise<VerifyResult> {
   const verifier = createVerifierClient({
     verifyMessage: async ({ address, message, signature }) => {
       return verifyMessage({ address, message, signature });
