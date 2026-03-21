@@ -1,6 +1,12 @@
+```
+▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄
+██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██
+▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██
+```
+
 # OrbitMem
 
-Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust.
+Decentralized data layer for agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents
 
 ## Architecture
 
@@ -16,15 +22,15 @@ Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identit
 │  │ (OrbitDB)│ │(ERC-8004)│ │ (Storacha)   │ │
 │  └──────────┘ └──────────┘ └──────────────┘ │
 │  ┌──────────────────────────────────────────┐│
-│  │         Agent Adapter                    ││
+│  │         Client                           ││
 │  │  discover → evaluate → fetch → rate      ││
 │  └──────────────────────────────────────────┘│
 └──────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────┐
 │  @orbitmem/relay                             │
-│  Hono server · ERC-8128 middleware           │
-│  Vault routes · Discovery routes · Snapshots │
+│  Hono server · ERC-8128 + MPP middleware     │
+│  Vault · Discovery · Snapshots · Plan tiers  │
 └──────────────────────────────────────────────┘
 
 ┌──────────────────────────────────────────────┐
@@ -65,18 +71,22 @@ npx orbitmem status                  # Show identity and vault info
 npx orbitmem vault store <path> <v>  # Store data in vault
 npx orbitmem vault get <path>        # Read data from vault
 npx orbitmem vault ls                # List vault keys
+npx orbitmem vault price set <p> <a> # Set per-read price (USDC)
+npx orbitmem vault price get <path>  # Show current price for path
+npx orbitmem vault price ls          # List all priced paths
+npx orbitmem vault price rm <path>   # Remove pricing (free access)
 npx orbitmem discover --schema dietary  # Search data sources
 npx orbitmem --help                  # Show all commands
 ```
 
 ### Contracts
 
-Deployed on **Base Sepolia**:
+Deployed on **Base, Base Sepolia**:
 
-| Contract | Address |
-|----------|---------|
-| DataRegistry | [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
-| FeedbackRegistry | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
+| Contract | Base | Base Sepolia |
+|----------|---------|---------|
+| DataRegistry | _TBD_ |  [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
+| FeedbackRegistry | _TBD_ | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
 
 ```bash
 cd packages/contracts
@@ -107,31 +117,34 @@ await orbit.vault.put('travel/dietary', { vegan: true }, {
 
 // Read data
 const prefs = await orbit.vault.get('travel/dietary');
+
+// Set per-read pricing (MPP pay-per-read)
+await orbit.pricing.setPrice('travel/dietary', { amount: '0.005', currency: 'USDC' });
 ```
 
-## Agent Adapter
+## Client
 
 ```typescript
-import { createOrbitMemAgentAdapter } from '@orbitmem/sdk/agent';
+import { createOrbitMemClient } from '@orbitmem/sdk/agent';
 
-const agent = createOrbitMemAgentAdapter({ orbit });
+const client = createOrbitMemClient({ orbit });
 
 // Full lifecycle: discover → evaluate → fetch → decrypt → rate
-const datasets = await agent.discoverData({ schema: 'orbitmem:dietary:v1' });
-const score = await agent.evaluateData(datasets[0].dataId);
-const data = await agent.fetchUserData({
+const datasets = await client.discoverData({ schema: 'orbitmem:dietary:v1' });
+const score = await client.evaluateData(datasets[0].dataId);
+const data = await client.fetchUserData({
   dataId: datasets[0].dataId,
   userAddress: '0x...',
 });
-await agent.rateData(datasets[0].dataId, 95);
+await client.rateData(datasets[0].dataId, 95);
 ```
 
 ## Packages
 
 | Package | Description |
 |---------|-------------|
-| `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, agent adapter |
-| `@orbitmem/relay` | Hono relay server — vault routes, discovery, snapshots, ERC-8128 auth |
+| `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, client |
+| `@orbitmem/relay` | Hono relay server — vault, discovery, snapshots, plan tiers, ERC-8128 auth |
 | `@orbitmem/contracts` | Solidity contracts — DataRegistry (ERC-721), FeedbackRegistry (reputation) |
 | `@orbitmem/cli` | CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots |
 | `@orbitmem/web` | React dashboard — data explorer, vault manager, trust graph, wallet connection |
@@ -141,7 +154,8 @@ await agent.rateData(datasets[0].dataId, 95);
 - **Runtime:** Bun
 - **Data:** OrbitDB + @orbitdb/nested-db (CRDT P2P)
 - **Encryption:** AES-256-GCM (Web Crypto), Lit Protocol
-- **Transport:** ERC-8128 signed HTTP requests
+- **Transport:** ERC-8128 signed HTTP requests (ECDSA, Ed25519, P256)
+- **Payments:** MPP (Machine Payments Protocol) — per-read vault monetization via HTTP 402
 - **Discovery:** ERC-8004 for Data — on-chain data discovery & reputation
 - **Persistence:** Storacha (Filecoin/IPFS)
 - **Contracts:** Solidity 0.8.28, Foundry, OpenZeppelin v5

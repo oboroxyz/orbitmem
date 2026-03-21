@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
+
+import { createSignerClient } from "@slicekit/erc8128";
 import { Hono } from "hono";
 import { privateKeyToAccount } from "viem/accounts";
+
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
 
 describe("ERC-8128 Middleware", () => {
@@ -108,6 +111,72 @@ describe("ERC-8128 Middleware", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as any;
     expect(body.signer).toBe(account.address);
+  });
+
+  test("accepts RFC 9421 class-bound replayable signature (trust mode)", async () => {
+    const app = createTestApp();
+
+    const account = privateKeyToAccount(
+      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+    );
+
+    const client = createSignerClient(
+      {
+        address: account.address,
+        chainId: 84532,
+        signMessage: async (message: Uint8Array) => {
+          return account.signMessage({ message: { raw: message } });
+        },
+      },
+      { preferReplayable: true, ttlSeconds: 60 },
+    );
+
+    const signed = await client.signRequest(new Request("http://localhost/protected/test"), {
+      binding: "class-bound",
+      replay: "replayable",
+      components: ["@authority"],
+    });
+
+    const res = await app.request("/protected/test", {
+      headers: Object.fromEntries(signed.headers.entries()),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as any;
+    expect(body.signer).toBe(account.address);
+    expect(body.family).toBe("evm");
+  });
+
+  test("reuses RFC 9421 replayable signature for multiple requests", async () => {
+    const app = createTestApp();
+
+    const account = privateKeyToAccount(
+      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+    );
+
+    const client = createSignerClient(
+      {
+        address: account.address,
+        chainId: 84532,
+        signMessage: async (message: Uint8Array) => {
+          return account.signMessage({ message: { raw: message } });
+        },
+      },
+      { preferReplayable: true, ttlSeconds: 60 },
+    );
+
+    const signed = await client.signRequest(new Request("http://localhost/protected/test"), {
+      binding: "class-bound",
+      replay: "replayable",
+      components: ["@authority"],
+    });
+    const headers = Object.fromEntries(signed.headers.entries());
+
+    // Same signature should work for multiple requests (replayable = no nonce)
+    const first = await app.request("/protected/test", { headers });
+    expect(first.status).toBe(200);
+
+    const second = await app.request("/protected/test", { headers });
+    expect(second.status).toBe(200);
   });
 
   test("verify: 'evm' rejects forged signature", async () => {

@@ -1,0 +1,25 @@
+name: Deploy Relay
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/relay/**
+      - packages/sdk/**
+      - packages/contracts/abi/**
+      - packages/contracts/package.json
+      - packages/contracts/tsconfig.build.json
+      - fly.toml
+      - packages/relay/Dockerfile
+      - bun.lock
+
+jobs:
+  deploy:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

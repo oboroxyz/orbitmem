@@ -2,6 +2,7 @@ import { createOrbitMem, getNetwork } from "@orbitmem/sdk";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { base, baseSepolia } from "viem/chains";
+
 import type { CliConfig } from "../config.js";
 
 const CHAINS = {

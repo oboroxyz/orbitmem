@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { createOrbitMemAgentAdapter } from "../agent-adapter.js";
 
 describe("AgentAdapter", () => {

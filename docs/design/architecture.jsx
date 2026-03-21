@@ -13,6 +13,9 @@ const L = [
   { id: "encryption", name: "Encryption", tech: "Lit / AES-256", color: "#FF6D00", icon: "⊛",
     desc: "Lit Protocol for on-chain condition-gated access (reputation-gated). AES-256-GCM for fast local encryption. Choose per record.",
     apis: ["encrypt(data, conditions)", "decrypt(blob)", "createCondition()"] },
+  { id: "payments", name: "Payments", tech: "MPP · HTTP 402", color: "#FFD600", icon: "⊕",
+    desc: "Pay-per-read vault monetization via Machine Payments Protocol. Producers set per-path prices, agents pay directly via stablecoins, Stripe, or Lightning.",
+    apis: ["pricing.setPrice(path, {amount, currency})", "pricing.getPrice(path)", "pricing.listPrices()"] },
   { id: "persistence", name: "Persistence", tech: "Storacha", color: "#FF1744", icon: "◉",
     desc: "Auto-archives encrypted snapshots to Filecoin/IPFS. Storacha never sees plaintext — only encrypted blobs.",
     apis: ["archive(snapshot)", "retrieve(cid)", "pinToFilecoin()"] },
@@ -27,14 +30,15 @@ const FLOW = [
   { n: "3", label: "Write Vault", sub: "Public / Private / Shared", color: "#00E676" },
   { n: "4", label: "Encrypt", sub: "Lit (rep-gated) / AES", color: "#FF6D00" },
   { n: "5", label: "Agent Fetch", sub: "ERC-8128 signed request", color: "#7C4DFF" },
-  { n: "6", label: "Execute → Rate", sub: "Mutual feedback loop", color: "#FF1744" },
+  { n: "6", label: "Pay-per-Read", sub: "MPP 402 → credential", color: "#FFD600" },
+  { n: "7", label: "Execute → Rate", sub: "Mutual feedback loop", color: "#FF1744" },
 ];
 
 const mono = "'DM Mono', monospace";
 const sans = "'DM Sans', 'Helvetica Neue', sans-serif";
 
 export default function App() {
-  const [sel, setSel] = useState("trust");
+  const [sel, setSel] = useState("payments");
   const a = L.find(l => l.id === sel);
 
   return (

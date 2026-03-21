@@ -1,37 +1,63 @@
+import { type SignerClient, createSignerClient } from "@slicekit/erc8128";
 import { type Config, getAccount, signMessage } from "@wagmi/core";
-import { toHex } from "viem";
 import { config } from "./wagmi";
 
 const RELAY = import.meta.env.VITE_RELAY_URL ?? "http://localhost:3000";
 
-export async function createErc8128Headers(
-  method: string,
-  url: string,
-  body?: string,
-): Promise<Record<string, string>> {
-  const challengeRes = await fetch(`${RELAY}/v1/auth/challenge`, { method: "POST" });
-  const { nonce, timestamp } = (await challengeRes.json()) as {
-    nonce: string;
-    timestamp: number;
-  };
+let signerClient: SignerClient | null = null;
 
-  const bodyBytes = new TextEncoder().encode(body ?? "");
-  const bodyHashBuf = await crypto.subtle.digest("SHA-256", bodyBytes);
-  const bodyHash = toHex(new Uint8Array(bodyHashBuf));
-
-  const payload = `${method}\n${url}\n${timestamp}\n${nonce}\n${bodyHash}`;
-
-  const signature = await signMessage(config as Config, { message: payload });
-
+/**
+ * Initialize the ERC-8128 signer client.
+ * Uses preferReplayable so the class-bound replayable signature is cached
+ * and reused for all requests within the TTL (30 min).
+ * Call this after wallet connection.
+ */
+export function initSignerClient() {
   const account = getAccount(config as Config);
-  const signer = account.address!;
+  if (!account.address) throw new Error("No wallet connected");
 
-  return {
-    "X-OrbitMem-Signer": signer,
-    "X-OrbitMem-Family": "evm",
-    "X-OrbitMem-Algorithm": "ecdsa-secp256k1",
-    "X-OrbitMem-Timestamp": String(timestamp),
-    "X-OrbitMem-Nonce": nonce,
-    "X-OrbitMem-Signature": signature,
-  };
+  signerClient = createSignerClient(
+    {
+      address: account.address,
+      chainId: account.chainId ?? 84532, // Base Sepolia
+      signMessage: async (message: Uint8Array) => {
+        const hex = await signMessage(config as Config, {
+          message: { raw: message },
+        });
+        return hex;
+      },
+    },
+    {
+      preferReplayable: true,
+      ttlSeconds: 1800, // 30 min
+    },
+  );
+}
+
+/**
+ * Get the current signer client. Throws if not initialized.
+ */
+export function getSignerClient(): SignerClient {
+  if (!signerClient) throw new Error("Signer client not initialized — call initSignerClient()");
+  return signerClient;
+}
+
+/**
+ * Reset the signer client (on disconnect).
+ */
+export function resetSignerClient() {
+  signerClient = null;
+}
+
+/**
+ * Make an authenticated fetch to the relay.
+ * Uses class-bound replayable signature (signs once, reuses within TTL).
+ */
+export async function signedFetch(path: string, init?: RequestInit): Promise<Response> {
+  const client = getSignerClient();
+  return client.fetch(`${RELAY}${path}`, init, {
+    binding: "class-bound",
+    replay: "replayable",
+    components: ["@authority"],
+  });
 }

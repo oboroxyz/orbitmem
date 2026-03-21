@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
+
 import {
   DataRegistryAbi,
   DataRegistryBytecode,
@@ -15,6 +16,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
+
 import { OnChainRegistry } from "../on-chain-registry.js";
 
 // Skip all tests if Anvil is not running

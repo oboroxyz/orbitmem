@@ -1,3 +1,6 @@
+import { createSignerClient } from "@slicekit/erc8128";
+import type { EthHttpSigner } from "@slicekit/erc8128";
+
 import type { ChainFamily, ITransportLayer, SignatureAlgorithm, WalletAddress } from "../types.js";
 
 interface TransportConfig {
@@ -12,6 +15,8 @@ interface TransportConfig {
   signerAddress: WalletAddress;
   family: ChainFamily;
   nonceTTL?: number; // ms, default 5 min
+  /** ERC-8128 chain ID (default 84532 = Base Sepolia) */
+  chainId?: number;
 }
 
 export function createTransportLayer(config: TransportConfig): ITransportLayer {
@@ -139,5 +144,28 @@ export function createTransportLayer(config: TransportConfig): ITransportLayer {
         body: signed.body ? JSON.stringify(signed.body) : undefined,
       });
     },
+  };
+}
+
+/**
+ * Create an RFC 9421 / ERC-8128 compliant transport layer using @slicekit/erc8128.
+ * This is the recommended transport for new integrations.
+ */
+export function createErc8128TransportLayer(config: {
+  signer: EthHttpSigner;
+  /** Whether to prefer replayable signatures (default false) */
+  preferReplayable?: boolean;
+  /** Signature TTL in seconds (default 60) */
+  ttlSeconds?: number;
+}) {
+  const client = createSignerClient(config.signer, {
+    preferReplayable: config.preferReplayable ?? false,
+    ttlSeconds: config.ttlSeconds ?? 60,
+  });
+
+  return {
+    client,
+    signRequest: (input: RequestInfo, init?: RequestInit) => client.signRequest(input, init),
+    fetch: (input: RequestInfo, init?: RequestInit) => client.fetch(input, init),
   };
 }

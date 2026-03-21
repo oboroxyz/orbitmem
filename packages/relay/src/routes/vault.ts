@@ -1,11 +1,13 @@
 import { Hono } from "hono";
+
 import { type ERC8128Env, erc8128 } from "../middleware/erc8128.js";
+import { type MPPConfig, mppPricing } from "../middleware/mpp.js";
 import type { IVaultService } from "../services/types.js";
 
-export function createVaultRoutes(vault: IVaultService): Hono<ERC8128Env> {
+export function createVaultRoutes(vault: IVaultService, mppConfig?: MPPConfig): Hono<ERC8128Env> {
   const routes = new Hono<ERC8128Env>();
 
-  // List public keys — must be before the wildcard route
+  // List public keys — must be before the wildcard route (always free)
   routes.get("/vault/public/:address/keys", async (c) => {
     const address = c.req.param("address");
     const prefix = c.req.query("prefix");
@@ -14,17 +16,36 @@ export function createVaultRoutes(vault: IVaultService): Hono<ERC8128Env> {
   });
 
   // Public read — no auth required (wildcard must come after /keys)
-  routes.get("/vault/public/:address/:key{.+}", async (c) => {
-    const address = c.req.param("address");
-    const key = c.req.param("key");
-    const entry = await vault.getPublic(address, key);
+  // If MPP config is provided, apply pricing middleware
+  if (mppConfig) {
+    routes.get(
+      "/vault/public/:address/:key{.+}",
+      mppPricing({ vault, config: mppConfig }),
+      async (c) => {
+        const address = c.req.param("address");
+        const key = c.req.param("key");
+        const entry = await vault.getPublic(address, key);
 
-    if (!entry) {
-      return c.json({ error: "Entry not found or not public" }, 404);
-    }
+        if (!entry) {
+          return c.json({ error: "Entry not found or not public" }, 404);
+        }
 
-    return c.json({ key, value: entry.value, visibility: "public" });
-  });
+        return c.json({ key, value: entry.value, visibility: "public" });
+      },
+    );
+  } else {
+    routes.get("/vault/public/:address/:key{.+}", async (c) => {
+      const address = c.req.param("address");
+      const key = c.req.param("key");
+      const entry = await vault.getPublic(address, key);
+
+      if (!entry) {
+        return c.json({ error: "Entry not found or not public" }, 404);
+      }
+
+      return c.json({ key, value: entry.value, visibility: "public" });
+    });
+  }
 
   // Encrypted read — requires ERC-8128
   routes.post("/vault/read", erc8128(), async (c) => {

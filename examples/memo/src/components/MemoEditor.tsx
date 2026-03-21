@@ -67,7 +67,7 @@ export function MemoEditor({ memo, onSave, onBack }: MemoEditorProps) {
           <button
             onClick={handleSave}
             disabled={saving || !title.trim()}
-            className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="px-3 py-1.5 hover:bg-gray-100 border-2 disabled:opacity-50 transition-colors"
           >
             {saving ? "Saving..." : "Save"}
           </button>

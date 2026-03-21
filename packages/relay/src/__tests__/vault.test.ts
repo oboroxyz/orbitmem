@@ -1,5 +1,16 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { app } from "../app.js";
+
+import { buildApp } from "../app.js";
+import type { MPPConfig } from "../middleware/mpp.js";
+import { createMockServices } from "../services/index.js";
+import { MockVaultService } from "../services/mock-vault.js";
+import { getTestVaultService, setTestVaultService } from "../services/test-helpers.js";
+
+const mockVault = new MockVaultService();
+setTestVaultService(mockVault);
+const mppConfig: MPPConfig = { acceptedMethods: ["tempo"], network: "base-sepolia" };
+const services = { ...createMockServices(), vault: mockVault };
+const app = buildApp(services, mppConfig);
 
 function makeERC8128Headers(overrides?: Record<string, string>) {
   return {
@@ -80,6 +91,35 @@ describe("Relay Vault Routes", () => {
     const body = (await res.json()) as any;
     expect(body.nonce).toBeTruthy();
     expect(body.message).toContain("OrbitMem Authentication");
+  });
+
+  test("GET /v1/vault/public/:address/:key returns 402 for priced entry", async () => {
+    const vault = getTestVaultService();
+    vault.seedPricing("test-vault-001", "travel/dietary", {
+      amount: "0.005",
+      currency: "USDC",
+    });
+
+    const res = await app.request("/v1/vault/public/test-vault-001/travel/dietary");
+    expect(res.status).toBe(402);
+    const body = (await res.json()) as any;
+    expect(body.error).toBe("payment_required");
+    expect(body.amount).toBe("0.005");
+  });
+
+  test("GET /v1/vault/public/:address/:key returns 200 with payment header", async () => {
+    const res = await app.request("/v1/vault/public/test-vault-001/travel/dietary", {
+      headers: { Authorization: "Payment mock-credential" },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test("GET /v1/vault/public/:address/keys is always free (no 402)", async () => {
+    const vault = getTestVaultService();
+    vault.seedPricing("test-vault-001", "_default", { amount: "0.01", currency: "USDC" });
+
+    const res = await app.request("/v1/vault/public/test-vault-001/keys");
+    expect(res.status).toBe(200);
   });
 });
 

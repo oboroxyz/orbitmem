@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+
 import { FeedbackForm } from "../../components/FeedbackForm";
 import { ScoreCard } from "../../components/ScoreCard";
 import { getDataScore } from "../../lib/api";

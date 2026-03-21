@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
+
 import { ConnectButton } from "../../components/ConnectButton";
 import { getPublicVaultEntry, getPublicVaultKeys, getUserStats } from "../../lib/api";
 import { createErc8128Headers } from "../../lib/erc8128";

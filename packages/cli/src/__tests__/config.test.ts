@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
+
 import { loadConfig, loadKey, saveConfig, saveKey } from "../config.js";
 
 const TEST_DIR = join(import.meta.dir, ".test-orbitmem");

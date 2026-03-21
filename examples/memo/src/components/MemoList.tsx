@@ -20,7 +20,7 @@ export function MemoList({ memos, address, onSelect, onDelete, onNew }: MemoList
         <h2 className="text-lg font-semibold">My Memos</h2>
         <button
           onClick={onNew}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          className="px-3 py-1.5 hover:bg-gray-100 border-2 transition-colors"
         >
           New Memo
         </button>

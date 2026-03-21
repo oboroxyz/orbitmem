@@ -20,6 +20,10 @@ export interface IVaultService {
   ): Promise<{ hash: string }>;
   delete(address: string, path: string): Promise<void>;
   getKeys(address: string, prefix?: string): Promise<string[]>;
+  getVaultPricing(
+    address: string,
+    path: string,
+  ): Promise<{ amount: string; currency: string } | null>;
 }
 
 export interface SnapshotMeta {

@@ -1,5 +1,6 @@
 import { DataRegistryAbi } from "@orbitmem/contracts";
 import { OnChainRegistry, type OnChainRegistryConfig } from "@orbitmem/sdk/discovery";
+
 import type { DataStats, IDiscoveryService, UserStats } from "./types.js";
 
 export class LiveDiscoveryService implements IDiscoveryService {
