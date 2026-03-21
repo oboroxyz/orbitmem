@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+
 import { createSessionToken, verifySessionToken } from "../middleware/session.js";
 
 describe("Session Tokens", () => {
