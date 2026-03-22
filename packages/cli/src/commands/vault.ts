@@ -1,4 +1,11 @@
-import type { EncryptionEngine, LitAccessCondition, Visibility } from "@orbitmem/sdk/types";
+import type {
+  EncryptionEngine,
+  EvmAddress,
+  EvmChain,
+  LitAccessCondition,
+  LitEvmCondition,
+  Visibility,
+} from "@orbitmem/sdk/types";
 
 import { loadConfig, loadKey } from "../config.js";
 import { createClient, type LitNetwork } from "../utils/client.js";
@@ -54,20 +61,30 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
       putOpts.engine = "lit";
       const accessConditions: LitAccessCondition[] = [];
       if (flags["allow-address"]) {
-        const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as any;
-        accessConditions.push(
-          client.encryption.lit!.createAddressCondition(flags["allow-address"], chain),
-        );
+        const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as EvmChain;
+        const condition: LitEvmCondition = {
+          conditionType: "evmBasic",
+          contractAddress: "" as EvmAddress,
+          standardContractType: "",
+          chain,
+          method: "",
+          parameters: [":userAddress"],
+          returnValueTest: { comparator: "=", value: flags["allow-address"] },
+        };
+        accessConditions.push(condition);
       }
       if (flags["min-score"]) {
-        const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as any;
-        accessConditions.push(
-          client.encryption.lit!.createReputationCondition({
-            registryAddress: config.reputationAddress,
-            minScore: Number(flags["min-score"]),
-            chain,
-          }),
-        );
+        const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as EvmChain;
+        const condition: LitEvmCondition = {
+          conditionType: "evmContract",
+          contractAddress: config.reputationAddress as EvmAddress,
+          standardContractType: "",
+          chain,
+          method: "getScore",
+          parameters: [":userAddress"],
+          returnValueTest: { comparator: ">=", value: flags["min-score"] },
+        };
+        accessConditions.push(condition);
       }
       if (accessConditions.length === 0) {
         error("Lit encryption requires --allow-address <addr> or --min-score <n>");
