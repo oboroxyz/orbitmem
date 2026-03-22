@@ -79,9 +79,8 @@ npx orbitmem discover --schema dietary  # Search data sources
 npx orbitmem --help                  # Show all commands
 
 # Lit Protocol encryption (shared, condition-gated)
-npx orbitmem vault store travel/diet vegan --engine lit --allow-address 0x1234...
-npx orbitmem vault store travel/diet vegan --engine lit --min-score 80
-npx orbitmem vault store travel/diet vegan --engine lit --min-score 80 --lit-network manzano
+npx orbitmem vault store travel/diet vegan --engine lit --allow-address 0xAgentAddr...
+npx orbitmem vault store travel/diet vegan --engine lit --allow-address 0xAgentAddr... --lit-network manzano
 ```
 
 ### Contracts

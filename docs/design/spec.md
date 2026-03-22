@@ -964,10 +964,10 @@ All commands support shared flags parsed in the entry point:
 - `--min-score <n>` — Lit: require minimum reputation score (via FeedbackRegistry) to decrypt
 - `--access-chain <chain>` — Lit: chain for evaluating access conditions (default: `base-sepolia`)
 
-Example: store data that only agents with reputation ≥ 80 can decrypt:
+Example: store data that only a specific agent can decrypt:
 
 ```bash
-npx orbitmem vault store travel/dietary vegan --engine lit --min-score 80
+npx orbitmem vault store travel/dietary vegan --engine lit --allow-address 0xAgentAddr...
 ```
 
 ### Architecture
