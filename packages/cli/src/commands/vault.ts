@@ -1,7 +1,7 @@
-import type { Visibility } from "@orbitmem/sdk/types";
+import type { EncryptionEngine, LitAccessCondition, Visibility } from "@orbitmem/sdk/types";
 
 import { loadConfig, loadKey } from "../config.js";
-import { createClient } from "../utils/client.js";
+import { createClient, type LitNetwork } from "../utils/client.js";
 import { error, output } from "../utils/output.js";
 
 export async function vault(args: string[], flags: Record<string, string>): Promise<void> {
@@ -27,21 +27,67 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+
+  const engine = (flags.engine as EncryptionEngine) ?? "aes";
+  const litNetwork = (flags["lit-network"] as LitNetwork) ?? "cayenne";
+  const useLit = engine === "lit";
+
+  const client = await createClient(config, loadKey(), useLit ? { litNetwork } : undefined);
 
   try {
-    const visibility: Visibility = flags.public !== undefined ? "public" : "private";
-    const entry = await client.vault.put(path, value, { visibility });
+    let visibility: Visibility;
+    if (flags.public !== undefined) {
+      visibility = "public";
+    } else if (flags.shared !== undefined || useLit) {
+      visibility = "shared";
+    } else {
+      visibility = "private";
+    }
+
+    const putOpts: {
+      visibility: Visibility;
+      engine?: EncryptionEngine;
+      accessConditions?: LitAccessCondition[];
+    } = { visibility };
+
+    if (useLit) {
+      putOpts.engine = "lit";
+      const accessConditions: LitAccessCondition[] = [];
+      if (flags["allow-address"]) {
+        const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as any;
+        accessConditions.push(
+          client.encryption.lit!.createAddressCondition(flags["allow-address"], chain),
+        );
+      }
+      if (flags["min-score"]) {
+        const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as any;
+        accessConditions.push(
+          client.encryption.lit!.createReputationCondition({
+            registryAddress: config.reputationAddress,
+            minScore: Number(flags["min-score"]),
+            chain,
+          }),
+        );
+      }
+      if (accessConditions.length === 0) {
+        error("Lit encryption requires --allow-address <addr> or --min-score <n>");
+      }
+      putOpts.accessConditions = accessConditions;
+    }
+
+    const entry = await client.vault.put(path, value, putOpts);
     const result = {
       path,
       visibility,
+      engine,
       encrypted: entry.encrypted,
       timestamp: entry.timestamp,
     };
     if (flags.json !== undefined) {
       output(result, true);
     } else {
-      process.stdout.write(`Stored "${path}" (${visibility})\n`);
+      const engineLabel = useLit ? " [lit]" : "";
+      process.stdout.write(`Stored "${path}" (${visibility}${engineLabel})\n`);
     }
   } finally {
     await client.destroy();
