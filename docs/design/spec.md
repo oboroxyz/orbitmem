@@ -954,6 +954,22 @@ All commands support shared flags parsed in the entry point:
 - `--chain <name>` — Override chain (default: `base`)
 - `--json` — Machine-readable JSON output (for agent consumption)
 
+#### Vault Store Flags
+
+- `--public` — Store as public (unencrypted)
+- `--shared` — Store as shared (encrypted, condition-gated)
+- `--engine <aes|lit>` — Encryption engine (default: `aes`). Using `lit` enables Lit Protocol MPC encryption with on-chain access conditions
+- `--lit-network <name>` — Lit network: `cayenne` | `manzano` | `habanero` (default: `cayenne`)
+- `--allow-address <addr>` — Lit: grant decryption access to a specific wallet address
+- `--min-score <n>` — Lit: require minimum reputation score (via FeedbackRegistry) to decrypt
+- `--access-chain <chain>` — Lit: chain for evaluating access conditions (default: `base-sepolia`)
+
+Example: store data that only agents with reputation ≥ 80 can decrypt:
+
+```bash
+npx orbitmem vault store travel/dietary vegan --engine lit --min-score 80
+```
+
 ### Architecture
 
 The CLI uses plain `process.argv` parsing (no framework) for fast `npx` startup. Commands are lazy-loaded via dynamic `import()` and share a common pattern: `loadConfig()` → `createClient()` → execute → `client.destroy()`.
