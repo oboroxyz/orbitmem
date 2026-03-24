@@ -1,5 +1,6 @@
 import { createRelaySession } from "@orbitmem/sdk";
 import { type Config, getAccount, signMessage } from "@wagmi/core";
+
 import { config } from "./wagmi";
 
 const RELAY = import.meta.env.VITE_RELAY_URL ?? "https://orbitmem-relay.fly.dev";

@@ -1,6 +1,7 @@
+import { deriveVaultKeyWithCache } from "@orbitmem/sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useSignMessage } from "wagmi";
-import { deriveVaultKeyWithCache } from "@orbitmem/sdk";
+
 import { decryptValue, encryptValue } from "../lib/encryption";
 import { initRelay, resetRelay } from "../lib/erc8128";
 import * as relay from "../lib/relay";

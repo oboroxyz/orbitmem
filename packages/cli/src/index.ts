@@ -51,10 +51,19 @@ Commands:
   dev                        Start local relay server
 
 Options:
-  --relay <url>     Override relay URL
-  --chain <name>    Override chain
-  --json            Output as JSON
-  --help            Show this help
+  --relay <url>           Override relay URL
+  --chain <name>          Override chain
+  --json                  Output as JSON
+  --help                  Show this help
+
+Vault store options:
+  --public                Store as public (unencrypted)
+  --shared                Store as shared (encrypted, condition-gated)
+  --engine <aes|lit>      Encryption engine (default: aes)
+  --lit-network <name>    Lit network: cayenne | manzano | habanero (default: cayenne)
+  --allow-address <addr>  Lit: allow this address to decrypt
+  --min-score <n>         Lit: require minimum reputation score to decrypt
+  --access-chain <chain>  Lit: chain for access conditions (default: base-sepolia)
 
 `);
 }

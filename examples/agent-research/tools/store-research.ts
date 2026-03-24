@@ -13,7 +13,9 @@ import { createAgentClient, printJson } from "./shared.js";
 const [topic, content, ...rest] = process.argv.slice(2);
 
 if (!topic || !content) {
-  console.error("Usage: store-research <topic> <content> [--tags t1,t2] [--visibility public|private]");
+  console.error(
+    "Usage: store-research <topic> <content> [--tags t1,t2] [--visibility public|private]",
+  );
   process.exit(1);
 }
 

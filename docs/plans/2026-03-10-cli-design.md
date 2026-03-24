@@ -42,7 +42,7 @@ A CLI package (`@orbitmem/cli`) enabling `npx orbitmem <command>` for both users
 | Command | Description |
 |---------|-------------|
 | `orbitmem init` | Generate keys, create `~/.orbitmem/config.json` |
-| `orbitmem vault store <path> <value>` | Store data (encrypted by default, `--public` for plaintext) |
+| `orbitmem vault store <path> <value>` | Store data (encrypted by default, `--public` for plaintext, `--engine lit` for Lit Protocol) |
 | `orbitmem vault get <path>` | Read data from vault |
 | `orbitmem vault ls [prefix]` | List vault keys |
 | `orbitmem register <path>` | Mint ERC-8004 NFT pointing to vault data |
@@ -69,6 +69,18 @@ A CLI package (`@orbitmem/cli`) enabling `npx orbitmem <command>` for both users
 | `--chain <name>` | Override chain |
 | `--json` | Machine-readable JSON output |
 
+### Vault Store Flags
+
+| Flag | Description |
+|------|-------------|
+| `--public` | Store as public (unencrypted) |
+| `--shared` | Store as shared (encrypted, condition-gated) |
+| `--engine <aes\|lit>` | Encryption engine (default: `aes`) |
+| `--lit-network <name>` | Lit network: `cayenne` \| `manzano` \| `habanero` (default: `cayenne`) |
+| `--allow-address <addr>` | Lit: allow this address to decrypt |
+| `--min-score <n>` | Lit: require minimum reputation score to decrypt |
+| `--access-chain <chain>` | Lit: chain for access conditions (default: `base-sepolia`) |
+
 ## Data Flow
 
 ### `orbitmem init`
@@ -82,7 +94,11 @@ A CLI package (`@orbitmem/cli`) enabling `npx orbitmem <command>` for both users
 2. Call `createOrbitMem()` → `vault.put(path, value)`
 3. Default: private visibility (AES encrypted)
 4. `--public`: plaintext, discoverable by agents
-5. Sync to relay via transport layer
+5. `--engine lit`: shared visibility with Lit Protocol MPC encryption
+   - Requires `--allow-address <addr>` or `--min-score <n>` for access conditions
+   - Optional `--lit-network` (cayenne/manzano/habanero) and `--access-chain`
+   - Uses FeedbackRegistry address from config for reputation conditions
+6. Sync to relay via transport layer
 
 ### `orbitmem vault get <path>` / `vault ls [prefix]`
 1. Read from local vault
