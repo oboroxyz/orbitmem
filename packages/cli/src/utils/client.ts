@@ -1,5 +1,5 @@
-import type { EncryptionConfig } from "@orbitmem/sdk/types";
 import { createOrbitMem, getNetwork } from "@orbitmem/sdk";
+import type { EncryptionConfig } from "@orbitmem/sdk/types";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { base, baseSepolia } from "viem/chains";
@@ -17,11 +17,7 @@ export interface CreateClientOpts {
   litNetwork?: LitNetwork;
 }
 
-export async function createClient(
-  config: CliConfig,
-  privateKey: string,
-  opts?: CreateClientOpts,
-) {
+export async function createClient(config: CliConfig, privateKey: string, opts?: CreateClientOpts) {
   const network = getNetwork(config.network);
   const chain = CHAINS[config.network] ?? baseSepolia;
   const transport = http(network.rpcUrl);

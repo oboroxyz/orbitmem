@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
+
 import { ConnectButton } from "./components/ConnectButton";
 import { MemoEditor } from "./components/MemoEditor";
 import { MemoList } from "./components/MemoList";
@@ -47,10 +48,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white px-6 py-4 flex items-center justify-between">
-        <h1
-          className="text-xl font-bold cursor-pointer"
-          onClick={() => setView({ type: "list" })}
-        >
+        <h1 className="text-xl font-bold cursor-pointer" onClick={() => setView({ type: "list" })}>
           OrbitMem Memo
         </h1>
         <ConnectButton />

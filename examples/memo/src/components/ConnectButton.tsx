@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  Dialog,
-  DialogTrigger,
-  Heading,
-  Modal,
-  ModalOverlay,
-} from "react-aria-components";
+import { Button, Dialog, DialogTrigger, Heading, Modal, ModalOverlay } from "react-aria-components";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 export function ConnectButton() {
@@ -36,7 +29,10 @@ export function ConnectButton() {
       <Button className="px-3 py-1.5 border-2 transition-colors cursor-pointer hover:bg-gray-100">
         Connect Wallet
       </Button>
-      <ModalOverlay isDismissable className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+      <ModalOverlay
+        isDismissable
+        className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center"
+      >
         <Modal className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
           <Dialog className="outline-none">
             <Heading slot="title" className="text-lg font-semibold mb-4">

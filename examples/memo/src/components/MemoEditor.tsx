@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
 import type { Memo } from "../hooks/useOrbitMem";
 
 interface MemoEditorProps {
@@ -19,9 +20,7 @@ interface MemoEditorProps {
 export function MemoEditor({ memo, onSave, onBack }: MemoEditorProps) {
   const [title, setTitle] = useState(memo?.title ?? "");
   const [body, setBody] = useState(memo?.body ?? "");
-  const [visibility, setVisibility] = useState<"public" | "private">(
-    memo?.visibility ?? "public",
-  );
+  const [visibility, setVisibility] = useState<"public" | "private">(memo?.visibility ?? "public");
   const [saving, setSaving] = useState(false);
   const [preview, setPreview] = useState(false);
 

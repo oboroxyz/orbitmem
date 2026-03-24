@@ -27,12 +27,7 @@ export type OrbitAddress = string;
 export type ChainFamily = "passkey" | "evm" | "solana";
 
 /** EVM chain identifiers */
-export type EvmChain =
-  | "ethereum"
-  | "polygon"
-  | "optimism"
-  | "arbitrum"
-  | "base";
+export type EvmChain = "ethereum" | "polygon" | "optimism" | "arbitrum" | "base";
 
 /** Solana cluster identifiers */
 export type SolanaCluster = "mainnet-beta" | "devnet" | "testnet";
@@ -100,19 +95,9 @@ export interface IdentityConfig {
   sessionTTL?: number;
 }
 
-export type EvmWalletAdapter =
-  | "metamask"
-  | "walletconnect"
-  | "coinbase"
-  | "rabby"
-  | "injected";
+export type EvmWalletAdapter = "metamask" | "walletconnect" | "coinbase" | "rabby" | "injected";
 
-export type SolanaWalletAdapter =
-  | "phantom"
-  | "solflare"
-  | "backpack"
-  | "glow"
-  | "injected";
+export type SolanaWalletAdapter = "phantom" | "solflare" | "backpack" | "glow" | "injected";
 
 /** Result of a successful wallet connection */
 export interface WalletConnection {
@@ -211,10 +196,7 @@ export interface IIdentityLayer {
    * Create an ephemeral session key with scoped permissions.
    * The session key is derived from a wallet signature.
    */
-  createSessionKey(
-    permissions: SessionPermission[],
-    opts?: { ttl?: number }
-  ): Promise<SessionKey>;
+  createSessionKey(permissions: SessionPermission[], opts?: { ttl?: number }): Promise<SessionKey>;
 
   /**
    * Resume an existing session (e.g., after page reload).
@@ -240,9 +222,7 @@ export interface IIdentityLayer {
   /**
    * Subscribe to connection state changes.
    */
-  onConnectionChange(
-    callback: (connection: WalletConnection | null) => void
-  ): () => void;
+  onConnectionChange(callback: (connection: WalletConnection | null) => void): () => void;
 }
 
 // ────────────────────────────────────────────────────────────
@@ -317,7 +297,7 @@ export interface ITransportLayer {
       method?: "GET" | "POST" | "PUT" | "DELETE";
       headers?: Record<string, string>;
       body?: unknown;
-    }
+    },
   ): Promise<Response>;
 }
 
@@ -460,7 +440,7 @@ export interface IDataLayer {
       accessConditions?: LitAccessCondition[];
       /** AES shared key source (for visibility='shared' + engine='aes') */
       sharedKeySource?: AESKeySource;
-    }
+    },
   ): Promise<VaultEntry<T>>;
 
   /**
@@ -483,7 +463,7 @@ export interface IDataLayer {
       visibility?: Visibility;
       engine?: EncryptionEngine;
       accessConditions?: LitAccessCondition[];
-    }
+    },
   ): Promise<void>;
 
   /**
@@ -547,11 +527,7 @@ export interface IDataLayer {
    * Subscribe to real-time changes.
    */
   onChange(
-    callback: (event: {
-      type: "put" | "delete";
-      path: string;
-      entry?: VaultEntry;
-    }) => void
+    callback: (event: { type: "put" | "delete"; path: string; entry?: VaultEntry }) => void,
   ): () => void;
 
   /**
@@ -665,10 +641,7 @@ export interface LitBooleanOperator {
 }
 
 /** Unified Lit access condition */
-export type LitAccessCondition =
-  | LitEvmCondition
-  | LitSolanaCondition
-  | LitBooleanOperator;
+export type LitAccessCondition = LitEvmCondition | LitSolanaCondition | LitBooleanOperator;
 
 /** Lit-encrypted blob */
 export interface LitEncryptedData {
@@ -750,7 +723,7 @@ export interface IEncryptionLayer {
    */
   encrypt(
     data: Uint8Array | string,
-    opts: EncryptLitOptions | EncryptAESOptions
+    opts: EncryptLitOptions | EncryptAESOptions,
   ): Promise<EncryptedData>;
 
   /**
@@ -762,10 +735,7 @@ export interface IEncryptionLayer {
    * - `aes`: Derives the key locally and decrypts. The caller must provide
    *   the same key source used during encryption.
    */
-  decrypt(
-    encrypted: EncryptedData,
-    opts?: DecryptOptions
-  ): Promise<Uint8Array>;
+  decrypt(encrypted: EncryptedData, opts?: DecryptOptions): Promise<Uint8Array>;
 
   /**
    * Grant an agent address access to Lit-encrypted data.
@@ -780,16 +750,13 @@ export interface IEncryptionLayer {
       chain?: Chain;
       /** Time-limited access (unix timestamp) */
       expiresAt?: number;
-    }
+    },
   ): Promise<LitEncryptedData>;
 
   /**
    * Revoke an agent's access to Lit-encrypted data.
    */
-  revokeAccess(
-    encrypted: LitEncryptedData,
-    agentAddress: WalletAddress
-  ): Promise<LitEncryptedData>;
+  revokeAccess(encrypted: LitEncryptedData, agentAddress: WalletAddress): Promise<LitEncryptedData>;
 
   /**
    * Derive an AES-256 key from a wallet signature.
@@ -886,10 +853,7 @@ export interface IPersistenceLayer {
   /**
    * List all snapshots for the current wallet.
    */
-  listSnapshots(opts?: {
-    limit?: number;
-    offset?: number;
-  }): Promise<Snapshot[]>;
+  listSnapshots(opts?: { limit?: number; offset?: number }): Promise<Snapshot[]>;
 
   /**
    * Delete a snapshot (removes IPFS pin, Filecoin deal remains).
@@ -1006,14 +970,14 @@ export interface DataRegistration {
 
 /** Standard data quality/verification tags */
 export type DataTag =
-  | "verified"       // Data has been independently verified
-  | "kyc-backed"     // Owner has completed KYC
-  | "self-attested"  // Owner claims accuracy (no independent check)
+  | "verified" // Data has been independently verified
+  | "kyc-backed" // Owner has completed KYC
+  | "self-attested" // Owner claims accuracy (no independent check)
   | "machine-generated" // Data was produced by an automated process
-  | "human-curated"  // Data was manually entered/reviewed
+  | "human-curated" // Data was manually entered/reviewed
   | "time-sensitive" // Data has a short validity window
-  | "immutable"      // Data does not change after creation
-  | string;          // Custom tags allowed
+  | "immutable" // Data does not change after creation
+  | string; // Custom tags allowed
 
 /** Data Registration File (resolves from dataURI, similar to agent registration) */
 export interface DataRegistrationFile {
@@ -1145,7 +1109,7 @@ export interface IDiscoveryLayer {
    */
   updateDataRegistration(
     dataId: number,
-    updates: Partial<Pick<DataRegistration, "name" | "description" | "tags" | "active">>
+    updates: Partial<Pick<DataRegistration, "name" | "description" | "tags" | "active">>,
   ): Promise<DataRegistration>;
 
   /**
@@ -1192,7 +1156,12 @@ export interface IDiscoveryLayer {
     value: number;
     valueDecimals?: number;
     /** Quality dimension being rated */
-    qualityDimension?: "accuracy" | "completeness" | "freshness" | "schema-compliance" | "usefulness";
+    qualityDimension?:
+      | "accuracy"
+      | "completeness"
+      | "freshness"
+      | "schema-compliance"
+      | "usefulness";
     /** Primary tag */
     tag1?: string;
     /** Secondary tag */
@@ -1215,10 +1184,7 @@ export interface IDiscoveryLayer {
   /**
    * Check validation status.
    */
-  getValidationStatus(
-    agentId: number,
-    taskId: string
-  ): Promise<ValidationRequest | null>;
+  getValidationStatus(agentId: number, taskId: string): Promise<ValidationRequest | null>;
 
   // ── Lit Protocol Integration ──
 
@@ -1356,16 +1322,13 @@ export interface IOrbitMem {
    */
   encrypt(
     data: Uint8Array | string,
-    opts: EncryptLitOptions | EncryptAESOptions
+    opts: EncryptLitOptions | EncryptAESOptions,
   ): Promise<EncryptedData>;
 
   /**
    * Decrypt data (auto-detects engine).
    */
-  decrypt(
-    encrypted: EncryptedData,
-    opts?: DecryptOptions
-  ): Promise<Uint8Array>;
+  decrypt(encrypted: EncryptedData, opts?: DecryptOptions): Promise<Uint8Array>;
 
   /**
    * Destroy the client and release all resources.
@@ -1374,9 +1337,7 @@ export interface IOrbitMem {
 }
 
 /** Factory function signature */
-export declare function createOrbitMem(
-  config: OrbitMemConfig
-): Promise<IOrbitMem>;
+export declare function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>;
 
 // ────────────────────────────────────────────────────────────
 //  9. AGENT-SIDE TYPES — For OpenClaw / Framework Integration
@@ -1408,10 +1369,7 @@ export interface IOrbitMemAgentAdapter {
    * Get the quality score for a specific data source.
    * Agents should check this BEFORE consuming data.
    */
-  getDataScore(
-    vaultAddress: OrbitAddress,
-    path: string
-  ): Promise<DataScore>;
+  getDataScore(vaultAddress: OrbitAddress, path: string): Promise<DataScore>;
 
   /**
    * Submit feedback about consumed data quality (agent → data).
@@ -1421,7 +1379,12 @@ export interface IOrbitMemAgentAdapter {
     dataId: number;
     value: number;
     valueDecimals?: number;
-    qualityDimension?: "accuracy" | "completeness" | "freshness" | "schema-compliance" | "usefulness";
+    qualityDimension?:
+      | "accuracy"
+      | "completeness"
+      | "freshness"
+      | "schema-compliance"
+      | "usefulness";
     tag1?: string;
     tag2?: string;
     feedbackURI?: string;
@@ -1478,7 +1441,7 @@ export interface IOrbitMemAgentAdapter {
     opts?: {
       /** For AES: shared key provided by the user out-of-band */
       sharedKey?: Uint8Array;
-    }
+    },
   ): Promise<Uint8Array>;
 
   /**
@@ -1504,9 +1467,14 @@ export interface IOrbitMemAgentAdapter {
       /** Auto-submit quality feedback after execution */
       autoRate?: {
         value: number;
-        qualityDimension?: "accuracy" | "completeness" | "freshness" | "schema-compliance" | "usefulness";
+        qualityDimension?:
+          | "accuracy"
+          | "completeness"
+          | "freshness"
+          | "schema-compliance"
+          | "usefulness";
       };
-    }
+    },
   ): Promise<R>;
 }
 
@@ -1535,7 +1503,7 @@ export interface AgentAdapterConfig {
 
 /** Factory for agent adapter */
 export declare function createOrbitMemAgentAdapter(
-  config: AgentAdapterConfig
+  config: AgentAdapterConfig,
 ): IOrbitMemAgentAdapter;
 
 // ────────────────────────────────────────────────────────────
@@ -1560,11 +1528,11 @@ export type OrbitMemEvent =
 export interface IOrbitMemEventEmitter {
   on<E extends OrbitMemEvent["type"]>(
     event: E,
-    handler: (payload: Extract<OrbitMemEvent, { type: E }>) => void
+    handler: (payload: Extract<OrbitMemEvent, { type: E }>) => void,
   ): () => void;
 
   once<E extends OrbitMemEvent["type"]>(
     event: E,
-    handler: (payload: Extract<OrbitMemEvent, { type: E }>) => void
+    handler: (payload: Extract<OrbitMemEvent, { type: E }>) => void,
   ): () => void;
 }
