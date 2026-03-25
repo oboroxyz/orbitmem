@@ -41,6 +41,7 @@ Commands:
   vault store <path> <value> Store data in vault
   vault get <path>           Read data from vault
   vault ls [prefix]          List vault keys
+  vault update-access <path> Re-encrypt with new Lit access conditions
   vault price set <path> <amount>  Set per-read price (USDC)
   vault price get <path>           Show price for path
   vault price ls                   List all priced paths

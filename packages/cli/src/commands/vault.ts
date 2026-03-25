@@ -20,10 +20,12 @@ export async function vault(args: string[], flags: Record<string, string>): Prom
       return vaultGet(args.slice(1), flags);
     case "ls":
       return vaultLs(args.slice(1), flags);
+    case "update-access":
+      return vaultUpdateAccess(args.slice(1), flags);
     case "price":
       return vaultPrice(args.slice(1), flags);
     default:
-      error(`Unknown vault command: ${sub ?? "(none)"}. Use: store, get, ls, price`);
+      error(`Unknown vault command: ${sub ?? "(none)"}. Use: store, get, ls, update-access, price`);
   }
 }
 
@@ -105,6 +107,66 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
     } else {
       const engineLabel = useLit ? " [lit]" : "";
       process.stdout.write(`Stored "${path}" (${visibility}${engineLabel})\n`);
+    }
+  } finally {
+    await client.destroy();
+  }
+}
+
+async function vaultUpdateAccess(args: string[], flags: Record<string, string>): Promise<void> {
+  const [path] = args;
+  if (!path) error("Usage: orbitmem vault update-access <path> --allow-address <addr> | --min-score <n>");
+
+  const config = loadConfig();
+  if (flags.relay) config.relay = flags.relay;
+
+  const litNetwork = (flags["lit-network"] as LitNetwork) ?? "cayenne";
+  const client = await createClient(config, loadKey(), { litNetwork });
+
+  try {
+    const accessConditions: LitAccessCondition[] = [];
+    const chain = (flags["access-chain"] ?? config.chain ?? "base-sepolia") as EvmChain;
+
+    if (flags["allow-address"]) {
+      const condition: LitEvmCondition = {
+        conditionType: "evmBasic",
+        contractAddress: "" as EvmAddress,
+        standardContractType: "",
+        chain,
+        method: "",
+        parameters: [":userAddress"],
+        returnValueTest: { comparator: "=", value: flags["allow-address"] },
+      };
+      accessConditions.push(condition);
+    }
+    if (flags["min-score"]) {
+      const condition: LitEvmCondition = {
+        conditionType: "evmContract",
+        contractAddress: config.reputationAddress as EvmAddress,
+        standardContractType: "",
+        chain,
+        method: "getScore",
+        parameters: [":userAddress"],
+        returnValueTest: { comparator: ">=", value: flags["min-score"] },
+      };
+      accessConditions.push(condition);
+    }
+    if (accessConditions.length === 0) {
+      error("update-access requires --allow-address <addr> or --min-score <n>");
+    }
+
+    const vault = client.vault as typeof client.vault & {
+      updateAccess: (
+        path: string,
+        conditions: LitAccessCondition[],
+        opts?: { chain?: string },
+      ) => Promise<{ timestamp: number }>;
+    };
+    const entry = await vault.updateAccess(path, accessConditions, { chain });
+    if (flags.json !== undefined) {
+      output({ path, updated: true, timestamp: entry.timestamp }, true);
+    } else {
+      process.stdout.write(`Updated access for "${path}"\n`);
     }
   } finally {
     await client.destroy();
