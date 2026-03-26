@@ -30,4 +30,10 @@ describe("config", () => {
     expect(config.relay).toBe("https://orbitmem-relay.fly.dev");
     expect(config.chain).toBe("base-sepolia");
   });
+
+  test("saveConfig persists walletName", () => {
+    saveConfig({ walletName: "my-wallet" });
+    const loaded = loadConfig();
+    expect(loaded.walletName).toBe("my-wallet");
+  });
 });
