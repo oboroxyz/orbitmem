@@ -36,6 +36,11 @@
       "bun": "./src/contracts.ts",
       "import": "./dist/contracts.js"
     },
+    "./identity": {
+      "types": "./src/identity/index.ts",
+      "bun": "./src/identity/index.ts",
+      "import": "./dist/identity/index.js"
+    },
     "./types": {
       "types": "./src/types.ts",
       "bun": "./src/types.ts",
