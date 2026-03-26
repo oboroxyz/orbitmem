@@ -1,7 +1,7 @@
 import { createOrbitMem, getNetwork } from "@orbitmem/sdk";
+import { createOwsAdapter } from "@orbitmem/sdk/identity";
 import type { EncryptionConfig } from "@orbitmem/sdk/types";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import { base, baseSepolia } from "viem/chains";
 
 import type { CliConfig } from "../config.js";
@@ -17,14 +17,16 @@ export interface CreateClientOpts {
   litNetwork?: LitNetwork;
 }
 
-export async function createClient(config: CliConfig, privateKey: string, opts?: CreateClientOpts) {
+export async function createClient(config: CliConfig, opts?: CreateClientOpts) {
   const network = getNetwork(config.network);
   const chain = CHAINS[config.network] ?? baseSepolia;
   const transport = http(network.rpcUrl);
-  const account = privateKeyToAccount(privateKey as `0x${string}`);
+
+  const adapter = createOwsAdapter(config.walletName, `eip155:${chain.id}`);
+  const viemAccount = await adapter.toViemAccount();
 
   const publicClient = createPublicClient({ chain, transport });
-  const walletClient = createWalletClient({ chain, transport, account });
+  const walletClient = createWalletClient({ chain, transport, account: viemAccount });
 
   const encryption: EncryptionConfig = {
     defaultEngine: "aes",
@@ -36,7 +38,7 @@ export async function createClient(config: CliConfig, privateKey: string, opts?:
 
   const client = await createOrbitMem({
     network: config.network,
-    identity: { privateKey },
+    identity: { owsWallet: config.walletName },
     vault: { dbName: "orbitmem-cli" },
     encryption,
     persistence: {
