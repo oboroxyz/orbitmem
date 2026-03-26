@@ -2,31 +2,34 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import type { NetworkId } from "@orbitmem/sdk/contracts";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { createWallet } from "@open-wallet-standard/core";
 
-import { getConfigDir, loadConfig, saveConfig, saveKey } from "../config.js";
+import { getConfigDir, loadConfig, saveConfig } from "../config.js";
 import { output } from "../utils/output.js";
 
 export async function init(_args: string[], flags: Record<string, string>): Promise<void> {
   const configDir = getConfigDir();
-  const keyPath = join(configDir, "key.json");
+  const configPath = join(configDir, "config.json");
 
-  if (existsSync(keyPath) && flags.force === undefined) {
-    process.stderr.write(`Already initialized at ${configDir}. Use --force to reinitialize.\n`);
-    process.exit(1);
+  if (existsSync(configPath) && flags.force === undefined) {
+    const existing = loadConfig();
+    if (existing.walletName) {
+      process.stderr.write(
+        `Already initialized at ${configDir}. Use --force to reinitialize.\n`,
+      );
+      process.exit(1);
+    }
   }
 
-  const privateKey = generatePrivateKey();
-  const account = privateKeyToAccount(privateKey);
+  const walletName = flags.name ?? "orbitmem";
+  createWallet(walletName);
 
   const network = (flags.network ?? "base-sepolia") as NetworkId;
-
-  saveKey(privateKey);
-  saveConfig({ network });
+  saveConfig({ walletName, network });
 
   const config = loadConfig();
   const info = {
-    address: account.address,
+    wallet: walletName,
     configDir,
     network: config.network,
     relay: config.relay,
@@ -39,7 +42,7 @@ export async function init(_args: string[], flags: Record<string, string>): Prom
     output(info, true);
   } else {
     process.stdout.write(`\nOrbitMem initialized!\n\n`);
-    process.stdout.write(`  Address:           ${info.address}\n`);
+    process.stdout.write(`  Wallet:            ${info.wallet}\n`);
     process.stdout.write(`  Config:            ${info.configDir}\n`);
     process.stdout.write(`  Network:           ${info.network}\n`);
     process.stdout.write(`  Relay:             ${info.relay}\n`);
