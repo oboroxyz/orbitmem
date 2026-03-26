@@ -52,7 +52,7 @@ export async function createVault(
     setAuthSig: (authSig: LitAuthSig) => void;
     updateAccess: (
       path: VaultPath,
-      newConditions: import("../types.js").LitAccessCondition[],
+      newConditions: LitAccessCondition[],
       opts?: { chain?: string },
     ) => Promise<VaultEntry>;
   }
