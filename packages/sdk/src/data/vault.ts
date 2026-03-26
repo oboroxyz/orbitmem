@@ -11,7 +11,9 @@ import type {
   EncryptionEngine,
   IDataLayer,
   IEncryptionLayer,
+  LitAccessCondition,
   LitAuthSig,
+  LitEncryptedData,
   VaultEntry,
   VaultPath,
   Visibility,
@@ -48,6 +50,11 @@ export async function createVault(
     metaDb: any;
     setDefaultKey: (key: CryptoKey) => void;
     setAuthSig: (authSig: LitAuthSig) => void;
+    updateAccess: (
+      path: VaultPath,
+      newConditions: LitAccessCondition[],
+      opts?: { chain?: string },
+    ) => Promise<VaultEntry>;
   }
 > {
   const db = await orbitdb.open(config.dbName ?? "orbitmem-vault", { type: "nested" });
@@ -159,6 +166,11 @@ export async function createVault(
     metaDb: any;
     setDefaultKey: (key: CryptoKey) => void;
     setAuthSig: (authSig: LitAuthSig) => void;
+    updateAccess: (
+      path: VaultPath,
+      newConditions: LitAccessCondition[],
+      opts?: { chain?: string },
+    ) => Promise<VaultEntry>;
   } = {
     db,
     metaDb,
@@ -325,6 +337,39 @@ export async function createVault(
       const obj = JSON.parse(new TextDecoder().decode(data));
       await db.insert(obj);
       return { merged: Object.keys(obj).length, conflicts: 0 };
+    },
+
+    async updateAccess(path, newConditions, opts) {
+      if (!config.encryptionLayer) throw new Error("Encryption layer not configured for Lit");
+      if (!litAuthSig) throw new Error("No authSig — call setAuthSig() first");
+
+      const key = normalizePath(path);
+      const rawValue = await db.get(key);
+      if (rawValue === undefined) throw new Error(`Not found: ${key}`);
+
+      const meta = await metaDb.get(key);
+      if (meta?.encryptionEngine !== "lit")
+        throw new Error(`Entry "${key}" is not Lit-encrypted (engine: ${meta?.encryptionEngine})`);
+      if (!isSerializedEncrypted(rawValue)) throw new Error(`Entry "${key}" is not encrypted`);
+
+      // Decrypt with current conditions
+      const encrypted = deserializeEncrypted(rawValue) as LitEncryptedData;
+      const plaintext = await config.encryptionLayer.decrypt(encrypted, { authSig: litAuthSig });
+
+      // Re-encrypt with new conditions
+      const reEncrypted = await config.encryptionLayer.encrypt(plaintext, {
+        engine: "lit",
+        accessConditions: newConditions,
+        chain: opts?.chain as any,
+      });
+      const serialized = serializeEncrypted(reEncrypted);
+
+      // Write back
+      await db.put(key, serialized);
+      await metaDb.put(key, { ...meta, timestamp: Date.now() });
+
+      const value = JSON.parse(new TextDecoder().decode(plaintext));
+      return makeEntry(key, value, meta.visibility, true, "lit");
     },
 
     async close() {

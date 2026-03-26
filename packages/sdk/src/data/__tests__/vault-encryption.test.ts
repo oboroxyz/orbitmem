@@ -223,6 +223,111 @@ describe("Vault Encryption", () => {
     expect(entry!.value).toBe("decrypted-value");
   });
 
+  test("updateAccess: decrypt → re-encrypt → store with new conditions", async () => {
+    let lastEncryptConditions: any[] = [];
+    const mockEncryptionLayer = {
+      encrypt: async (_data: any, opts: any) => {
+        lastEncryptConditions = opts.accessConditions ?? [];
+        return {
+          engine: "lit" as const,
+          ciphertext: new TextEncoder().encode("encrypted"),
+          dataToEncryptHash: "hash-new",
+          accessControlConditions: opts.accessConditions ?? [],
+          chain: "base" as const,
+        };
+      },
+      decrypt: async (_encrypted: any, opts: any) => {
+        if (!opts?.authSig) throw new Error("No authSig");
+        return new TextEncoder().encode(JSON.stringify("secret-data"));
+      },
+    };
+
+    const vault = await createVault(createMockOrbitDB(), {
+      encryptionLayer: mockEncryptionLayer as any,
+    });
+
+    const authSig = {
+      sig: "0xsig",
+      derivedVia: "web3.eth.personal.sign",
+      signedMessage: "test",
+      address: "0xABCD",
+    };
+    vault.setAuthSig(authSig);
+
+    // Store with initial conditions
+    await vault.put("gated/data", "secret-data", {
+      visibility: "shared",
+      engine: "lit",
+      accessConditions: [
+        {
+          conditionType: "evmBasic",
+          contractAddress: "",
+          standardContractType: "",
+          chain: "base-sepolia",
+          method: "",
+          parameters: [":userAddress"],
+          returnValueTest: { comparator: "=", value: "0xOLD" },
+        },
+      ],
+    });
+
+    // Update access to a new address
+    const newConditions = [
+      {
+        conditionType: "evmBasic" as const,
+        contractAddress: "" as any,
+        standardContractType: "" as const,
+        chain: "base-sepolia" as const,
+        method: "",
+        parameters: [":userAddress"],
+        returnValueTest: { comparator: "=" as const, value: "0xNEW" },
+      },
+    ];
+
+    const entry = await vault.updateAccess("gated/data", newConditions);
+    expect(entry.value).toBe("secret-data");
+    expect(entry.encrypted).toBe(true);
+    expect(entry.encryptionEngine).toBe("lit");
+
+    // Verify the re-encrypt call received the new conditions
+    expect(lastEncryptConditions).toEqual(newConditions);
+  });
+
+  test("updateAccess: throws for non-Lit entry", async () => {
+    const aes = new AESEngine({ kdf: "hkdf-sha256" });
+    const key = await deriveTestKey(aes);
+    const mockEncLayer = {
+      encrypt: async () => ({}),
+      decrypt: async () => new Uint8Array(),
+    };
+    const vault = await createVault(createMockOrbitDB(), {
+      aesEngine: aes,
+      encryptionLayer: mockEncLayer as any,
+    });
+    vault.setDefaultKey(key);
+    vault.setAuthSig({ sig: "0x", derivedVia: "test", signedMessage: "t", address: "0x1" });
+
+    await vault.put("private/data", "hello", { visibility: "private" });
+    await expect(vault.updateAccess("private/data", [])).rejects.toThrow(/not Lit-encrypted/);
+  });
+
+  test("updateAccess: throws for missing path", async () => {
+    const vault = await createVault(createMockOrbitDB(), {
+      encryptionLayer: { encrypt: async () => ({}), decrypt: async () => new Uint8Array() } as any,
+    });
+    vault.setAuthSig({ sig: "0x", derivedVia: "test", signedMessage: "t", address: "0x1" });
+
+    await expect(vault.updateAccess("nonexistent", [])).rejects.toThrow(/Not found/);
+  });
+
+  test("updateAccess: throws without authSig", async () => {
+    const vault = await createVault(createMockOrbitDB(), {
+      encryptionLayer: { encrypt: async () => ({}), decrypt: async () => new Uint8Array() } as any,
+    });
+
+    await expect(vault.updateAccess("some/path", [])).rejects.toThrow(/authSig/);
+  });
+
   test("query auto-decrypts private entries", async () => {
     const aes = new AESEngine({ kdf: "hkdf-sha256" });
     const key = await deriveTestKey(aes);
