@@ -122,7 +122,7 @@ async function vaultUpdateAccess(args: string[], flags: Record<string, string>):
   if (flags.relay) config.relay = flags.relay;
 
   const litNetwork = (flags["lit-network"] as LitNetwork) ?? "cayenne";
-  const client = await createClient(config, loadKey(), { litNetwork });
+  const client = await createClient(config, { litNetwork });
 
   try {
     const accessConditions: LitAccessCondition[] = [];

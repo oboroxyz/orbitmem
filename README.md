@@ -105,7 +105,7 @@ forge fmt                # Format Solidity
 import { createOrbitMem } from '@orbitmem/sdk';
 
 const orbit = await createOrbitMem({
-  identity: { chains: ['evm'] },
+  identity: { owsWallet: 'orbitmem' },  // OpenWallet Standard
   encryption: { defaultEngine: 'aes' },
   discovery: {
     dataRegistry: '0xDATA_REGISTRY',
@@ -165,7 +165,7 @@ await client.rateData(datasets[0].dataId, 95);
 - **Contracts:** Solidity 0.8.28, Foundry, OpenZeppelin v5
 - **Relay Server:** Hono (on fly.io)
 - **Web:** React 19, TanStack Router, Tailwind CSS v4, wagmi + viem (on cloudflare worker)
-- **Identity:** EVM, Solana multi-chain
+- **Identity:** OpenWallet Standard (OWS) for CLI/SDK, wagmi for browser
 
 ## License
 

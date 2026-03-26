@@ -48,7 +48,7 @@ IPFS gives you content-addressable storage — but not a database. Three things 
 | Layer | Technology | Role |
 | :--- | :--- | :--- |
 | **Interface** | SDK + CLI (Skills) | One-call lifecycle for users and AI agents |
-| **Identity** | Porto Passkeys + EVM + Solana | Biometric-first auth, multi-chain wallet support |
+| **Identity** | OWS + Porto Passkeys + EVM + Solana | OWS wallet for CLI/SDK, biometric-first auth for browser |
 | **Encryption** | Lit Protocol + AES-256-GCM | Reputation-gated access control, per-path encryption |
 | **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation) | On-chain data discovery & quality scoring |
 | **Data Vault** | OrbitDB Nested | Local-first P2P storage with hierarchical JSON paths |
@@ -159,7 +159,7 @@ OrbitMem is built from scratch for this hackathon — SDK, relay, contracts, CLI
 OrbitMem gives users self-custodial, encrypted data with access control — no centralized server ever sees plaintext data.
 
 - **`@orbitmem/sdk`** — 6-layer composable SDK: identity, encryption (AES-256-GCM + Lit Protocol), P2P vault (OrbitDB Nested), transport (ERC-8128 signed requests), discovery, persistence
-- **`@orbitmem/cli`** — `npx orbitmem init` generates EVM identity, `vault store/get/ls` manages encrypted data, all commands support `--json` for machine consumption
+- **`@orbitmem/cli`** — `npx orbitmem init` creates an OWS wallet, `vault store/get/ls` manages encrypted data, all commands support `--json` for machine consumption
 - **Per-path visibility** — same vault tree with `public`, `shared` (reputation-gated via Lit), and `private` (AES encrypted) paths
 
 ### 3. AI & Robotics

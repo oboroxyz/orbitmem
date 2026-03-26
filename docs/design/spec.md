@@ -161,6 +161,21 @@ Sessions are scoped. An agent can only perform actions that the user explicitly 
 - `relay:fetch` — Make signed requests to the Relay Node
 - `storacha:archive` / `storacha:retrieve` — Archive or restore snapshots
 
+### OpenWallet Standard (CLI/SDK)
+
+For CLI and SDK (Node.js) contexts, OrbitMem uses the [OpenWallet Standard](https://github.com/nicolo-ribaudo/open-wallet-standard) (`@open-wallet-standard/core`) for key management. Private keys are generated, encrypted at rest, and stored by OWS in `~/.ows/wallets/` — OrbitMem never handles raw key material.
+
+```
+orbitmem init
+  → OWS createWallet("orbitmem")
+  → ~/.orbitmem/config.json = { walletName: "orbitmem", network: "base-sepolia" }
+  → Private key lives in ~/.ows/wallets/ (OWS-managed, encrypted at rest)
+```
+
+The SDK's `createOwsAdapter(walletName, chain)` wraps OWS into an `OwsAdapter` interface with `getAddress()`, `signMessage()`, and `toViemAccount()`. Chain selection uses CAIP-2 identifiers (e.g., `eip155:84532` for Base Sepolia).
+
+Browser-based apps (web dashboard, memo example) continue using wagmi/passkey — OWS scope is CLI and SDK only.
+
 ### Challenge Message Format
 
 ```
@@ -927,11 +942,16 @@ The `@orbitmem/cli` package provides a unified command-line interface for both u
 
 | Command | Description |
 |:--------|:------------|
-| `init` | Generate EVM identity, create `~/.orbitmem/` config |
+| `init` | Create OWS wallet, generate `~/.orbitmem/` config |
 | `status` | Show identity, config, and vault info |
 | `vault store <path> <value>` | Store data in encrypted P2P vault |
 | `vault get <path>` | Read data from vault |
 | `vault ls` | List vault keys |
+| `vault update-access <path>` | Re-encrypt with new Lit access conditions |
+| `vault price set <path> <amount>` | Set per-read price (USDC) |
+| `vault price get <path>` | Show price for path |
+| `vault price ls` | List all priced paths |
+| `vault price rm <path>` | Remove pricing (free access) |
 | `register` | Register data on-chain (ERC-8004) |
 | `discover` | Search for data sources by schema/tags/quality |
 | `snapshot` | Archive vault to Filecoin via Storacha |
@@ -941,10 +961,11 @@ The `@orbitmem/cli` package provides a unified command-line interface for both u
 
 ```
 ~/.orbitmem/
-├── config.json    # { relay, chain, registryAddress, reputationAddress }
-├── key.json       # Generated EVM private key
+├── config.json    # { walletName, network, relay, chain, registryAddress, reputationAddress }
 └── vault/         # Local OrbitDB data directory
 ```
+
+Private keys are managed by OpenWallet Standard in `~/.ows/wallets/` — OrbitMem config only stores the wallet name.
 
 ### Flags
 
@@ -972,7 +993,7 @@ npx orbitmem vault store travel/dietary vegan --engine lit --allow-address 0xAge
 
 ### Architecture
 
-The CLI uses plain `process.argv` parsing (no framework) for fast `npx` startup. Commands are lazy-loaded via dynamic `import()` and share a common pattern: `loadConfig()` → `createClient()` → execute → `client.destroy()`.
+The CLI uses plain `process.argv` parsing (no framework) for fast `npx` startup. Commands are lazy-loaded via dynamic `import()` and share a common pattern: `loadConfig()` → `createClient()` (OWS-backed) → execute → `client.destroy()`.
 
 ---
 
@@ -992,21 +1013,10 @@ import { createOrbitMem } from '@orbitmem/sdk';
 // Initialize
 const orbitmem = await createOrbitMem({
   identity: {
-    chains: ['passkey', 'evm', 'solana'],
-    passkey: {
-      rpId: 'app.orbitmem.xyz',
-      rpName: 'OrbitMem',
-      delegationChain: 'base',   // EIP-7702 delegation target
-      enableSessionKeys: true,    // EIP-7715 agent sessions
-    },
-    evm: {
-      chains: ['base', 'ethereum'],
-      adapters: ['metamask', 'walletconnect'],
-    },
-    solana: {
-      cluster: 'mainnet-beta',
-      adapters: ['phantom'],
-    },
+    owsWallet: 'orbitmem',  // OpenWallet Standard (CLI/SDK)
+    // Browser alternatives:
+    // chains: ['passkey', 'evm', 'solana'],
+    // passkey: { rpId: 'app.orbitmem.xyz', rpName: 'OrbitMem' },
   },
   encryption: {
     defaultEngine: 'lit',
