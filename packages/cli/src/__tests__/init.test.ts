@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 import { init } from "../commands/init.js";
-import { loadConfig, loadKey } from "../config.js";
+import { loadConfig } from "../config.js";
 
 const TEST_DIR = join(import.meta.dir, ".test-orbitmem-init");
 
@@ -18,20 +18,14 @@ describe("init", () => {
     delete process.env.ORBITMEM_HOME;
   });
 
-  test("creates config and key files", async () => {
-    await init([], {});
-    expect(existsSync(join(TEST_DIR, "config.json"))).toBe(true);
-    expect(existsSync(join(TEST_DIR, "key.json"))).toBe(true);
-  });
-
-  test("generated key is a valid hex private key", async () => {
-    await init([], {});
-    const key = loadKey();
-    expect(key).toMatch(/^0x[0-9a-f]{64}$/);
+  test("creates config file with walletName", async () => {
+    await init([], { name: "test-wallet" });
+    const config = loadConfig();
+    expect(config.walletName).toBe("test-wallet");
   });
 
   test("config has default network and relay", async () => {
-    await init([], {});
+    await init([], { name: "test-wallet" });
     const config = loadConfig();
     expect(config.network).toBe("base-sepolia");
     expect(config.relay).toBe("https://orbitmem-relay.fly.dev");
