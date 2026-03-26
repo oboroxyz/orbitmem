@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 
 import type { NetworkId } from "@orbitmem/sdk/contracts";
+import { createOwsAdapter } from "@orbitmem/sdk/identity";
 import { createWallet } from "@open-wallet-standard/core";
 
 import { getConfigDir, loadConfig, saveConfig } from "../config.js";
@@ -28,8 +29,13 @@ export async function init(_args: string[], flags: Record<string, string>): Prom
   saveConfig({ walletName, network });
 
   const config = loadConfig();
+  const caip2 = network === "base" ? "eip155:8453" : "eip155:84532";
+  const adapter = createOwsAdapter(walletName, caip2);
+  const address = await adapter.getAddress();
+
   const info = {
     wallet: walletName,
+    address,
     configDir,
     network: config.network,
     relay: config.relay,

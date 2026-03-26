@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeAll } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { createOwsAdapter } from "../ows-adapter.js";
 
 const WALLET = "orbitmem-test-adapter";
@@ -6,8 +6,20 @@ const CHAIN = "eip155:84532"; // Base Sepolia
 
 describe("ows-adapter", () => {
   beforeAll(async () => {
-    const { createWallet } = await import("@open-wallet-standard/core");
-    await createWallet(WALLET);
+    const { createWallet, listWallets } = await import("@open-wallet-standard/core");
+    const existing = listWallets().find((w) => w.name === WALLET);
+    if (!existing) {
+      createWallet(WALLET);
+    }
+  });
+
+  afterAll(async () => {
+    try {
+      const { deleteWallet } = await import("@open-wallet-standard/core");
+      deleteWallet(WALLET);
+    } catch {
+      // ignore
+    }
   });
 
   test("getAddress returns a valid EVM address", async () => {
