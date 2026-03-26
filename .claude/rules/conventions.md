@@ -11,3 +11,4 @@
 - **Solidity** uses `forge fmt` (4-space indent, 100-char line width), optimizer enabled with 200 runs
 - **Contract tests** in `test/*.t.sol` follow Foundry conventions (`test_` prefix, `setUp()`, `vm.expectRevert`)
 - **CI** runs 4 parallel jobs: lint (Vite+ / Oxlint + Oxfmt), test (bun test), contracts (forge build/test/fmt --check), typecheck (tsc --noEmit)
+- **Before every commit**, run `bun run format` to auto-format. CI will reject unformatted code (`bun run format:check`)
