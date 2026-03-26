@@ -1,4 +1,4 @@
-import { loadConfig, loadKey } from "../config.js";
+import { loadConfig } from "../config.js";
 import { createClient } from "../utils/client.js";
 import { error, output } from "../utils/output.js";
 
@@ -8,7 +8,7 @@ export async function discover(args: string[], flags: Record<string, string>): P
   if (!config.registryAddress)
     error("No registry address configured. Set registryAddress in ~/.orbitmem/config.json");
 
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const query: Record<string, unknown> = {};

@@ -1,21 +1,26 @@
-import { privateKeyToAccount } from "viem/accounts";
+import { createOwsAdapter } from "@orbitmem/sdk/identity";
 
-import { getConfigDir, loadConfig, loadKey } from "../config.js";
+import { getConfigDir, loadConfig } from "../config.js";
 import { error, output } from "../utils/output.js";
 
+const CAIP2: Record<string, string> = {
+  "base-sepolia": "eip155:84532",
+  base: "eip155:8453",
+};
+
 export async function status(_args: string[], flags: Record<string, string>): Promise<void> {
-  let key: string;
-  try {
-    key = loadKey();
-  } catch {
+  const config = loadConfig();
+  if (!config.walletName) {
     error("Not initialized. Run `orbitmem init` first.");
   }
 
-  const config = loadConfig();
-  const account = privateKeyToAccount(key as `0x${string}`);
+  const caip2 = CAIP2[config.network] ?? "eip155:84532";
+  const adapter = createOwsAdapter(config.walletName, caip2);
+  const address = await adapter.getAddress();
 
   const info = {
-    address: account.address,
+    wallet: config.walletName,
+    address,
     configDir: getConfigDir(),
     relay: flags.relay ?? config.relay,
     chain: flags.chain ?? config.chain,

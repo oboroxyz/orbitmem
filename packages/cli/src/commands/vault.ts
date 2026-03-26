@@ -7,7 +7,7 @@ import type {
   Visibility,
 } from "@orbitmem/sdk/types";
 
-import { loadConfig, loadKey } from "../config.js";
+import { loadConfig } from "../config.js";
 import { createClient, type LitNetwork } from "../utils/client.js";
 import { error, output } from "../utils/output.js";
 
@@ -39,7 +39,7 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
   const litNetwork = (flags["lit-network"] as LitNetwork) ?? "cayenne";
   const useLit = engine === "lit";
 
-  const client = await createClient(config, loadKey(), useLit ? { litNetwork } : undefined);
+  const client = await createClient(config, useLit ? { litNetwork } : undefined);
 
   try {
     let visibility: Visibility;
@@ -117,7 +117,7 @@ async function vaultGet(args: string[], flags: Record<string, string>): Promise<
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const entry = await client.vault.get(path);
@@ -133,7 +133,7 @@ async function vaultLs(args: string[], flags: Record<string, string>): Promise<v
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const keys = await client.vault.keys(prefix);
@@ -173,7 +173,7 @@ async function vaultPriceSet(args: string[], flags: Record<string, string>): Pro
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const currency = flags.currency ?? "USDC";
@@ -194,7 +194,7 @@ async function vaultPriceGet(args: string[], flags: Record<string, string>): Pro
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const price = await client.pricing.getPrice(path);
@@ -217,7 +217,7 @@ async function vaultPriceGet(args: string[], flags: Record<string, string>): Pro
 async function vaultPriceLs(flags: Record<string, string>): Promise<void> {
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const prices = await client.pricing.listPrices();
@@ -241,7 +241,7 @@ async function vaultPriceRm(args: string[], flags: Record<string, string>): Prom
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     await client.pricing.removePrice(path);

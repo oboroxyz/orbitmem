@@ -1,11 +1,11 @@
-import { loadConfig, loadKey } from "../config.js";
+import { loadConfig } from "../config.js";
 import { createClient } from "../utils/client.js";
 import { output } from "../utils/output.js";
 
 export async function snapshot(_args: string[], flags: Record<string, string>): Promise<void> {
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config, loadKey());
+  const client = await createClient(config);
 
   try {
     const result = await client.persistence.archive({
