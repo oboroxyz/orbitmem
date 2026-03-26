@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+
 import { createOwsAdapter } from "../ows-adapter.js";
 
 const WALLET = "orbitmem-test-adapter";

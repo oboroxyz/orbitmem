@@ -2,9 +2,7 @@ import type { SignatureAlgorithm, WalletAddress } from "../types.js";
 
 export interface OwsAdapter {
   getAddress(): Promise<WalletAddress>;
-  signMessage(
-    message: string,
-  ): Promise<{ signature: Uint8Array; algorithm: SignatureAlgorithm }>;
+  signMessage(message: string): Promise<{ signature: Uint8Array; algorithm: SignatureAlgorithm }>;
   toViemAccount(): Promise<import("viem").Account>;
 }
 
@@ -18,18 +16,14 @@ export function createOwsAdapter(walletName: string, chain: string): OwsAdapter 
 
   function hexToBytes(hex: string): Uint8Array {
     const clean = hex.replace(/^0x/, "");
-    return new Uint8Array(
-      clean.match(/.{2}/g)!.map((b) => Number.parseInt(b, 16)),
-    );
+    return new Uint8Array(clean.match(/.{2}/g)!.map((b) => Number.parseInt(b, 16)));
   }
 
   /**
    * Find the EVM address for the given CAIP-2 chain from WalletInfo.accounts.
    * Falls back to the first eip155 account if exact chain not found.
    */
-  function resolveAddress(
-    accounts: Array<{ chainId: string; address: string }>,
-  ): string {
+  function resolveAddress(accounts: Array<{ chainId: string; address: string }>): string {
     const exact = accounts.find((a) => a.chainId === chain);
     if (exact) return exact.address;
     const evm = accounts.find((a) => a.chainId.startsWith("eip155:"));

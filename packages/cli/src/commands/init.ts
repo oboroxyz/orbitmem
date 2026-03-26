@@ -1,9 +1,9 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 
+import { createWallet } from "@open-wallet-standard/core";
 import type { NetworkId } from "@orbitmem/sdk/contracts";
 import { createOwsAdapter } from "@orbitmem/sdk/identity";
-import { createWallet } from "@open-wallet-standard/core";
 
 import { getConfigDir, loadConfig, saveConfig, toCaip2 } from "../config.js";
 import { output } from "../utils/output.js";
@@ -15,9 +15,7 @@ export async function init(_args: string[], flags: Record<string, string>): Prom
   if (existsSync(configPath) && flags.force === undefined) {
     const existing = loadConfig();
     if (existing.walletName) {
-      process.stderr.write(
-        `Already initialized at ${configDir}. Use --force to reinitialize.\n`,
-      );
+      process.stderr.write(`Already initialized at ${configDir}. Use --force to reinitialize.\n`);
       process.exit(1);
     }
   }
