@@ -63,8 +63,10 @@ export type SignatureAlgorithm = "p256" | "ecdsa-secp256k1" | "ed25519";
 export interface IdentityConfig {
   /** Supported chain families (default: ["evm"]) */
   chains?: ChainFamily[];
-  /** EVM private key for CLI / server-side usage (hex string) */
-  privateKey?: string;
+  /** OWS wallet name for CLI / server-side usage */
+  owsWallet?: string;
+  /** CAIP-2 chain ID for OWS signing (e.g., "eip155:84532"). Defaults to "eip155:84532" (Base Sepolia) */
+  owsChain?: string;
   /** Porto Passkey config (optional if not using passkey auth) */
   passkey?: {
     /** WebAuthn Relying Party ID (e.g., "app.orbitmem.xyz") */
