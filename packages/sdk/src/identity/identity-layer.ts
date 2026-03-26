@@ -1,4 +1,5 @@
 import type {
+  ChainFamily,
   IdentityConfig,
   IIdentityLayer,
   SessionKey,
@@ -27,10 +28,13 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
         const adapter = createOwsAdapter(config.owsWallet, owsChain);
         const address = await adapter.getAddress();
 
+        const family: ChainFamily = owsChain.startsWith("solana:") ? "solana" : "evm";
+        const algorithm: SignatureAlgorithm = family === "solana" ? "ed25519" : "ecdsa-secp256k1";
+
         connection = {
           address,
-          family: "evm",
-          signatureAlgorithm: "ecdsa-secp256k1",
+          family,
+          signatureAlgorithm: algorithm,
           connectedAt: Date.now(),
         };
 

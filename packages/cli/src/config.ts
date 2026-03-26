@@ -42,6 +42,15 @@ export function loadConfig(): CliConfig {
   return { walletName: "", ...base, ...raw };
 }
 
+/** Derive CAIP-2 chain ID from network name */
+export function toCaip2(network: string): string {
+  const map: Record<string, string> = {
+    "base-sepolia": "eip155:84532",
+    base: "eip155:8453",
+  };
+  return map[network] ?? "eip155:84532";
+}
+
 export function saveConfig(config: Partial<CliConfig>): void {
   ensureDir();
   const configPath = join(getConfigDir(), "config.json");
