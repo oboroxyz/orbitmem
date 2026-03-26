@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { getNetwork, type NetworkId } from "@orbitmem/sdk/contracts";
 
 export interface CliConfig {
+  walletName: string;
   network: NetworkId;
   relay: string;
   chain: string;
@@ -12,7 +13,7 @@ export interface CliConfig {
   reputationAddress: string;
 }
 
-function defaultConfig(network?: NetworkId): CliConfig {
+function defaultConfig(network?: NetworkId): Omit<CliConfig, "walletName"> {
   const net = getNetwork(network);
   return {
     network: network ?? "base-sepolia",
@@ -35,11 +36,19 @@ function ensureDir(): void {
 export function loadConfig(): CliConfig {
   const configPath = join(getConfigDir(), "config.json");
   const defaults = defaultConfig();
-  if (!existsSync(configPath)) return { ...defaults };
+  if (!existsSync(configPath)) return { walletName: "", ...defaults };
   const raw = JSON.parse(readFileSync(configPath, "utf-8"));
-  // If saved config has a network, resolve defaults from that network
   const base = raw.network ? defaultConfig(raw.network) : defaults;
-  return { ...base, ...raw };
+  return { walletName: "", ...base, ...raw };
+}
+
+/** Derive CAIP-2 chain ID from network name */
+export function toCaip2(network: string): string {
+  const map: Record<string, string> = {
+    "base-sepolia": "eip155:84532",
+    base: "eip155:8453",
+  };
+  return map[network] ?? "eip155:84532";
 }
 
 export function saveConfig(config: Partial<CliConfig>): void {
@@ -48,19 +57,4 @@ export function saveConfig(config: Partial<CliConfig>): void {
   const existing = loadConfig();
   const merged = { ...existing, ...config };
   writeFileSync(configPath, `${JSON.stringify(merged, null, 2)}\n`);
-}
-
-export function loadKey(): string {
-  const keyPath = join(getConfigDir(), "key.json");
-  if (!existsSync(keyPath)) {
-    throw new Error("No key found. Run `orbitmem init` first.");
-  }
-  const raw = JSON.parse(readFileSync(keyPath, "utf-8"));
-  return raw.privateKey;
-}
-
-export function saveKey(privateKey: string): void {
-  ensureDir();
-  const keyPath = join(getConfigDir(), "key.json");
-  writeFileSync(keyPath, `${JSON.stringify({ privateKey }, null, 2)}\n`);
 }

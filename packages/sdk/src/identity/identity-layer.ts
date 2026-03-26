@@ -1,4 +1,5 @@
 import type {
+  ChainFamily,
   IdentityConfig,
   IIdentityLayer,
   SessionKey,
@@ -20,27 +21,25 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
 
   return {
     async connect(opts) {
-      // If a private key was provided (CLI / server usage), auto-connect via viem
-      if (config.privateKey && opts.method === "evm") {
-        const { privateKeyToAccount } = await import("viem/accounts");
-        const account = privateKeyToAccount(config.privateKey as `0x${string}`);
+      // If an OWS wallet was provided (CLI / server usage), auto-connect via OWS adapter
+      if (config.owsWallet) {
+        const { createOwsAdapter } = await import("./ows-adapter.js");
+        const owsChain = config.owsChain ?? "eip155:84532";
+        const adapter = createOwsAdapter(config.owsWallet, owsChain);
+        const address = await adapter.getAddress();
+
+        const family: ChainFamily = owsChain.startsWith("solana:") ? "solana" : "evm";
+        const algorithm: SignatureAlgorithm = family === "solana" ? "ed25519" : "ecdsa-secp256k1";
 
         connection = {
-          address: account.address,
-          family: "evm",
-          signatureAlgorithm: "ecdsa-secp256k1",
+          address,
+          family,
+          signatureAlgorithm: algorithm,
           connectedAt: Date.now(),
         };
 
         signFn = async (message: string) => {
-          const sig = await account.signMessage({ message });
-          const bytes = new Uint8Array(
-            sig
-              .slice(2)
-              .match(/.{2}/g)!
-              .map((b) => Number.parseInt(b, 16)),
-          );
-          return { signature: bytes, algorithm: "ecdsa-secp256k1" as const };
+          return adapter.signMessage(message);
         };
 
         for (const cb of listeners) cb(connection);
@@ -48,7 +47,7 @@ export function createIdentityLayer(config: IdentityConfig): IIdentityLayer {
       }
 
       throw new Error(
-        `connect(${opts.method}) requires a wallet adapter or privateKey config. ` +
+        `connect(${opts.method}) requires a wallet adapter or owsWallet config. ` +
           "Use setConnection() for testing or integrate a wallet provider.",
       );
     },

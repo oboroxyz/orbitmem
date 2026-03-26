@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
-import { loadConfig, loadKey, saveConfig, saveKey } from "../config.js";
+import { loadConfig, saveConfig } from "../config.js";
 
 const TEST_DIR = join(import.meta.dir, ".test-orbitmem");
 
@@ -31,13 +31,9 @@ describe("config", () => {
     expect(config.chain).toBe("base-sepolia");
   });
 
-  test("saveKey and loadKey roundtrip", () => {
-    saveKey("0xabc123");
-    const key = loadKey();
-    expect(key).toBe("0xabc123");
-  });
-
-  test("loadKey throws when no key exists", () => {
-    expect(() => loadKey()).toThrow("No key found");
+  test("saveConfig persists walletName", () => {
+    saveConfig({ walletName: "my-wallet" });
+    const loaded = loadConfig();
+    expect(loaded.walletName).toBe("my-wallet");
   });
 });
