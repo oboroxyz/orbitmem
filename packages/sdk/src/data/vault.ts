@@ -340,8 +340,7 @@ export async function createVault(
     },
 
     async updateAccess(path, newConditions, opts) {
-      if (!config.encryptionLayer)
-        throw new Error("Encryption layer not configured for Lit");
+      if (!config.encryptionLayer) throw new Error("Encryption layer not configured for Lit");
       if (!litAuthSig) throw new Error("No authSig — call setAuthSig() first");
 
       const key = normalizePath(path);
@@ -351,8 +350,7 @@ export async function createVault(
       const meta = await metaDb.get(key);
       if (meta?.encryptionEngine !== "lit")
         throw new Error(`Entry "${key}" is not Lit-encrypted (engine: ${meta?.encryptionEngine})`);
-      if (!isSerializedEncrypted(rawValue))
-        throw new Error(`Entry "${key}" is not encrypted`);
+      if (!isSerializedEncrypted(rawValue)) throw new Error(`Entry "${key}" is not encrypted`);
 
       // Decrypt with current conditions
       const encrypted = deserializeEncrypted(rawValue) as LitEncryptedData;

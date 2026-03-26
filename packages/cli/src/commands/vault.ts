@@ -115,7 +115,8 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
 
 async function vaultUpdateAccess(args: string[], flags: Record<string, string>): Promise<void> {
   const [path] = args;
-  if (!path) error("Usage: orbitmem vault update-access <path> --allow-address <addr> | --min-score <n>");
+  if (!path)
+    error("Usage: orbitmem vault update-access <path> --allow-address <addr> | --min-score <n>");
 
   const config = loadConfig();
   if (flags.relay) config.relay = flags.relay;
