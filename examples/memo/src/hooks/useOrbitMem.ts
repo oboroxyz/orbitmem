@@ -15,7 +15,8 @@ export interface Memo {
   updated: number;
 }
 
-export function useOrbitMem() {
+export function useOrbitMem(opts?: { skip?: boolean }) {
+  const skip = opts?.skip ?? false;
   const { address, isConnected, status } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const [memos, setMemos] = useState<Memo[]>([]);
@@ -99,6 +100,7 @@ export function useOrbitMem() {
 
   // Initialize relay session + derive vault key on connect
   useEffect(() => {
+    if (skip) return;
     if (status !== "connected" || !address) {
       vaultKeyRef.current = null;
       if (status === "disconnected") {
@@ -129,7 +131,7 @@ export function useOrbitMem() {
         setError(`Initialization failed: ${e}`);
       }
     })();
-  }, [status, address]);
+  }, [status, address, skip]);
 
   const saveMemo = useCallback(
     async (memo: {

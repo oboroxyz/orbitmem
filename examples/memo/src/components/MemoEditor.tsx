@@ -4,6 +4,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import type { Memo } from "../hooks/useOrbitMem";
+import { navigate } from "../hooks/useRouter";
 
 interface MemoEditorProps {
   memo?: Memo;
@@ -27,13 +28,16 @@ export function MemoEditor({ memo, onSave, onBack }: MemoEditorProps) {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const id = memo?.id ?? nanoid();
       await onSave({
-        id: memo?.id ?? nanoid(),
+        id,
         title,
         body,
         visibility,
         created: memo?.created,
       });
+      // Update URL to reflect saved memo before navigating back
+      if (!memo) navigate(`/edit/${id}`);
       onBack();
     } catch (e) {
       alert(`Save failed: ${e}`);

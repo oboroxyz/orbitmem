@@ -1,54 +1,47 @@
-import { useState } from "react";
 import { useAccount } from "wagmi";
 
 import { ConnectButton } from "./components/ConnectButton";
 import { MemoEditor } from "./components/MemoEditor";
 import { MemoList } from "./components/MemoList";
 import { PublicMemoView } from "./components/PublicMemoView";
-import { type Memo, useOrbitMem } from "./hooks/useOrbitMem";
-
-type View =
-  | { type: "list" }
-  | { type: "edit"; memo?: Memo }
-  | { type: "public"; address: string; memoId: string };
-
-function parseRoute(): View {
-  const path = window.location.pathname;
-  // Match /:address/:memoId (address starts with 0x)
-  const match = path.match(/^\/(0x[a-fA-F0-9]+)\/([a-zA-Z0-9_-]+)$/);
-  if (match) {
-    return { type: "public", address: match[1], memoId: match[2] };
-  }
-  return { type: "list" };
-}
+import { useOrbitMem } from "./hooks/useOrbitMem";
+import { useRouter } from "./hooks/useRouter";
 
 export function App() {
   const { isConnected } = useAccount();
-  const orbit = useOrbitMem();
-  const initialView = parseRoute();
-  const [view, setView] = useState<View>(initialView);
+  const { route, go } = useRouter();
+  const orbit = useOrbitMem({ skip: route.page === "public" });
 
   // Public memo view — no wallet required
-  if (view.type === "public") {
+  if (route.page === "public") {
     return (
       <div className="min-h-screen bg-gray-50">
         <header className="border-b bg-white px-6 py-4 flex items-center justify-between">
-          <a href="/" className="text-xl font-bold hover:text-blue-600 transition-colors">
+          <button
+            onClick={() => go("/")}
+            className="text-xl font-bold hover:text-blue-600 transition-colors"
+          >
             OrbitMem Memo
-          </a>
+          </button>
           <ConnectButton />
         </header>
         <main className="px-6 py-8">
-          <PublicMemoView address={view.address} memoId={view.memoId} />
+          <PublicMemoView address={route.address} memoId={route.memoId} />
         </main>
       </div>
     );
   }
 
+  const selectedMemo =
+    route.page === "edit" ? orbit.memos.find((m) => m.id === route.id) : undefined;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold cursor-pointer" onClick={() => setView({ type: "list" })}>
+        <h1
+          className="text-xl font-bold cursor-pointer"
+          onClick={() => go("/")}
+        >
           OrbitMem Memo
         </h1>
         <ConnectButton />
@@ -71,19 +64,19 @@ export function App() {
           </div>
         ) : orbit.loading ? (
           <p className="text-center py-12 text-gray-500">Loading memos...</p>
-        ) : view.type === "edit" ? (
+        ) : route.page === "new" || route.page === "edit" ? (
           <MemoEditor
-            memo={view.memo}
+            memo={selectedMemo}
             onSave={orbit.saveMemo}
-            onBack={() => setView({ type: "list" })}
+            onBack={() => go("/")}
           />
         ) : (
           <MemoList
             memos={orbit.memos}
             address={orbit.address!}
-            onSelect={(memo) => setView({ type: "edit", memo })}
+            onSelect={(memo) => go(`/edit/${memo.id}`)}
             onDelete={orbit.deleteMemo}
-            onNew={() => setView({ type: "edit" })}
+            onNew={() => go("/new")}
           />
         )}
       </main>

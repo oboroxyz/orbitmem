@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { navigate } from "../hooks/useRouter";
 import { readPublic } from "../lib/relay";
 
 interface PublicMemoViewProps {
@@ -49,9 +50,9 @@ export function PublicMemoView({ address, memoId }: PublicMemoViewProps) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 mb-4">{error}</p>
-        <a href="/" className="text-blue-600 hover:underline">
+        <button onClick={() => navigate("/")} className="text-blue-600 hover:underline">
           Go to OrbitMem Memo
-        </a>
+        </button>
       </div>
     );
   }

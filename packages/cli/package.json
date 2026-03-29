@@ -1,17 +1,32 @@
 {
   "name": "@orbitmem/cli",
   "version": "0.1.0",
-  "type": "module",
-  "main": "./dist/index.js",
+  "description": "CLI for OrbitMem — manage vaults, discover data, and interact with on-chain registries",
+  "keywords": [
+    "agents",
+    "ai",
+    "cli",
+    "data",
+    "orbitmem",
+    "vault",
+    "web3"
+  ],
+  "homepage": "https://github.com/oboroxyz/orbitmem/tree/main/packages/cli",
+  "license": "MIT",
+  "author": "Oboro Inc. <dev@oboro.xyz> (https://oboro.xyz)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oboroxyz/orbitmem",
+    "directory": "packages/cli"
+  },
   "bin": {
     "orbitmem": "./dist/index.js"
   },
   "files": [
     "dist"
   ],
-  "engines": {
-    "node": ">=18.0.0"
-  },
+  "type": "module",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target node --packages external",
     "test": "bun test",
@@ -21,13 +36,16 @@
   "dependencies": {
     "@hono/node-server": "^1.13.0",
     "@open-wallet-standard/core": "^1.1.0",
-    "@orbitmem/relay": "workspace:*",
-    "@orbitmem/sdk": "workspace:*",
+    "@orbitmem/relay": "^0.1.0",
+    "@orbitmem/sdk": "^0.1.0",
     "viem": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",
     "bun-types": "latest",
     "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

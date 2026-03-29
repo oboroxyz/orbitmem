@@ -1,29 +1,38 @@
 {
   "name": "@orbitmem/relay",
-  "version": "0.3.0",
+  "version": "0.1.0",
+  "description": "HTTP relay server for OrbitMem — authenticated vault access, data discovery, and snapshot archival",
   "type": "module",
+  "license": "MIT",
+  "author": "Oboro Inc. <dev@oboro.xyz> (https://oboro.xyz)",
+  "homepage": "https://github.com/oboroxyz/orbitmem/tree/main/packages/relay",
+  "keywords": ["ai", "agents", "relay", "vault", "data", "web3", "orbitmem"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oboroxyz/orbitmem",
+    "directory": "packages/relay"
+  },
   "main": "./dist/index.js",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "bun": "./src/index.ts",
       "import": "./dist/index.js",
-      "types": "./src/index.ts"
+      "types": "./dist/index.d.ts"
     },
     "./app": {
       "bun": "./src/app.ts",
       "import": "./dist/app.js",
-      "types": "./src/app.ts"
+      "types": "./dist/app.d.ts"
     },
     "./services": {
       "bun": "./src/services/index.ts",
       "import": "./dist/services/index.js",
-      "types": "./src/services/index.ts"
+      "types": "./dist/services/index.d.ts"
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "dev": "bun run --hot src/index.ts",
@@ -41,8 +50,8 @@
     "@libp2p/tcp": "^10.0.0",
     "@orbitdb/core": "^3.0.2",
     "@orbitdb/nested-db": "^2.0.4",
-    "@orbitmem/contracts": "workspace:*",
-    "@orbitmem/sdk": "workspace:*",
+    "@orbitmem/contracts": "^0.1.0",
+    "@orbitmem/sdk": "^0.1.0",
     "@slicekit/erc8128": "0.3.2",
     "@storacha/client": "^1.0.0",
     "blockstore-level": "^2.0.0",

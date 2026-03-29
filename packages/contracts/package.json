@@ -1,13 +1,18 @@
 {
   "name": "@orbitmem/contracts",
   "version": "0.1.0",
+  "description": "Solidity smart contracts for OrbitMem — on-chain data discovery and reputation (ERC-8004)",
   "type": "module",
   "license": "MIT",
+  "author": "Oboro Inc. <dev@oboro.xyz> (https://oboro.xyz)",
+  "homepage": "https://github.com/oboroxyz/orbitmem/tree/main/packages/contracts",
+  "keywords": ["solidity", "erc-8004", "data-registry", "reputation", "web3", "orbitmem"],
   "repository": {
     "type": "git",
     "url": "https://github.com/oboroxyz/orbitmem",
     "directory": "packages/contracts"
   },
+  "main": "./dist/index.js",
   "exports": {
     ".": {
       "bun": "./abi/index.ts",

@@ -1,48 +1,52 @@
 {
   "name": "@orbitmem/sdk",
-  "version": "0.3.0",
+  "version": "0.1.0",
+  "description": "Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust",
   "type": "module",
   "license": "MIT",
+  "author": "Oboro Inc. <dev@oboro.xyz> (https://oboro.xyz)",
+  "homepage": "https://github.com/oboroxyz/orbitmem/tree/main/packages/sdk",
+  "keywords": ["ai", "agents", "data", "encryption", "p2p", "vault", "identity", "web3", "orbitmem"],
   "repository": {
     "type": "git",
     "url": "https://github.com/oboroxyz/orbitmem",
     "directory": "packages/sdk"
   },
   "main": "./dist/index.js",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "bun": "./src/index.ts",
       "import": "./dist/index.js"
     },
     "./agent": {
-      "types": "./src/agent/index.ts",
+      "types": "./dist/agent/index.d.ts",
       "bun": "./src/agent/index.ts",
       "import": "./dist/agent/index.js"
     },
     "./discovery": {
-      "types": "./src/discovery/index.ts",
+      "types": "./dist/discovery/index.d.ts",
       "bun": "./src/discovery/index.ts",
       "import": "./dist/discovery/index.js"
     },
     "./transport": {
-      "types": "./src/transport/index.ts",
+      "types": "./dist/transport/index.d.ts",
       "bun": "./src/transport/index.ts",
       "import": "./dist/transport/index.js"
     },
     "./contracts": {
-      "types": "./src/contracts.ts",
+      "types": "./dist/contracts.d.ts",
       "bun": "./src/contracts.ts",
       "import": "./dist/contracts.js"
     },
     "./identity": {
-      "types": "./src/identity/index.ts",
+      "types": "./dist/identity/index.d.ts",
       "bun": "./src/identity/index.ts",
       "import": "./dist/identity/index.js"
     },
     "./types": {
-      "types": "./src/types.ts",
+      "types": "./dist/types.d.ts",
       "bun": "./src/types.ts",
       "import": "./dist/types.js"
     }
