@@ -8,7 +8,7 @@
 
 **`OrbitMem` is a decentralized data layer for the agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents.**
 
-Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 signed transport, and ERC-8004 for data discovery and reputation.
+Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 wallet auth, and ERC-8004 for data discovery and reputation.
 
 [📝 Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101) | [▶️ Video](https://youtube.com) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
 
@@ -16,7 +16,7 @@ Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 signed transport, an
 
 ## 🤔 Problem
 
-IPFS gives you content-addressable storage — but not a database. Three things are missing:
+IPFS is great as decentralized storage — but it falls short as a modern, developer-friendly database:
 
 - **No Encryption.** IPFS stores data in the open. There's no built-in per-record encryption or fine-grained access control. If you want to store private data on a P2P network, you're on your own.
 - **No Authentication.** There's no identity layer, no signed requests, no way to verify who is reading or writing data. Any node can access any content if it has the CID.
@@ -83,7 +83,7 @@ await vault.put('travel/passport', { number: 'XX123' }, {
 });
 ```
 
-### Signed Transport
+### Wallet Auth
 
 ERC-8128 signed HTTP with Passkey, EVM, or Solana wallets. Every request is cryptographically verified — no OAuth, no API keys.
 
@@ -113,7 +113,7 @@ High-quality data attracts more agent consumption → more feedback → higher s
 
 ## Example apps using OrbitMem
 
-### 1. Decentralized Memo App - [Source Code](../../examples/memo/)
+### 1. Decentralized Memo App - [Live Demo (IPFS)](https://ipfs.io/ipfs/bafybeiewn6m4l37cbcriwt7qh45sbue7r4thhiimnwnfiqxahba33i6k54/) | [Source Code](../../examples/memo/)
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 

@@ -22,7 +22,7 @@ const FEATURES: { title: string; description: string; tag: string; icon: IconTyp
     icon: PiSealCheck,
   },
   {
-    title: "Signed Transport",
+    title: "Wallet Auth",
     description:
       "Authenticate with Passkey, ETH Wallet, or Solana Wallet — then communicate over ERC-8128 signed HTTP. Every request is cryptographically verified across chains.",
     tag: "ERC-8128",
