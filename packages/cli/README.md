@@ -1,11 +1,11 @@
-# @orbitmem/cli
+# orbitmem
 
 CLI for OrbitMem — manage vaults, discover data, and interact with on-chain registries.
 
 ## Install
 
 ```bash
-npm install -g @orbitmem/cli
+npm install -g orbitmem
 ```
 
 ## Quick Start

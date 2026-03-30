@@ -150,7 +150,7 @@ await client.rateData(datasets[0].dataId, 95);
 | `@orbitmem/sdk` | Core SDK — identity, encryption, vault, transport, discovery, persistence, client |
 | `@orbitmem/relay` | Hono relay server — vault, discovery, snapshots, plan tiers, ERC-8128 auth |
 | `@orbitmem/contracts` | Solidity contracts — DataRegistry (ERC-721), FeedbackRegistry (reputation) |
-| `@orbitmem/cli` | CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots |
+| `orbitmem` | CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots |
 | `@orbitmem/web` | React dashboard — data explorer, vault manager, trust graph, wallet connection |
 
 ## Tech Stack

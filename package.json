@@ -6,7 +6,7 @@
     "apps/*"
   ],
   "bin": {
-    "orbitmem": "./packages/cli/src/index.ts"
+    "orbitmem": "./packages/cli/dist/index.js"
   },
   "scripts": {
     "build": "bun run --filter '*' build",
