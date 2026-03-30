@@ -1,6 +1,6 @@
 {
   "name": "@orbitmem/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI for OrbitMem — manage vaults, discover data, and interact with on-chain registries",
   "keywords": [
     "agents",
