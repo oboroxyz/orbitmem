@@ -10,7 +10,7 @@
 
 Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 wallet auth, and ERC-8004 for data discovery and reputation.
 
-[📝 Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101) | [▶️ Video](https://youtube.com) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
+[📝 Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101) | [▶️ Video](https://youtube.com/xxx) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
 
 ---
 
@@ -45,14 +45,14 @@ IPFS is great as decentralized storage — but it falls short as a modern, devel
 └─────────────────────────────────────────────────────────┘
 ```
 
-| Layer | Technology | Role |
-| :--- | :--- | :--- |
-| **Interface** | SDK + CLI (Skills) | One-call lifecycle for users and AI agents |
-| **Identity** | OWS + Porto Passkeys + EVM + Solana | OWS wallet for CLI/SDK, biometric-first auth for browser |
-| **Encryption** | Lit Protocol + AES-256-GCM | Reputation-gated access control, per-path encryption |
-| **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation) | On-chain data discovery & quality scoring |
-| **Data Vault** | OrbitDB Nested | Local-first P2P storage with hierarchical JSON paths |
-| **Persistence** | Storacha (Filecoin/IPFS) | Immutable archival snapshots, disaster recovery |
+| Layer                 | Technology                          | Role                                                     |
+| :-------------------- | :---------------------------------- | :------------------------------------------------------- |
+| **Interface**         | SDK + CLI (Skills)                  | One-call lifecycle for users and AI agents               |
+| **Identity**          | OWS + Porto Passkeys + EVM + Solana | OWS wallet for CLI/SDK, biometric-first auth for browser |
+| **Encryption**        | Lit Protocol + AES-256-GCM          | Reputation-gated access control, per-path encryption     |
+| **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation)     | On-chain data discovery & quality scoring                |
+| **Data Vault**        | OrbitDB Nested                      | Local-first P2P storage with hierarchical JSON paths     |
+| **Persistence**       | Storacha (Filecoin/IPFS)            | Immutable archival snapshots, disaster recovery          |
 
 ---
 
@@ -68,19 +68,27 @@ P2P data vaults with per-path visibility control. The same data tree can have di
 
 ```typescript
 // Public — any agent reads freely
-await vault.put('travel/dietary', 'vegan', { visibility: 'public' });
+await vault.put("travel/dietary", "vegan", { visibility: "public" });
 
 // Shared — only agents with reputation ≥ 80 can decrypt (Lit Protocol)
-await vault.put('travel/budget', { min: 3000, max: 5000 }, {
-  visibility: 'shared',
-  engine: 'lit',
-  accessConditions: [reputationCondition({ minScore: 80 })],
-});
+await vault.put(
+  "travel/budget",
+  { min: 3000, max: 5000 },
+  {
+    visibility: "shared",
+    engine: "lit",
+    accessConditions: [reputationCondition({ minScore: 80 })],
+  },
+);
 
 // Private — owner only, AES encrypted
-await vault.put('travel/passport', { number: 'XX123' }, {
-  visibility: 'private',
-});
+await vault.put(
+  "travel/passport",
+  { number: "XX123" },
+  {
+    visibility: "private",
+  },
+);
 ```
 
 ### Wallet Auth
@@ -113,7 +121,7 @@ High-quality data attracts more agent consumption → more feedback → higher s
 
 ## Example apps using OrbitMem
 
-### 1. Decentralized Memo App - [Live Demo (IPFS)](https://ipfs.io/ipfs/bafybeiewn6m4l37cbcriwt7qh45sbue7r4thhiimnwnfiqxahba33i6k54/) | [Source Code](../../examples/memo/)
+### 1. Decentralized Memo App - [Live Demo (IPFS)](https://ipfs.io/ipfs/bafybeig3h3rymklg2agcjp7jg2wwtsfcu2qox545fmgbclqttsazyfname/) | [Source Code](../../examples/memo/)
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
@@ -139,7 +147,7 @@ AI agents produce and consume data autonomously — research results, curated da
 
 1. **Agent publishes data** — an agent stores output in an OrbitMem vault and registers it on-chain via `npx orbitmem register`, minting an ERC-721 NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
 2. **Other agents discover** — `npx orbitmem discover --schema research --min-score 70` finds entries by tag and reputation score
-3. **Agents rate data** — consuming agents call `giveFeedback()` to score accuracy, freshness, completeness — building the producer's on-chain reputation
+3. **Agents rate data** — consuming agents call `npx orbitmem rate <dataId> <score> --tag accurate` to score accuracy, freshness, completeness — building the producer's on-chain reputation
 4. **Agents pay for data** — priced vault entries require MPP payment via HTTP 402 before access is granted
 
 ---
@@ -190,12 +198,12 @@ OrbitMem uses Filecoin (via Storacha) for verifiable archival storage and IPFS/O
 
 OrbitMem addresses **4 of 7** Filecoin challenge ideas:
 
-| Challenge Idea | OrbitMem Implementation |
-| :--- | :--- |
-| **Onchain Agent Registry** | `DataRegistry` (ERC-721) — `register(dataURI)` mints on-chain pointers to off-chain data |
+| Challenge Idea                           | OrbitMem Implementation                                                                        |
+| :--------------------------------------- | :--------------------------------------------------------------------------------------------- |
+| **Onchain Agent Registry**               | `DataRegistry` (ERC-721) — `register(dataURI)` mints on-chain pointers to off-chain data       |
 | **Agent Reputation & Portable Identity** | `FeedbackRegistry` — registry-agnostic reputation with per-tag scoring, bidirectional feedback |
-| **Agent-Generated Data Marketplace** | Client lifecycle: discover → evaluate → consume → rate |
-| **Agent Storage SDK** | `@orbitmem/sdk` + `@orbitmem/cli` — encrypted vault, Storacha persistence, `--json` output |
+| **Agent-Generated Data Marketplace**     | Client lifecycle: discover → evaluate → consume → rate                                         |
+| **Agent Storage SDK**                    | `@orbitmem/sdk` + `@orbitmem/cli` — encrypted vault, Storacha persistence, `--json` output     |
 
 **Storacha integration:** encrypted vault snapshots archived to Filecoin via `@storacha/client` — immutable backups, CID-based retrieval, verifiable storage deals. No plaintext exposure (encryption before upload).
 
@@ -238,6 +246,7 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 - **`npx orbitmem register`** — register data on-chain, minting a receipt NFT
 - **`npx orbitmem discover`** — search by schema, tags, and minimum quality scores
+- **`npx orbitmem rate`** — rate data quality on-chain with per-tag scoring
 - **Interface** — `discoverData` → `getDataScore` → `rateData` lifecycle, all scored on-chain
 
 ### 9. Funding the Commons
@@ -248,13 +257,13 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 ## What We've Built
 
-| Package | Description |
-| :--- | :--- |
-| **`@orbitmem/sdk`** | Composable SDK — identity, encryption, vault, transport, discovery, persistence + client |
-| **`@orbitmem/contracts`** | `ERC-8004` Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia |
-| **`@orbitmem/relay`** | Hono HTTP relay with `ERC-8128` auth + MPP payment middleware, vault/data/snapshot routes |
-| **`@orbitmem/web`** | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers) |
-| **`@orbitmem/cli`** | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` + `vault price` for pay-per-read pricing. `--json` output. Includes Claude Code skill for natural language operation |
+| Package                   | Description                                                                                                                                                                                          |
+| :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`@orbitmem/sdk`**       | Composable SDK — identity, encryption, vault, transport, discovery, persistence + client                                                                                                             |
+| **`@orbitmem/contracts`** | `ERC-8004` Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia                                                                                               |
+| **`@orbitmem/relay`**     | Hono HTTP relay with `ERC-8128` auth + MPP payment middleware, vault/data/snapshot routes                                                                                                            |
+| **`@orbitmem/web`**       | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers)                                                                                                    |
+| **`@orbitmem/cli`**       | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` + `vault price` for pay-per-read pricing. `--json` output. Includes Claude Code skill for natural language operation |
 
 ---
 

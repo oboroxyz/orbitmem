@@ -6,42 +6,44 @@ Hi, I'm building OrbitMem — a decentralized data layer for the agentic web, de
 
 ## Slide 2: Problem (~30s)
 
-IPFS is great as decentralized storage — but it falls short as a modern, developer-friendly database.
+IPFS is great as decentralized storage — but it's no modern usable database.
 
-No encryption — data is stored in the open. No authentication — anyone with a CID can access it. And no discovery — you can't search for data, and there's no quality signal.
+- _No encryption_ — data is stored in the open.
+- _No authentication_ — anyone know a CID can access it. - _No discovery_ — you can't search for data, and there's no quality signal.
 
 So I'm building OrbitMem to fill these gaps.
 
 ## Slide 3: Architecture (~30s)
 
-OrbitMem is built on OrbitDB — a local-first P2P database built on IPFS and libp2p.
+OrbitMem is built on top of OrbitDB — a local-first P2P database built on libp2p.
 
-On top of that, authentication uses Passkeys, EVM, and Solana wallets with ERC-8128 signed HTTP — no OAuth, no API keys. Encryption combines Lit Protocol for token-gated access with AES-256-GCM for per-record encryption. And discovery & trust is powered by ERC-8004. It was originally designed for agent reputation, but we applied it to data — on-chain scoring where every data entry is rated by humans and agents.
-
-Snapshots are archived to Filecoin via Storacha for long-term persistence.
+- Auth uses Passkeys and wallets via ERC-8128(eighty-one twenty-eight) signed HTTP — no token or API keys.
+- Encryption pairs Lit Protocol with AES.
+- Discovery runs on ERC-8004(eighty-oh-four) — on-chain scoring where data entries are rated by humans and agents. we applied this to data not only agent.
+- Persistence is handled by P2P replication across relays — no single point of failure. And snapshots are archived to Filecoin via Storacha.
 
 ## Slide 4: Key Features
 
 ## Slide 5: Demo — Decentralized Memo (~40s)
 
-To show how OrbitMem works as a decentralized database via SDK, here's a memo app. No server, no platform, no lock-in.
+OrbitMem works as a decentralized database via SDK, here's a demo memo app deployed on IPFS.
 
-Connect with a Passkey(Porto) or EVM wallet. Write memos in Markdown with live preview.
+--- _DEMO_1_ ---
 
-Each memo has per-path visibility control. Public memos are shareable and can be registered on-chain. Private memos are AES-256-GCM encrypted — the relay server and IPFS nodes only receive already-encrypted data, so only the owner can decrypt it.
-
-And you can snapshot your vault to Filecoin via Storacha for long-term backup.
+- Auth with wallet or passkey(porto)
+- Public memos are shareable.
+- Private memos are AES encrypted — the relay server and IPFS nodes only receive already-encrypted data, so only the owner can decrypt it.
 
 ## Slide 6: Demo — Agent Data Trust (~40s)
 
-OrbitMem is also designed for agent use cases. We provide a CLI and agent skills so AI agents can publish, discover, and rate data autonomously. You can integrate it into your own agents — whether it's OpenClaw, WorkFlow, or any autonomous system.
+OrbitMem is also designed for agents. We provide a CLI and Skills so agents can publish, discover, and rate data autonomously.
 
-Agent A stores research data and registers it on-chain — minting an ERC-721 receipt. Agent B discovers it by searching with schema and quality filters, then rates it with a score and tags like "accurate."
+--- _DEMO_2_ ---
 
-This creates a virtuous cycle — higher quality, higher visibility. Reputation-gated access via Lit Protocol means the best data producers earn more trust and reach.
+You can integrate it into your own agents — whether it's OpenClaw, WorkFlow, or any agents.
+
+Quality drives visibility. We also integrated Machine Payments Protocol by Tempo/Stpipe, so data can be bought and sold based on reputation. This drives a healthy data ecosystem.
 
 ## Slide 7: Closing + QR (~15s)
 
-That's OrbitMem — encrypted vaults, on-chain discovery, and verifiable data trust. All open source.
-
-Scan the QR codes to check it out. Thanks.
+That's it. Thanks.
