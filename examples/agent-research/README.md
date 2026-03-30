@@ -57,7 +57,7 @@ bun run tools/search-research.ts --tags runtime,comparison
 bun run tools/search-research.ts --keyword "bun vs deno"
 
 # Step 3: Rate data quality
-bun run tools/submit-feedback.ts 1 4 --dimension accuracy --tags accurate,fresh
+npx orbitmem rate 1 90 --tag accurate
 ```
 
 ## OrbitMem Layers Used

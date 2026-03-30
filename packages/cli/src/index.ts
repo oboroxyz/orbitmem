@@ -48,6 +48,7 @@ Commands:
   vault price rm <path>            Remove pricing (free)
   register <path>            Register data on-chain (ERC-8004)
   discover [query]           Search on-chain registries
+  rate <dataId> <score>      Rate data quality on-chain (ERC-8004)
   snapshot                   Persist vault to Storacha
   dev                        Start local relay server
 
@@ -56,6 +57,11 @@ Options:
   --chain <name>          Override chain
   --json                  Output as JSON
   --help                  Show this help
+
+Rate options:
+  --tag <tag>             Primary quality tag (e.g. accurate, fresh)
+  --tag2 <tag>            Secondary tag
+  --uri <uri>             Off-chain feedback URI
 
 Vault store options:
   --public                Store as public (unencrypted)
@@ -101,6 +107,11 @@ async function main(): Promise<void> {
     case "discover": {
       const { discover } = await import("./commands/discover.js");
       await discover(args, flags);
+      break;
+    }
+    case "rate": {
+      const { rate } = await import("./commands/rate.js");
+      await rate(args, flags);
       break;
     }
     case "snapshot": {

@@ -68,6 +68,7 @@ bun run cli vault get <path>  # Read data from vault
 bun run cli vault ls          # List vault keys
 bun run cli register          # Register data on-chain (ERC-8004)
 bun run cli discover          # Search data sources by schema/tags/quality
+bun run cli rate <id> <score> # Rate data quality on-chain (ERC-8004)
 bun run cli snapshot          # Archive vault to Filecoin via Storacha
 bun run cli dev               # Start local relay server
 bun run cli --help            # Show all commands

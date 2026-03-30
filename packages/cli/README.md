@@ -122,6 +122,15 @@ Search on-chain data registries.
 orbitmem discover json --tags public --min-quality 80
 ```
 
+### `rate`
+
+Rate data quality on-chain via FeedbackRegistry (ERC-8004).
+
+```bash
+orbitmem rate 1 90 --tag accurate
+orbitmem rate 1 85 --tag fresh --tag2 complete --json
+```
+
 ### `snapshot`
 
 Archive vault to Filecoin/IPFS via Storacha.
