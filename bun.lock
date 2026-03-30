@@ -122,6 +122,7 @@
         "viem": "^2.0.0",
       },
       "devDependencies": {
+        "@noble/curves": "^2.0.1",
         "@types/node": "^25.4.0",
         "bun-types": "latest",
         "typescript": "^5.5.0",
