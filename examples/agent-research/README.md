@@ -13,14 +13,11 @@ Agent C (reviewer)   →  Verify content → Record score in FeedbackRegistry
 ## Setup
 
 ```bash
-# 1. Install dependencies (from repo root)
-bun install
+# 1. Initialize OrbitMem (generates key + config)
+npx orbitmem init
 
-# 2. Initialize OrbitMem (generates key + config)
-bun run cli init
-
-# 3. Verify setup
-bun run cli status
+# 2. Verify setup
+npx orbitmem status
 ```
 
 ## Usage with Claude Code Skills
@@ -44,19 +41,19 @@ You: "Rate this data a 4"
 ## Usage with CLI (standalone)
 
 ```bash
-cd examples/agent-research
-
 # Step 1: Store data
-bun run tools/store-research.ts "bun-vs-deno-2026" \
-  "Bun 1.2 outperforms Deno 2.1 in bundling speed by 3x..." \
-  --tags runtime,comparison,2026 \
-  --visibility public
+npx orbitmem vault store research/bun-vs-deno \
+  '{"topic":"Bun vs Deno 2026","finding":"Bun 1.2 outperforms Deno 2.1 in bundling by 3x"}' \
+  --public
 
-# Step 2: Search for data
-bun run tools/search-research.ts --tags runtime,comparison
-bun run tools/search-research.ts --keyword "bun vs deno"
+# Step 2: Register on-chain
+npx orbitmem register research/bun-vs-deno
 
-# Step 3: Rate data quality
+# Step 3: Discover data
+npx orbitmem discover --tags runtime,comparison
+npx orbitmem discover --min-quality 70
+
+# Step 4: Rate data quality
 npx orbitmem rate 1 90 --tag accurate
 ```
 
@@ -80,11 +77,6 @@ npx orbitmem rate 1 90 --tag accurate
 └── orbitmem-rate/SKILL.md             # Rate data quality on-chain
 
 examples/agent-research/
-├── tools/                             # TS scripts (invoked by skills or directly)
-│   ├── shared.ts                      # Client bootstrap (reuses ~/.orbitmem config)
-│   ├── store-research.ts              # Vault put + DataRegistry register
-│   ├── search-research.ts             # Discovery findData query
-│   └── submit-feedback.ts             # FeedbackRegistry rateData
 ├── package.json
 └── README.md
 ```
