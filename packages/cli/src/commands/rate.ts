@@ -11,7 +11,8 @@ export async function rate(args: string[], flags: Record<string, string>): Promi
   const dataId = Number(args[0]);
   const score = Number(args[1]);
 
-  if (!Number.isInteger(dataId) || dataId < 0) error("Usage: orbitmem rate <dataId> <score> [--tag <tag>]");
+  if (!Number.isInteger(dataId) || dataId < 0)
+    error("Usage: orbitmem rate <dataId> <score> [--tag <tag>]");
   if (!Number.isFinite(score)) error("Score must be a number");
 
   const client = await createClient(config);
