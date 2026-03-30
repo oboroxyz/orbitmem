@@ -1,276 +1,527 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OrbitMem — PL_Genesis Hackathon</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
-  body { font-family: 'JetBrains Mono', system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-  h1, h2, h3, h4, h5, h6 { font-weight: 600; }
-  .text-xxs { font-size: 0.625rem; }
-  .btn { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.15s; }
-  .btn-outline { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.15s; }
-  @keyframes pulse-0 { 50% { opacity: 0; } }
-  .animate-pulse-0 { animation: pulse-0 3s ease-in-out infinite; }
-  /* --- slides-specific --- */
-  .slide { display: none; min-height: 100vh; }
-  .slide.active { display: flex; }
-  .progress-bar { transition: width 0.3s ease; }
-  .fade-in { animation: fadeIn 0.4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-</style>
-</head>
-<body class="bg-stone-50 text-stone-900 overflow-hidden select-none">
-
-<!-- Slide 1: Title -->
-<section class="slide active flex-col items-center justify-center text-center px-8" data-slide="1">
-  <div class="fade-in">
-    <h1 class="font-mono text-sm tracking-tight mb-8">
-      <pre>▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄   <br />██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██   <br />▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██ <span class="animate-pulse-0">██</span><br /></pre>
-    </h1>
-    <p class="text-2xl max-w-2xl mx-auto mb-24 text-stone-500">
-      Decentralized data layer for agentic web.
-    </p>
-    <div class="inline-flex bg-white px-6 py-2 rounded-full border border-stone-200 text-stone-500">PL_Genesis: Frontiers of Collaboration Hackathon</div>
-  </div>
-</section>
-
-<!-- Slide 2: Problem -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="2">
-  <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-semibold mb-4 text-center">Problem</h2>
-    <p class="text-2xl text-stone-500 text-center mb-14">IPFS is great as decentralized storage — but it falls short as a modern, developer-friendly database.</p>
-    <div class="grid grid-cols-3 gap-12 text-center">
-      <div class="space-y-4">
-        <div class="text-5xl">🔓</div>
-        <h3 class="text-xl font-semibold">No Encryption</h3>
-        <p class="text-base text-stone-500 leading-relaxed">IPFS stores data in the open. No built-in per-record encryption or fine-grained access control.</p>
-      </div>
-      <div class="space-y-4">
-        <div class="text-5xl">🚫</div>
-        <h3 class="text-xl font-semibold">No Authentication</h3>
-        <p class="text-base text-stone-500 leading-relaxed">No identity layer, no signed requests. Any node can access any content if it has the CID.</p>
-      </div>
-      <div class="space-y-4">
-        <div class="text-5xl">🔍</div>
-        <h3 class="text-xl font-semibold">No Discovery</h3>
-        <p class="text-base text-stone-500 leading-relaxed">No search, no quality signal. You need a CID to find anything — decentralized data is invisible.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Slide 3: OrbitMem Overview + Architecture -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="3">
-  <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-semibold mb-4 text-center">OrbitMem</h2>
-    <p class="text-2xl text-stone-500 text-center mb-12">A decentralized data layer for the agentic web — encrypted vaults, on-chain discovery, and verifiable data trust, designed for both humans and AI agents.</p>
-    <div class="w-full max-w-4xl mx-auto space-y-3 text-base">
-      <div class="bg-stone-900 text-stone-50 rounded-xl px-7 py-4 flex justify-between items-center">
-        <span class="font-semibold text-lg">Interface</span>
-        <span class="text-stone-400">SDK + CLI (Skills)</span>
-      </div>
-      <div class="grid grid-cols-3 gap-3">
-        <div class="bg-white border border-stone-200 rounded-xl px-5 py-4 text-center">
-          <div class="font-semibold text-stone-900 text-lg">Identity</div>
-          <div class="text-stone-500 text-sm mt-2">Passkeys + EVM + Solana</div>
-        </div>
-        <div class="bg-white border border-stone-200 rounded-xl px-5 py-4 text-center">
-          <div class="font-semibold text-stone-900 text-lg">Encryption</div>
-          <div class="text-stone-500 text-sm mt-2">Lit Protocol + AES-256-GCM</div>
-        </div>
-        <div class="bg-white border border-stone-200 rounded-xl px-5 py-4 text-center">
-          <div class="font-semibold text-stone-900 text-lg">Discovery & Trust</div>
-          <div class="text-stone-500 text-sm mt-2">ERC-8004 (ERC-721 + Reputation)</div>
-        </div>
-      </div>
-      <div class="bg-white border border-stone-200 rounded-xl px-7 py-4 flex justify-between items-center">
-        <span class="font-semibold text-stone-900 text-lg">Data Vault</span>
-        <span class="text-stone-500">OrbitDB Nested — local-first P2P storage</span>
-      </div>
-      <div class="bg-white border border-stone-200 rounded-xl px-7 py-4 flex justify-between items-center">
-        <span class="font-semibold text-stone-900 text-lg">Persistence</span>
-        <span class="text-stone-500">Storacha → Filecoin/IPFS</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Slide 4: Key Features -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="4">
-  <div class="fade-in w-full max-w-5xl">
-    <h2 class="text-4xl font-semibold mb-12 text-center">Key Features</h2>
-    <div class="grid gap-10 grid-cols-2 text-center">
-      <div class="space-y-4">
-        <div class="text-4xl">🌐</div>
-        <h3 class="text-xl font-semibold">Fully Decentralized</h3>
-        <p class="text-base text-stone-500 leading-relaxed">Built on IPFS and OrbitDB — no central servers, no single point of failure. Offline-first, censorship resistant.</p>
-      </div>
-      <div class="space-y-4">
-        <div class="text-4xl">🔒</div>
-        <h3 class="text-xl font-semibold">Encrypted Vaults</h3>
-        <p class="text-base text-stone-500 leading-relaxed">P2P data vaults with per-path visibility control. End-to-end encryption — only authorized parties can decrypt.</p>
-      </div>
-      <div class="space-y-4">
-        <div class="text-4xl">✅</div>
-        <h3 class="text-xl font-semibold">Discovery & Trust</h3>
-        <p class="text-base text-stone-500 leading-relaxed">On-chain data discovery and quality scoring via <span class="whitespace-nowrap bg-stone-200 px-2">ERC-8004</span>. Every data entry is rated by humans and agents.</p>
-      </div>
-      <div class="space-y-4">
-        <div class="text-4xl">✍️</div>
-        <h3 class="text-xl font-semibold">Wallet Auth</h3>
-        <p class="text-base text-stone-500 leading-relaxed"><span class="whitespace-nowrap bg-stone-200 px-2">ERC-8128</span> signed HTTP with Passkey, ETH or Solana Wallet. Every request is cryptographically verified across chains.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Slide 5: Demo — Memo App -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="5">
-  <div class="fade-in w-full max-w-5xl">
-    <div class="flex items-center justify-center gap-2 mb-4"><span class="bg-stone-900 text-stone-50 text-xs font-semibold px-3 py-1 rounded-full">SDK</span></div>
-    <h2 class="text-4xl font-semibold mb-3 text-center">Demo 1: Decentralized Memo</h2>
-    <p class="text-lg text-stone-500 text-center mb-10">OrbitMem as a decentralized database via SDK — no server, no platform, no lock-in.</p>
-    <div class="grid grid-cols-2 gap-10 items-start">
-      <div class="bg-stone-900 text-stone-50 rounded-xl p-6 text-sm leading-relaxed font-mono">
-        <div class="text-stone-500 mb-3">// Per-path visibility control</div>
-        <div><span class="text-stone-400">await</span> vault.put(<span class="text-emerald-400">'memo/hello'</span>, content, {</div>
-        <div class="pl-4">visibility: <span class="text-emerald-400">'public'</span></div>
-        <div>});</div>
-        <div class="mt-4"><span class="text-stone-400">await</span> vault.put(<span class="text-emerald-400">'memo/secret'</span>, content, {</div>
-        <div class="pl-4">visibility: <span class="text-emerald-400">'private'</span></div>
-        <div>});</div>
-        <div class="mt-4 text-stone-500">// Archive to Filecoin</div>
-        <div><span class="text-stone-400">await</span> persistence.snapshot();</div>
-      </div>
-      <div class="space-y-6">
-        <div>
-          <h3 class="font-semibold text-lg mb-3">Key Features</h3>
-          <ul class="space-y-2 text-base text-stone-700">
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Wallet connect (Passkey/Porto or EVM)</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Public memos — shareable, on-chain registered</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Private memos — AES-256-GCM encrypted</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Markdown editor with live preview</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Storacha backup to Filecoin</li>
-          </ul>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrbitMem — PL_Genesis Hackathon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+      body {
+        font-family:
+          "JetBrains Mono",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: 600;
+      }
+      .text-xxs {
+        font-size: 0.625rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        transition: background-color 0.15s;
+      }
+      .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        transition: background-color 0.15s;
+      }
+      @keyframes pulse-0 {
+        50% {
+          opacity: 0;
+        }
+      }
+      .animate-pulse-0 {
+        animation: pulse-0 3s ease-in-out infinite;
+      }
+      /* --- slides-specific --- */
+      .slide {
+        display: none;
+        min-height: 100vh;
+      }
+      .slide.active {
+        display: flex;
+      }
+      .progress-bar {
+        transition: width 0.3s ease;
+      }
+      .fade-in {
+        animation: fadeIn 0.4s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-stone-900 overflow-hidden select-none">
+    <!-- Slide 1: Title -->
+    <section
+      class="slide active flex-col items-center justify-center text-center px-8"
+      data-slide="1"
+    >
+      <div class="fade-in">
+        <h1 class="font-mono text-sm tracking-tight mb-8">
+          <pre>▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄   <br />██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██   <br />▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██ <span class="animate-pulse-0">██</span><br /></pre>
+        </h1>
+        <p class="text-2xl max-w-2xl mx-auto mb-24 text-stone-500">
+          Decentralized data layer for agentic web.
+        </p>
+        <div
+          class="inline-flex bg-white px-6 py-2 rounded-full border border-stone-200 text-stone-500"
+        >
+          PL_Genesis: Frontiers of Collaboration Hackathon
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- Slide 6: Demo — Agent Research -->
-<section class="slide flex-col items-center justify-center px-16" data-slide="6">
-  <div class="fade-in w-full max-w-5xl">
-    <div class="flex items-center justify-center gap-2 mb-4"><span class="bg-stone-900 text-stone-50 text-xs font-semibold px-3 py-1 rounded-full">CLI</span><span class="bg-stone-900 text-stone-50 text-xs font-semibold px-3 py-1 rounded-full">Skills</span></div>
-    <h2 class="text-4xl font-semibold mb-3 text-center">Demo 2: Agent Research & Data Trust</h2>
-    <p class="text-lg text-stone-500 text-center mb-10">CLI and agent skills for autonomous data publishing, discovery, and rating.</p>
-    <div class="grid grid-cols-2 gap-10 items-start">
-      <div class="bg-stone-900 text-stone-50 rounded-xl p-6 text-sm leading-relaxed font-mono">
-        <div class="text-stone-500 mb-3"># Agent A — publish & register</div>
-        <div>$ npx orbitmem vault store \</div>
-        <div class="pl-4"><span class="text-emerald-400">research/q1</span> <span class="text-emerald-400">'{"topic":"AI"}'</span></div>
-        <div>$ npx orbitmem register</div>
-        <div class="mt-4 text-stone-500"># Agent B — discover & rate</div>
-        <div>$ npx orbitmem discover \</div>
-        <div class="pl-4">--schema <span class="text-emerald-400">research</span> --min-score <span class="text-emerald-400">70</span></div>
-        <div class="mt-4 text-stone-500">// Rate via SDK</div>
-        <div><span class="text-stone-400">await</span> client.rateData(tokenId, {</div>
-        <div class="pl-4">score: <span class="text-emerald-400">90</span>, tag: <span class="text-emerald-400">'accurate'</span></div>
-        <div>});</div>
-      </div>
-      <div class="space-y-6">
-        <div>
-          <h3 class="font-semibold text-lg mb-3">Key Features</h3>
-          <ul class="space-y-2 text-base text-stone-700">
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Register data on-chain — mint ERC-721 receipt</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Discover by schema, tags, quality score</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Rate data — per-tag reputation scoring</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Reputation-gated access via Lit Protocol</li>
-            <li class="flex items-start gap-2"><span class="text-stone-400 mt-0.5">&#9656;</span>Virtuous cycle — quality &uarr; visibility &uarr;</li>
-          </ul>
+    <!-- Slide 2: Problem -->
+    <section class="slide flex-col items-center justify-center px-16" data-slide="2">
+      <div class="fade-in w-full max-w-5xl">
+        <h2 class="text-4xl font-semibold mb-4 text-center">Problem</h2>
+        <p class="text-2xl text-stone-500 text-center mb-14">
+          IPFS is great as decentralized storage — but it falls short as a modern,
+          developer-friendly database.
+        </p>
+        <div class="grid grid-cols-3 gap-12 text-center">
+          <div class="space-y-4">
+            <div class="text-5xl">🔓</div>
+            <h3 class="text-xl font-semibold">No Encryption</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              IPFS stores data in the open. No built-in per-record encryption or fine-grained access
+              control.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div class="text-5xl">🚫</div>
+            <h3 class="text-xl font-semibold">No Authentication</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              No identity layer, no signed requests. Any node can access any content if it has the
+              CID.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div class="text-5xl">🔍</div>
+            <h3 class="text-xl font-semibold">No Discovery</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              No search, no quality signal. You need a CID to find anything — decentralized data is
+              invisible.
+            </p>
+          </div>
         </div>
       </div>
+    </section>
+
+    <!-- Slide 3: OrbitMem Overview + Architecture -->
+    <section class="slide flex-col items-center justify-center px-16" data-slide="3">
+      <div class="fade-in w-full max-w-5xl">
+        <h2 class="text-4xl font-semibold mb-4 text-center">OrbitMem</h2>
+        <p class="text-2xl text-stone-500 text-center mb-12">
+          A decentralized data layer for the agentic web — encrypted vaults, on-chain discovery, and
+          verifiable data trust, designed for both humans and AI agents.
+        </p>
+        <div class="w-full max-w-4xl mx-auto space-y-3 text-base">
+          <div
+            class="bg-stone-900 text-stone-50 rounded-xl px-7 py-4 flex justify-between items-center"
+          >
+            <span class="font-semibold text-lg">Interface</span>
+            <span class="text-stone-400">SDK + CLI (Skills)</span>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="bg-white border border-stone-200 rounded-xl px-5 py-4 text-center">
+              <div class="font-semibold text-stone-900 text-lg">Identity</div>
+              <div class="text-stone-500 text-sm mt-2">ERC-8128: Signed request (EOA, Passkey)</div>
+              <div class="text-stone-500 text-sm mt-2">
+                OWS (Open Wallet Standard) for agents wallet
+              </div>
+            </div>
+            <div class="bg-white border border-stone-200 rounded-xl px-5 py-4 text-center">
+              <div class="font-semibold text-stone-900 text-lg">Encryption</div>
+              <div class="text-stone-500 text-sm mt-2">Lit Protocol + AES-256-GCM</div>
+            </div>
+            <div class="bg-white border border-stone-200 rounded-xl px-5 py-4 text-center">
+              <div class="font-semibold text-stone-900 text-lg">Discovery & Trust</div>
+              <div class="text-stone-500 text-sm mt-2">
+                ERC-8004 for data<br />(ERC-721 + Reputation)
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-white border border-stone-200 rounded-xl px-7 py-4 flex justify-between items-center"
+          >
+            <span class="font-semibold text-stone-900 text-lg">Data Vault</span>
+            <span class="text-stone-500">OrbitDB Nested — local-first P2P storage</span>
+          </div>
+          <div
+            class="bg-white border border-stone-200 rounded-xl px-7 py-4 flex justify-between items-center"
+          >
+            <span class="font-semibold text-stone-900 text-lg">Persistence</span>
+            <span class="text-stone-500">P2P replication via Relay + Snapshots via Storacha</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Key Features -->
+    <section class="slide flex-col items-center justify-center px-16" data-slide="4">
+      <div class="fade-in w-full max-w-5xl">
+        <h2 class="text-4xl font-semibold mb-12 text-center">Key Features</h2>
+        <div class="grid gap-10 grid-cols-2 text-center">
+          <div class="space-y-4">
+            <div class="text-4xl">🌐</div>
+            <h3 class="text-xl font-semibold">Fully Decentralized</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              Built on IPFS and OrbitDB — no central servers, no single point of failure.
+              Offline-first, censorship resistant.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div class="text-4xl">🔒</div>
+            <h3 class="text-xl font-semibold">Encrypted Vaults</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              P2P data vaults with per-path visibility control. End-to-end encryption — only
+              authorized parties can decrypt.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div class="text-4xl">✅</div>
+            <h3 class="text-xl font-semibold">Discovery & Trust</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              On-chain data discovery and quality scoring via
+              <span class="whitespace-nowrap bg-stone-200 px-2">ERC-8004</span>. Every data entry is
+              rated by humans and agents.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div class="text-4xl">✍️</div>
+            <h3 class="text-xl font-semibold">Wallet Auth</h3>
+            <p class="text-base text-stone-500 leading-relaxed">
+              <span class="whitespace-nowrap bg-stone-200 px-2">ERC-8128</span> signed HTTP with
+              Passkey, ETH or Solana Wallet. Every request is cryptographically verified across
+              chains.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: Demo — Memo App -->
+    <section class="slide flex-col items-center justify-center px-16" data-slide="5">
+      <div class="fade-in w-full max-w-5xl">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <span class="bg-stone-900 text-stone-50 text font-semibold px-3 py-1 rounded-full"
+            >SDK</span
+          >
+        </div>
+        <h2 class="text-4xl font-semibold mb-3 text-center">Demo 1: Decentralized Memo</h2>
+        <p class="text-lg text-stone-500 text-center mb-10">
+          OrbitMem as a decentralized database via SDK — no server, no platform, no lock-in.
+        </p>
+        <div class="grid grid-cols-2 gap-10 items-start">
+          <div class="bg-stone-900 text-stone-50 rounded-xl p-6 text-sm leading-relaxed font-mono">
+            <div class="text-stone-500 mb-3">// Per-path visibility control</div>
+            <div>
+              <span class="text-stone-400">await</span> vault.put(<span class="text-emerald-400"
+                >'memo/hello'</span
+              >, content, {
+            </div>
+            <div class="pl-4">visibility: <span class="text-emerald-400">'public'</span></div>
+            <div>});</div>
+            <div class="mt-4">
+              <span class="text-stone-400">await</span> vault.put(<span class="text-emerald-400"
+                >'memo/secret'</span
+              >, content, {
+            </div>
+            <div class="pl-4">visibility: <span class="text-emerald-400">'private'</span></div>
+            <div>});</div>
+            <div class="mt-4 text-stone-500">// Sync with relay</div>
+            <div><span class="text-stone-400">await</span> transport.sync();</div>
+          </div>
+          <div class="space-y-6">
+            <div>
+              <h3 class="font-semibold text-lg mb-3">Key Features</h3>
+              <ul class="space-y-2 text-base text-stone-700">
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Wallet connect — Passkey(Porto)
+                  or EVM
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Public memos — shareable
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Private memos — AES-256-GCM
+                  encrypted
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Markdown editor with live
+                  preview
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>P2P sync via relay
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: Demo — Agent Research -->
+    <section class="slide flex-col items-center justify-center px-16" data-slide="6">
+      <div class="fade-in w-full max-w-5xl">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <span class="bg-stone-900 text-stone-50 font-semibold px-3 py-1 rounded-full">CLI</span
+          ><span class="bg-stone-900 text-stone-50 font-semibold px-3 py-1 rounded-full"
+            >Skills</span
+          >
+        </div>
+        <h2 class="text-4xl font-semibold mb-3 text-center">Demo 2: Agent Research & Data Trust</h2>
+        <p class="text-lg text-stone-500 text-center mb-10">
+          CLI and agent skills for autonomous data publishing, discovery, and rating.
+        </p>
+        <div class="grid grid-cols-2 gap-10 items-start">
+          <div class="bg-stone-900 text-stone-50 rounded-xl p-6 text-sm leading-relaxed font-mono">
+            <div class="text-stone-500 mb-3"># Agent A — publish & register</div>
+            <div>$ npx orbitmem vault store \</div>
+            <div class="pl-4">
+              <span class="text-emerald-400">research/q1</span>
+              <span class="text-emerald-400">'{"topic":"AI"}'</span>
+            </div>
+            <div>$ npx orbitmem register</div>
+            <div class="mt-4 text-stone-500"># Agent B — discover & rate</div>
+            <div>$ npx orbitmem discover \</div>
+            <div class="pl-4">
+              --schema <span class="text-emerald-400">research</span> --min-score
+              <span class="text-emerald-400">70</span>
+            </div>
+            <div class="mt-4 text-stone-500"># Rate data quality</div>
+            <div>
+              $ npx orbitmem rate <span class="text-emerald-400">1</span>
+              <span class="text-emerald-400">90</span> \
+            </div>
+            <div class="pl-4">--tag <span class="text-emerald-400">accurate</span></div>
+          </div>
+          <div class="space-y-6">
+            <div>
+              <h3 class="font-semibold text-lg mb-3">Key Features</h3>
+              <ul class="space-y-2 text-base text-stone-700">
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>OWS(Open Wallet Standard) for
+                  agents wallet
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>ERC-8004: Register data on-chain
+                  — mint ERC-721
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>ERC-8004: Discover by schema,
+                  tags, quality score
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>ERC-8004: Rate data — per-tag
+                  reputation scoring
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Reputation-gated access via Lit
+                  Protocol
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Pay-per-read via MPP (x402)
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-stone-400 mt-0.5">&#9656;</span>Virtuous cycle — quality &uarr;
+                  visibility &uarr;
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Closing -->
+    <section class="slide flex-col items-center justify-center text-center px-8" data-slide="7">
+      <div class="fade-in">
+        <h1 class="font-mono text-sm tracking-tight mb-8">
+          <pre>▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄   <br />██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██   <br />▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██ <span class="animate-pulse-0">██</span><br /></pre>
+        </h1>
+        <p class="text-xl text-stone-500 mb-10">Decentralized data layer for agentic web.</p>
+        <div class="flex items-center justify-center gap-8">
+          <a
+            href="https://youtube.com"
+            class="flex flex-col items-center gap-2 group"
+            target="_blank"
+          >
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=https://youtube.com"
+              alt="Video QR"
+              class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors"
+              width="128"
+              height="128"
+            />
+            <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors"
+              >▶️ Video</span
+            >
+          </a>
+          <a
+            href="https://github.com/oboroxyz/orbitmem"
+            class="flex flex-col items-center gap-2 group"
+            target="_blank"
+          >
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=https://github.com/oboroxyz/orbitmem"
+              alt="GitHub QR"
+              class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors"
+              width="128"
+              height="128"
+            />
+            <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors"
+              >&lt;&sol;&gt; Source</span
+            >
+          </a>
+          <a
+            href="https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101"
+            class="flex flex-col items-center gap-2 group"
+            target="_blank"
+          >
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101"
+              alt="Submission QR"
+              class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors"
+              width="128"
+              height="128"
+            />
+            <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors"
+              >📝 Submission</span
+            >
+          </a>
+          <a
+            href="https://orbitmem.0x7.sh"
+            class="flex flex-col items-center gap-2 group"
+            target="_blank"
+          >
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=https://orbitmem.0x7.sh"
+              alt="Website QR"
+              class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors"
+              width="128"
+              height="128"
+            />
+            <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors"
+              >🌐 Website</span
+            >
+          </a>
+          <a
+            href="https://ipfs.io/ipfs/bafybeig3h3rymklg2agcjp7jg2wwtsfcu2qox545fmgbclqttsazyfname/"
+            class="flex flex-col items-center gap-2 group"
+            target="_blank"
+          >
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=https://ipfs.io/ipfs/bafybeig3h3rymklg2agcjp7jg2wwtsfcu2qox545fmgbclqttsazyfname/"
+              alt="Video QR"
+              class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors"
+              width="128"
+              height="128"
+            />
+            <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors"
+              >📋 Demo1: dMemo</span
+            >
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress Bar -->
+    <div class="fixed bottom-0 left-0 w-full h-1 bg-stone-200">
+      <div class="progress-bar h-full bg-stone-900" id="progress" style="width: 10%"></div>
     </div>
-  </div>
-</section>
 
-<!-- Slide 7: Closing -->
-<section class="slide flex-col items-center justify-center text-center px-8" data-slide="7">
-  <div class="fade-in">
-    <h1 class="font-mono text-sm tracking-tight mb-8">
-      <pre>▄████▄ ▄▄▄▄  ▄▄▄▄  ▄▄ ▄▄▄▄▄▄ ██▄  ▄██ ▄▄▄▄▄ ▄▄   ▄▄   <br />██  ██ ██▄█▄ ██▄██ ██   ██   ██ ▀▀ ██ ██▄▄  ██▀▄▀██   <br />▀████▀ ██ ██ ██▄█▀ ██   ██   ██    ██ ██▄▄▄ ██   ██ <span class="animate-pulse-0">██</span><br /></pre>
-    </h1>
-    <p class="text-xl text-stone-500 mb-10">Decentralized data layer for agentic web.</p>
-    <div class="flex items-center justify-center gap-8">
-      <a href="https://orbitmem.0x7.sh" class="flex flex-col items-center gap-2 group" target="_blank">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://orbitmem.0x7.sh" alt="Website QR" class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors" width="80" height="80" />
-        <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors">🌐 Website</span>
-      </a>
-      <a href="https://github.com/oboroxyz/orbitmem" class="flex flex-col items-center gap-2 group" target="_blank">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://github.com/oboroxyz/orbitmem" alt="GitHub QR" class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors" width="80" height="80" />
-        <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors">&lt;&sol;&gt; Source</span>
-      </a>
-      <a href="https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101" class="flex flex-col items-center gap-2 group" target="_blank">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101" alt="Submission QR" class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors" width="80" height="80" />
-        <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors">📝 Submission</span>
-      </a>
-      <a href="https://youtube.com" class="flex flex-col items-center gap-2 group" target="_blank">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://youtube.com" alt="Video QR" class="rounded border border-stone-200 group-hover:border-stone-400 transition-colors" width="80" height="80" />
-        <span class="text-xs text-stone-600 group-hover:text-stone-900 transition-colors">▶️ Video</span>
-      </a>
-    </div>
-  </div>
-</section>
+    <!-- Slide Counter -->
+    <div class="fixed bottom-4 right-6 text-sm text-stone-400 font-bold" id="counter">1 / 10</div>
 
-<!-- Progress Bar -->
-<div class="fixed bottom-0 left-0 w-full h-1 bg-stone-200">
-  <div class="progress-bar h-full bg-stone-900" id="progress" style="width: 10%"></div>
-</div>
+    <script>
+      const slides = document.querySelectorAll(".slide");
+      const totalSlides = slides.length;
 
-<!-- Slide Counter -->
-<div class="fixed bottom-4 right-6 text-xs text-stone-400 font-medium" id="counter">1 / 10</div>
+      function getPageFromURL() {
+        const p = new URLSearchParams(window.location.search).get("page");
+        const n = parseInt(p, 10);
+        return n >= 1 && n <= totalSlides ? n - 1 : 0;
+      }
 
-<script>
-const slides = document.querySelectorAll('.slide');
-const totalSlides = slides.length;
+      let current = getPageFromURL();
 
-function getPageFromURL() {
-  const p = new URLSearchParams(window.location.search).get('page');
-  const n = parseInt(p, 10);
-  return (n >= 1 && n <= totalSlides) ? n - 1 : 0;
-}
+      function show(index) {
+        slides.forEach((s) => {
+          s.classList.remove("active");
+        });
+        slides[index].classList.add("active");
+        document.getElementById("progress").style.width = `${((index + 1) / totalSlides) * 100}%`;
+        document.getElementById("counter").textContent = `${index + 1} / ${totalSlides}`;
+        const url = new URL(window.location);
+        url.searchParams.set("page", index + 1);
+        history.replaceState(null, "", url);
+      }
 
-let current = getPageFromURL();
+      show(current);
 
-function show(index) {
-  slides.forEach(s => s.classList.remove('active'));
-  slides[index].classList.add('active');
-  document.getElementById('progress').style.width = ((index + 1) / totalSlides * 100) + '%';
-  document.getElementById('counter').textContent = (index + 1) + ' / ' + totalSlides;
-  const url = new URL(window.location);
-  url.searchParams.set('page', index + 1);
-  history.replaceState(null, '', url);
-}
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === " ") {
+          e.preventDefault();
+          current = Math.min(current + 1, totalSlides - 1);
+          show(current);
+        }
+        if (e.key === "ArrowLeft") {
+          current = Math.max(current - 1, 0);
+          show(current);
+        }
+        if (e.key === "Home") {
+          current = 0;
+          show(current);
+        }
+        if (e.key === "End") {
+          current = totalSlides - 1;
+          show(current);
+        }
+      });
 
-show(current);
+      document.addEventListener("click", (e) => {
+        const edge = window.innerWidth * 0.15;
+        if (e.clientX > window.innerWidth - edge) {
+          current = Math.min(current + 1, totalSlides - 1);
+          show(current);
+        } else if (e.clientX < edge) {
+          current = Math.max(current - 1, 0);
+          show(current);
+        }
+      });
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); current = Math.min(current + 1, totalSlides - 1); show(current); }
-  if (e.key === 'ArrowLeft') { current = Math.max(current - 1, 0); show(current); }
-  if (e.key === 'Home') { current = 0; show(current); }
-  if (e.key === 'End') { current = totalSlides - 1; show(current); }
-});
-
-document.addEventListener('click', (e) => {
-  const edge = window.innerWidth * 0.15;
-  if (e.clientX > window.innerWidth - edge) { current = Math.min(current + 1, totalSlides - 1); show(current); }
-  else if (e.clientX < edge) { current = Math.max(current - 1, 0); show(current); }
-});
-
-window.addEventListener('popstate', () => { current = getPageFromURL(); show(current); });
-</script>
-</body>
+      window.addEventListener("popstate", () => {
+        current = getPageFromURL();
+        show(current);
+      });
+    </script>
+  </body>
 </html>

@@ -9,7 +9,7 @@ OrbitMem is a sovereign data layer for AI agents — encrypted P2P vaults, multi
 - `@orbitmem/sdk` — Core SDK with six composable layers (identity, encryption, data, transport, discovery, persistence) plus a client facade
 - `@orbitmem/relay` — Hono HTTP server with ERC-8128 auth + session token middleware, vault/discovery/snapshot routes
 - `@orbitmem/contracts` — Foundry/Solidity smart contracts implementing ERC-8004 for Data — on-chain data discovery & reputation
-- `@orbitmem/cli` — CLI tool (`bun run cli`) — vault management, data discovery, identity, snapshots
+- `orbitmem` — CLI tool (`npx orbitmem`) — vault management, data discovery, identity, snapshots
 - `@orbitmem/web` — React dashboard (Vite + TanStack Router + wagmi + Tailwind) deployed via Cloudflare Workers
 - `examples/memo` — Example app demonstrating OrbitMem usage
 
