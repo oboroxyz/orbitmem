@@ -10,7 +10,7 @@ interface MemoListProps {
 
 export function MemoList({ memos, address, onSelect, onDelete, onNew }: MemoListProps) {
   const copyShareUrl = (memo: Memo) => {
-    const url = `${window.location.origin}/${address}/${memo.id}`;
+    const url = `${window.location.origin}${window.location.pathname}#/${address}/${memo.id}`;
     navigator.clipboard.writeText(url);
   };
 
