@@ -31,7 +31,9 @@ orbitmem status
 
 ### `init`
 
-Generate keys and create `~/.orbitmem/config.json`.
+Generate an OWS wallet and create `~/.orbitmem/config.json`. Vault data is stored at `~/.orbitmem/vault/`.
+
+If the OWS wallet already exists (e.g. after removing `~/.orbitmem/`), use `--force` to re-link it.
 
 ```bash
 orbitmem init --name <wallet> --network <chain> [--force]

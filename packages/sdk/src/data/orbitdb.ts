@@ -16,10 +16,12 @@ import { createLibp2p } from "libp2p";
 useDatabaseType(Nested);
 
 export async function createOrbitDBInstance(opts: {
+  id?: string;
   directory?: string;
   listenAddrs?: string[];
 }): Promise<{ orbitdb: any; ipfs: any; libp2p: any; cleanup: () => Promise<void> }> {
-  const blockstore = new LevelBlockstore(opts.directory ?? "./orbitdb/blocks");
+  const dir = opts.directory ?? "./orbitdb";
+  const blockstore = new LevelBlockstore(`${dir}/blocks`);
 
   const libp2p = await createLibp2p({
     addresses: { listen: opts.listenAddrs ?? ["/ip4/0.0.0.0/tcp/0"] },
@@ -33,7 +35,7 @@ export async function createOrbitDBInstance(opts: {
   });
 
   const ipfs = await createHelia({ libp2p, blockstore });
-  const orbitdb = await createOrbitDB({ ipfs });
+  const orbitdb = await createOrbitDB({ ipfs, id: opts.id ?? "default", directory: dir });
 
   return {
     orbitdb,
@@ -42,6 +44,7 @@ export async function createOrbitDBInstance(opts: {
     cleanup: async () => {
       await orbitdb.stop();
       await ipfs.stop();
+      await libp2p.stop();
     },
   };
 }

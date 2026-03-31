@@ -21,7 +21,11 @@ export async function init(_args: string[], flags: Record<string, string>): Prom
   }
 
   const walletName = flags.name ?? "orbitmem";
-  createWallet(walletName);
+  try {
+    createWallet(walletName);
+  } catch {
+    // Wallet already exists in OWS keystore — reuse it
+  }
 
   const network = (flags.network ?? "base-sepolia") as NetworkId;
   saveConfig({ walletName, network });

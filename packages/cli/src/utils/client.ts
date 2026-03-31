@@ -1,10 +1,12 @@
+import { join } from "node:path";
+
 import { createOrbitMem, getNetwork } from "@orbitmem/sdk";
 import { createOwsAdapter } from "@orbitmem/sdk/identity";
 import type { EncryptionConfig } from "@orbitmem/sdk/types";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { base, baseSepolia } from "viem/chains";
 
-import type { CliConfig } from "../config.js";
+import { getConfigDir, type CliConfig } from "../config.js";
 
 const CHAINS = {
   "base-sepolia": baseSepolia,
@@ -39,7 +41,7 @@ export async function createClient(config: CliConfig, opts?: CreateClientOpts) {
   const client = await createOrbitMem({
     network: config.network,
     identity: { owsWallet: config.walletName },
-    vault: { dbName: "orbitmem-cli" },
+    vault: { dbName: join(getConfigDir(), "vault") },
     encryption,
     persistence: {
       relayUrl: config.relay,
