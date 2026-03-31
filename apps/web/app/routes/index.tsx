@@ -6,7 +6,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const FEATURES: { title: string; description: string; tag: string; icon: IconType }[] = [
+const FEATURES: { title: string; description: string; tag: string | string[]; icon: IconType }[] = [
   {
     title: "Encrypted Vaults",
     description:
@@ -25,7 +25,7 @@ const FEATURES: { title: string; description: string; tag: string; icon: IconTyp
     title: "Wallet Auth",
     description:
       "Authenticate with Passkey, ETH Wallet, or Solana Wallet — then communicate over ERC-8128 signed HTTP. Every request is cryptographically verified across chains.",
-    tag: "ERC-8128",
+    tag: ["ERC-8128", "Open Wallet Standard"],
     icon: PiSignature,
   },
 ];
@@ -104,7 +104,7 @@ function HomePage() {
           <div className="grid grid-cols-3 gap-2">
             <div className="rounded-lg border border-stone-200 px-4 py-3 text-center">
               <p className="text-sm font-semibold text-stone-900">Identity</p>
-              <p className="text-xs text-stone-400 mt-1">Passkeys + EVM + Solana</p>
+              <p className="text-xs text-stone-400 mt-1">ERC-8128 (EOA, Passkey) + OWS</p>
             </div>
             <div className="rounded-lg border border-stone-200 px-4 py-3 text-center">
               <p className="text-sm font-semibold text-stone-900">Encryption</p>
@@ -112,7 +112,9 @@ function HomePage() {
             </div>
             <div className="rounded-lg border border-stone-200 px-4 py-3 text-center">
               <p className="text-sm font-semibold text-stone-900">Discovery & Trust</p>
-              <p className="text-xs text-stone-400 mt-1">ERC-8004 (ERC-721 + Reputation)</p>
+              <p className="text-xs text-stone-400 mt-1">
+                ERC-8004 for Data (ERC-721 + Reputation)
+              </p>
             </div>
           </div>
           <div className="rounded-lg border border-stone-200 px-6 py-3 flex justify-between items-center">
@@ -121,7 +123,9 @@ function HomePage() {
           </div>
           <div className="rounded-lg border border-stone-200 px-6 py-3 flex justify-between items-center">
             <span className="text-sm font-semibold text-stone-900">Persistence</span>
-            <span className="text-xs text-stone-400">Storacha → Filecoin/IPFS</span>
+            <span className="text-xs text-stone-400">
+              P2P replication via Relay + Snapshots via Storacha
+            </span>
           </div>
         </div>
         <h2 className="text-sm font-semibold text-stone-900 mb-4">Key Features</h2>
@@ -138,8 +142,15 @@ function HomePage() {
             >
               <f.icon className="text-base text-stone-400 shrink-0" />
               <span className="text-sm font-semibold text-stone-900">{f.title}</span>
-              <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5 ml-auto">
-                {f.tag}
+              <span className="flex gap-1 ml-auto">
+                {(Array.isArray(f.tag) ? f.tag : [f.tag]).map((t) => (
+                  <span
+                    key={t}
+                    className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5"
+                  >
+                    {t}
+                  </span>
+                ))}
               </span>
             </div>
           ))}

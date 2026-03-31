@@ -11,9 +11,8 @@ import type { ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 
 import { Layout } from "../components/Layout";
-import { wagmiConfig } from "../lib/wagmi";
-
 import appCss from "../index.css?url";
+import { wagmiConfig } from "../lib/wagmi";
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -30,7 +29,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: "Decentralized data layer for agentic web.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "OrbitMem — Decentralized data layer for agentic web." },
+      {
+        property: "og:title",
+        content: "OrbitMem — Decentralized data layer for agentic web.",
+      },
       {
         property: "og:description",
         content: "Decentralized data layer for agentic web.",
@@ -43,7 +45,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/png", href: "/logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossorigin: "anonymous",
+      },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap",
