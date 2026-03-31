@@ -82,4 +82,5 @@ orbitdb/
 worktrees/
 
 # Project-specific
-orbitmem-cli/
+/orbitmem-cli/
+.orbitmem

@@ -14,17 +14,18 @@ making it discoverable by other agents.
 ## Store Command
 
 ```bash
-cd examples/agent-research && bun run tools/store-research.ts "<key>" "<value>" --tags <tag1>,<tag2> --visibility public
+npx orbitmem vault store <key> <value> --public
+npx orbitmem register <key> --tags <tag1>,<tag2>
 ```
 
 ### Arguments
 
 | Arg | Required | Description |
 |-----|----------|-------------|
-| `key` | yes | Kebab-case path identifier (e.g. `notes/bun-vs-deno`) |
+| `key` | yes | Kebab-case path identifier (e.g. `research/bun-vs-deno`) |
 | `value` | yes | The data to store (plain text, JSON string, markdown) |
-| `--tags` | no | Comma-separated tags for discovery (default: `research`) |
-| `--visibility` | no | `public` (default) or `private` |
+| `--public` | no | Store as public (default: private, AES encrypted) |
+| `--tags` | no | Comma-separated tags for on-chain registration |
 
 ## OrbitMem Layers Used
 

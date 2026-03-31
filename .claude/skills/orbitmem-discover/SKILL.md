@@ -13,7 +13,7 @@ or quality thresholds. Returns data IDs, names, tags, quality scores, and vault 
 ## Search Command
 
 ```bash
-cd examples/agent-research && bun run tools/search-research.ts --tags <tag1>,<tag2> --keyword "<text>" --min-quality <1-5>
+npx orbitmem discover --tags <tag1>,<tag2> --min-quality <score>
 ```
 
 ### Flags (all optional, use at least one)
@@ -21,10 +21,9 @@ cd examples/agent-research && bun run tools/search-research.ts --tags <tag1>,<ta
 | Flag | Description |
 |------|-------------|
 | `--tags` | Comma-separated tags to filter by |
-| `--keyword` | Free-text keyword search |
-| `--min-quality` | Minimum quality score (1-5) |
 | `--schema` | Schema identifier to filter by |
-| `--fetch` | Also retrieve the first result's vault data |
+| `--min-quality` | Minimum quality score |
+| `--json` | Machine-readable output |
 
 ## OrbitMem Layers Used
 

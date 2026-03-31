@@ -34,25 +34,25 @@ IPFS is great as decentralized storage — but it falls short as a modern, devel
 └─────────────────────────────────────────────────────────┘
 ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
 │    Identity      │ │   Encryption    │ │ Discovery &     │
-│ Passkeys + EVM  │ │  Lit + AES-256  │ │ Trust           │
-│   + Solana      │ │                 │ │ ERC-8004        │
+│ ERC-8128 + OWS  │ │  Lit + AES-256  │ │ Trust           │
+│                 │ │                 │ │ ERC-8004        │
 └─────────────────┘ └─────────────────┘ └─────────────────┘
 ┌─────────────────────────────────────────────────────────┐
 │  Data Vault       OrbitDB Nested — local-first P2P      │
 └─────────────────────────────────────────────────────────┘
 ┌─────────────────────────────────────────────────────────┐
-│  Persistence      Storacha → Filecoin/IPFS              │
+│  Persistence      P2P replication via Relay + Storacha   │
 └─────────────────────────────────────────────────────────┘
 ```
 
 | Layer                 | Technology                          | Role                                                     |
 | :-------------------- | :---------------------------------- | :------------------------------------------------------- |
 | **Interface**         | SDK + CLI (Skills)                  | One-call lifecycle for users and AI agents               |
-| **Identity**          | OWS + Porto Passkeys + EVM + Solana | OWS wallet for CLI/SDK, biometric-first auth for browser |
+| **Identity**          | ERC-8128 + OWS (Open Wallet Standard) | Signed HTTP auth, OWS wallet for CLI/SDK, Porto Passkeys for browser |
 | **Encryption**        | Lit Protocol + AES-256-GCM          | Reputation-gated access control, per-path encryption     |
 | **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation)     | On-chain data discovery & quality scoring                |
 | **Data Vault**        | OrbitDB Nested                      | Local-first P2P storage with hierarchical JSON paths     |
-| **Persistence**       | Storacha (Filecoin/IPFS)            | Immutable archival snapshots, disaster recovery          |
+| **Persistence**       | P2P replication + Storacha          | Relay sync for availability, Filecoin snapshots for archival |
 
 ---
 
@@ -121,7 +121,7 @@ High-quality data attracts more agent consumption → more feedback → higher s
 
 ## Example apps using OrbitMem
 
-### 1. Decentralized Memo App - [Live Demo (IPFS)](https://ipfs.io/ipfs/bafybeig3h3rymklg2agcjp7jg2wwtsfcu2qox545fmgbclqttsazyfname/) | [Source Code](../../examples/memo/)
+### 1. Decentralized Memo App - [Live Demo (IPFS)](https://ipfs.io/ipfs/bafybeidd2kxqnpmtpteqernqqunem5nkl4462cqr3mf4gg7jmibrh3amgu/) | [Source Code](../../examples/memo/)
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
@@ -133,10 +133,10 @@ A fully decentralized note-taking app — no server, no platform, no lock-in.
 
 ```
 User writes memo → OrbitMem Vault (OrbitDB)
-                      ├── public/  → readable by anyone, registered on-chain
+                      ├── public/  → readable by anyone, shareable links
                       └── private/ → AES encrypted, owner-only
                               ↓
-                    Storacha → Filecoin (backup)
+                    P2P sync via Relay (availability)
 ```
 
 ### 2. Agent Research & Data Trust (Planned)

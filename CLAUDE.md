@@ -61,7 +61,8 @@ OWNER=<SAFE_ADDRESS> forge script script/Deploy.s.sol --broadcast --rpc-url <RPC
 ### CLI Commands
 
 ```bash
-bun run cli init              # Initialize OrbitMem (generate keys, create config)
+bun run cli init              # Initialize OrbitMem (OWS wallet + ~/.orbitmem/ config)
+bun run cli init --force      # Re-link existing OWS wallet to config
 bun run cli status            # Show identity, config, and vault info
 bun run cli vault store <p> <v>  # Store data in vault
 bun run cli vault get <path>  # Read data from vault

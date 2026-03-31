@@ -23,15 +23,14 @@ packages/cli/src/
 
 | File | Contents |
 |------|----------|
-| `config.json` | `{ relay, chain, registryAddress, reputationAddress }` |
-| `key.json` | Generated EVM private key |
-| `vault/` | Local OrbitDB data directory |
+| `config.json` | `{ walletName, network, relay, chain, registryAddress, reputationAddress }` |
+| `vault/` | OrbitDB data directory (blocks, keystore, database logs) |
 
 ## Command → SDK layer mapping
 
 | Command | SDK Layer(s) |
 |---------|-------------|
-| `init` | Identity (key gen via viem) |
+| `init` | Identity (OWS wallet creation) |
 | `vault store/get/ls` | Data (vault) + Encryption |
 | `register` | Discovery (on-chain registry) |
 | `discover` | Discovery (findData) |

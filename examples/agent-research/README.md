@@ -13,8 +13,12 @@ Agent C (reviewer)   →  Verify content → Record score in FeedbackRegistry
 ## Setup
 
 ```bash
-# 1. Initialize OrbitMem (generates key + config)
+# 1. Initialize OrbitMem (OWS wallet + ~/.orbitmem/ config)
 npx orbitmem init
+
+# If wallet already exists (e.g. re-init), use --force or a new name:
+npx orbitmem init --force
+npx orbitmem init --name demo
 
 # 2. Verify setup
 npx orbitmem status
