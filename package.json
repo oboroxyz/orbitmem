@@ -1,13 +1,13 @@
 {
   "name": "orbitmem",
   "private": true,
+  "bin": {
+    "orbitmem": "./packages/cli/dist/index.js"
+  },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
-  "bin": {
-    "orbitmem": "./packages/cli/dist/index.js"
-  },
   "scripts": {
     "build": "bun run --filter '*' build",
     "test": "bun test packages/sdk packages/relay packages/cli apps",
