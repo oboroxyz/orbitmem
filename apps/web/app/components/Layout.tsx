@@ -139,6 +139,15 @@ export function Layout({ children }: { children: ReactNode }) {
           >
             ERC-8128
           </a>
+          <span className="text-stone-300">&middot;</span>
+          <a
+            href="https://openwallet.sh/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-stone-600 transition-colors"
+          >
+            Open Wallet Standard
+          </a>
         </div>
       </footer>
     </div>
