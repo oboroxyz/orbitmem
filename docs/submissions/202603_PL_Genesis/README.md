@@ -177,11 +177,11 @@ OrbitMem gives users self-custodial, encrypted data with access control — no c
 
 > Verifiable AI, agent coordination, and autonomous systems.
 
-OrbitMem provides the data layer for autonomous AI agents — on-chain data discovery, verifiable quality scores, and auditable receipts for every interaction.
+OrbitMem provides the data layer for autonomous AI agents — on-chain data discovery, verifiable quality scores, and auditable receipts for every interaction. CLI and Skills are provided — full command list in [Section 7](#7-agent-only-let-the-agent-cook).
 
-- **Client** — `createOrbitMemClient()` provides a one-call lifecycle: `discoverData` → `readPublicData` → `getDataScore` → `rateData`
-- **`ERC-`8004` on-chain trust** — `DataRegistry` (ERC-721) mints data as discoverable assets; `FeedbackRegistry` scores data quality with per-tag reputation (`accurate`, `fresh`)
-- **Agents with receipts** — every data interaction produces an auditable on-chain receipt via `giveFeedback()`
+- **CLI** — `npx orbitmem` covers the full agent lifecycle: `init` → `vault store` → `register` → `discover` → `rate`
+- **SDK** — `createOrbitMemClient()`: `discoverData` → `readPublicData` → `getDataScore` → `rateData`
+- **ERC-8004 on-chain trust** — `DataRegistry` (ERC-721) mints data as discoverable assets; `FeedbackRegistry` scores data quality with per-tag reputation (`accurate`, `fresh`)
 
 ```
 Agent A registers data → DataRegistry mints NFT (receipt)
@@ -206,7 +206,7 @@ OrbitMem addresses **4 of 7** Filecoin challenge ideas:
 | **Onchain Agent Registry**               | `DataRegistry` (ERC-721) — `register(dataURI)` mints on-chain pointers to off-chain data       |
 | **Agent Reputation & Portable Identity** | `FeedbackRegistry` — registry-agnostic reputation with per-tag scoring, bidirectional feedback |
 | **Agent-Generated Data Marketplace**     | Client lifecycle: discover → evaluate → consume → rate                                         |
-| **Agent Storage SDK**                    | `@orbitmem/sdk` + `@orbitmem/cli` — encrypted vault, Storacha persistence, `--json` output     |
+| **Agent Storage SDK**                    | `@orbitmem/sdk` + `orbitmem` — encrypted vault, Storacha persistence, `--json` output          |
 
 **Storacha integration:** encrypted vault snapshots archived to Filecoin via `@storacha/client` — immutable backups, CID-based retrieval, verifiable storage deals. No plaintext exposure (encryption before upload).
 
@@ -230,16 +230,45 @@ OrbitMem uses Lit Protocol as the encryption engine for shared data — reputati
 - **On-chain condition-based decryption** — agents can only decrypt if `FeedbackRegistry` quality score meets threshold
 - **Dynamic access revocation** — reputation drops below minimum → access revoked automatically
 
+CLI for Lit-encrypted shared data:
+
+```bash
+# Store with Lit encryption — only a specific address can decrypt
+npx orbitmem vault store /shared/data "gated info" \
+  --shared --engine lit --allow-address 0x1234...
+
+# Store with reputation-gated access — min score required to decrypt
+npx orbitmem vault store /gated/data "quality data" \
+  --shared --engine lit --min-score 80
+
+# Update access conditions on existing data
+npx orbitmem vault update-access /shared/data --min-score 90
+```
+
+Use case: an agent publishes premium research data. Only agents with a reputation score ≥ 80 in the `FeedbackRegistry` can decrypt and read it. As the producer's reputation grows, they can tighten access conditions dynamically.
+
 ### 7. Agent Only: Let the Agent Cook
 
 > Fully autonomous agent workflows — no human in the loop.
 
 OrbitMem is built for agent-first consumption. The CLI, SDK, and Skills provide everything an autonomous agent needs:
 
-- **`@orbitmem/cli`** — every command supports `--json` for machine-readable output, `--relay`/`--chain` overrides
-- **`createOrbitMemClient()`** — one-call lifecycle: discover → read → score → rate, no UI required
-- **Skills** — AI agents operate OrbitMem via natural language (e.g. "store my travel preferences in the vault")
-- **ERC-8128 transport auth** — agents sign their own requests with wallet keys, no OAuth or API keys
+```bash
+npx orbitmem init                        # Create OWS wallet — agent identity
+npx orbitmem vault store <path> <value>  # Store data in encrypted vault
+npx orbitmem vault get <path>            # Read data back
+npx orbitmem vault ls                    # List all vault keys
+npx orbitmem register <path>             # Register on-chain (ERC-8004)
+npx orbitmem discover --tags <t>         # Search data by tags/quality
+npx orbitmem rate <id> <score>           # Rate data on-chain
+npx orbitmem status                      # Show wallet, config, vault info
+```
+
+- Every command supports **`--json`** for machine-readable output — agents parse structured data, not human text
+- **`--relay`/`--chain`** overrides — agents can target different networks or relay servers
+- **Skills** — Claude Code skills (`orbitmem-store`, `orbitmem-discover`, `orbitmem-rate`) let AI agents operate OrbitMem via natural language
+- **ERC-8128 transport auth** — agents sign their own requests with OWS wallet keys, no OAuth or API keys
+- **SDK** — `createOrbitMemClient()` provides a one-call lifecycle: discover → read → score → rate, no UI required
 
 ### 8. Agents With Receipts — ERC-8004
 
@@ -247,10 +276,24 @@ OrbitMem is built for agent-first consumption. The CLI, SDK, and Skills provide 
 
 ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFTs as data receipts; `FeedbackRegistry` records per-tag quality scores (`accurate`, `fresh`) for every consumption event. Agents don't just use data — they leave verifiable proof of what they used and how they rated it.
 
-- **`npx orbitmem register`** — register data on-chain, minting a receipt NFT
-- **`npx orbitmem discover`** — search by schema, tags, and minimum quality scores
-- **`npx orbitmem rate`** — rate data quality on-chain with per-tag scoring
-- **Interface** — `discoverData` → `getDataScore` → `rateData` lifecycle, all scored on-chain
+```bash
+# Agent A publishes data → receipt minted as ERC-721 NFT
+npx orbitmem register guides/coffee --tags coffee,tokyo
+# → DataRegistry.register(dataURI) → tokenId #42
+
+# Agent B discovers data by tags and quality
+npx orbitmem discover --tags coffee --min-quality 70
+# → returns dataId, name, tags, quality score
+
+# Agent B rates data → on-chain receipt via FeedbackRegistry
+npx orbitmem rate 42 90 --tag accurate
+# → FeedbackRegistry.giveFeedback(42, 90, "accurate")
+```
+
+- **`register`** — calls `DataRegistry.register(dataURI)`, mints ERC-721 NFT as on-chain receipt
+- **`discover`** — reads `DataRegistry` + `FeedbackRegistry` to search by schema, tags, and minimum quality scores
+- **`rate`** — calls `FeedbackRegistry.giveFeedback(targetId, score, tag)`, recording an auditable on-chain receipt
+- **SDK** — `discoverData` → `getDataScore` → `rateData` lifecycle, all scored on-chain
 
 ### 9. Funding the Commons
 
@@ -275,16 +318,3 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 | **DataRegistry**     | [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
 | **FeedbackRegistry** | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
 
----
-
-## Future Work
-
-- Advanced Lit Protocol reputation conditions — fully wire reputation-gated decryption in vault
-- Passkey/WebAuthn browser integration for biometric-first UX
-- Solana end-to-end testing and deployment
-- Filecoin deal status tracking (live Storacha integration)
-- Backup/restore UI in the web dashboard
-- Multi-signature vault support and delegation patterns
-- MPP session billing for streaming vault access (bulk reads)
-- Web dashboard earnings visualization and payment history
-- PaymentSplitter contract for relay operator fee revenue
