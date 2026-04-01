@@ -45,14 +45,14 @@ IPFS is great as decentralized storage — but it falls short as a modern, devel
 └─────────────────────────────────────────────────────────┘
 ```
 
-| Layer                 | Technology                          | Role                                                     |
-| :-------------------- | :---------------------------------- | :------------------------------------------------------- |
-| **Interface**         | SDK + CLI (Skills)                  | One-call lifecycle for users and AI agents               |
+| Layer                 | Technology                            | Role                                                                 |
+| :-------------------- | :------------------------------------ | :------------------------------------------------------------------- |
+| **Interface**         | SDK + CLI (Skills)                    | One-call lifecycle for users and AI agents                           |
 | **Identity**          | ERC-8128 + OWS (Open Wallet Standard) | Signed HTTP auth, OWS wallet for CLI/SDK, Porto Passkeys for browser |
-| **Encryption**        | Lit Protocol + AES-256-GCM          | Reputation-gated access control, per-path encryption     |
-| **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation)     | On-chain data discovery & quality scoring                |
-| **Data Vault**        | OrbitDB Nested                      | Local-first P2P storage with hierarchical JSON paths     |
-| **Persistence**       | P2P replication + Storacha          | Relay sync for availability, Filecoin snapshots for archival |
+| **Encryption**        | Lit Protocol + AES-256-GCM            | Reputation-gated access control, per-path encryption                 |
+| **Discovery & Trust** | ERC-8004 (ERC-721 + Reputation)       | On-chain data discovery & quality scoring                            |
+| **Data Vault**        | OrbitDB Nested                        | Local-first P2P storage with hierarchical JSON paths                 |
+| **Persistence**       | P2P replication + Storacha            | Relay sync for availability, Filecoin snapshots for archival         |
 
 ---
 

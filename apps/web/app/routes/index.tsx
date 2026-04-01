@@ -30,13 +30,6 @@ const FEATURES: { title: string; description: string; tag: string | string[]; ic
   },
 ];
 
-const STEPS_CLI = [
-  { step: "01", cmd: "npx orbitmem init", desc: "Generate keys and create config" },
-  { step: "02", cmd: "npx orbitmem vault store <path> <value>", desc: "Store data in vault" },
-  { step: "03", cmd: "npx orbitmem register", desc: "Register data on-chain (ERC-8004)" },
-  { step: "04", cmd: "npx orbitmem discover", desc: "Search data sources by quality/tags" },
-];
-
 function HomePage() {
   return (
     <div>
@@ -49,45 +42,91 @@ function HomePage() {
         <p className="mt-6 text-lg text-stone-700 max-w-md leading-relaxed">
           Decentralized Data Layer for Agentic Web.
         </p>
-        <div className="grid gap-4 grid-cols-2 mt-10">
-          <Link to="/dashboard" className="btn px-6 py-3">
-            Get Started &rarr;
-          </Link>
-          <Link to="/explore" className="btn-outline px-6 py-3">
-            Explore &rarr;
-          </Link>
-        </div>
       </section>
 
-      {/* Use Cases */}
+      {/* Getting Started */}
       <section className="max-w-4xl mx-auto pb-16">
+        <h2 className="text-sm font-semibold text-stone-900 mb-6">Getting Started</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-lg border border-stone-200 p-6 space-y-4">
-            <div className="w-10 h-10 rounded-lg bg-stone-200 flex items-center justify-center">
-              <PiUser className="text-xl text-stone-600" />
+            <div className="flex items-center gap-2">
+              <PiRobot className="text-xl text-stone-600" />
+              <h3 className="text-sm font-semibold text-stone-900">CLI & Skills</h3>
+              <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5">
+                For Agents
+              </span>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-stone-900 mb-4">For Users, Developers</h3>
-              <p className="text-sm text-stone-500 leading-relaxed">
-                Create and use a decentralized database in minutes via SDK + CLI — with built-in
-                encryption, access control, and automatic P2P backup.
-              </p>
+            <div className="bg-stone-900 text-stone-50 rounded-lg p-4 text-xs font-mono leading-relaxed space-y-1">
+              <div>
+                <span className="text-stone-500">$</span>{" "}
+                <span className="text-stone-300">npx orbitmem</span>{" "}
+                <span className="text-stone-100">init</span>
+              </div>
+              <div>
+                <span className="text-stone-500">$</span>{" "}
+                <span className="text-stone-300">npx orbitmem vault store</span>{" "}
+                <span className="text-stone-100">guides/coffee</span>{" "}
+                <span className="text-stone-600">\</span>
+              </div>
+              <div className="pl-4">
+                <span className="text-green-500/80">&apos;{`{"name":"Blue Bottle"}`}&apos;</span>{" "}
+                <span className="text-stone-400">--public</span>
+              </div>
+              <div>
+                <span className="text-stone-500">$</span>{" "}
+                <span className="text-stone-300">npx orbitmem register</span>{" "}
+                <span className="text-stone-100">guides/coffee</span>{" "}
+                <span className="text-stone-600">\</span>
+              </div>
+              <div className="pl-4">
+                <span className="text-stone-400">--tags</span>{" "}
+                <span className="text-green-500/80">coffee,tokyo</span>
+              </div>
+              <div>
+                <span className="text-stone-500">$</span>{" "}
+                <span className="text-stone-300">npx orbitmem discover</span>{" "}
+                <span className="text-stone-400">--tags</span>{" "}
+                <span className="text-green-500/80">coffee</span>
+              </div>
+              <div>
+                <span className="text-stone-500">$</span>{" "}
+                <span className="text-stone-300">npx orbitmem rate</span>{" "}
+                <span className="text-stone-100">1 90</span>{" "}
+                <span className="text-stone-400">--tag</span>{" "}
+                <span className="text-green-500/80">accurate</span>
+              </div>
             </div>
           </div>
           <div className="rounded-lg border border-stone-200 p-6 space-y-4">
-            <div className="w-10 h-10 rounded-lg bg-stone-200 flex items-center justify-center">
-              <PiRobot className="text-xl text-stone-600" />
+            <div className="flex items-center gap-2">
+              <PiUser className="text-xl text-stone-600" />
+              <h3 className="text-sm font-semibold text-stone-900">SDK</h3>
+              <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5">
+                For Developers
+              </span>
             </div>
-            <div>
-              <h3 className="text-sm font-semibold text-stone-900 mb-2">For AI Agents</h3>
-              <p className="text-sm text-stone-500 leading-relaxed">
-                Use{" "}
-                <code className="text-xs font-mono bg-white px-1.5 py-0.5 rounded">
-                  npx orbitmem
-                </code>{" "}
-                CLI (Skills) to access decentralized database — with built-in data discovery and
-                on-chain data reputation.
-              </p>
+            <div className="bg-stone-900 text-stone-50 rounded-lg p-4 text-xs font-mono leading-relaxed space-y-1">
+              <div>
+                <span className="text-stone-400">import</span> {"{ createOrbitMem }"}
+              </div>
+              <div className="pl-4">
+                <span className="text-stone-400">from</span>{" "}
+                <span className="text-emerald-400">&apos;@orbitmem/sdk&apos;</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-stone-400">const</span> om ={" "}
+                <span className="text-stone-400">await</span> createOrbitMem(config)
+              </div>
+              <div>
+                <span className="text-stone-400">await</span> om.vault.put(
+                <span className="text-emerald-400">&apos;key&apos;</span>, data)
+              </div>
+              <div>
+                <span className="text-stone-400">await</span> om.discovery.registerData(...)
+              </div>
+              <div>
+                <span className="text-stone-400">await</span> om.discovery.findData(query)
+              </div>
             </div>
           </div>
         </div>
@@ -157,67 +196,11 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Getting Started */}
-      <section className="max-w-4xl mx-auto pb-24">
-        <h2 className="text-sm font-semibold text-stone-900 mb-6">Getting Started</h2>
-        <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr]">
-          {/* CLI path */}
-          <div className="rounded-lg border border-stone-200 p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-stone-900">CLI</h3>
-              <span className="text-xxs font-mono text-stone-400 border border-stone-200 rounded px-1.5 py-0.5">
-                Recommended
-              </span>
-            </div>
-            <div className="space-y-2">
-              {STEPS_CLI.map((s) => (
-                <div key={s.step} className="flex gap-3">
-                  <span className="text-xxs font-mono text-stone-300 pt-1 shrink-0">{s.step}</span>
-                  <div>
-                    <code className="text-xs font-mono text-stone-900 bg-stone-100 px-1.5 py-0.5 rounded">
-                      {s.cmd}
-                    </code>
-                    <p className="text-xs text-stone-400 mt-0.5">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Divider */}
-          <div className="flex items-center justify-center -my-1 sm:my-0">
-            <span className="text-xs font-mono text-stone-300">or</span>
-          </div>
-          {/* Web path */}
-          <div className="rounded-lg border border-stone-200 p-6 space-y-4">
-            <h3 className="text-sm font-semibold text-stone-900">Web Dashboard</h3>
-            <div className="space-y-2">
-              <div className="flex gap-3">
-                <span className="text-xxs font-mono text-stone-300 pt-1 shrink-0">01</span>
-                <div>
-                  <p className="text-xs text-stone-900">Connect your wallet</p>
-                  <p className="text-xs text-stone-400 mt-0.5">Ethereum identity via browser</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-xxs font-mono text-stone-300 pt-1 shrink-0">02</span>
-                <div>
-                  <p className="text-xs text-stone-900">Browse &amp; rate data entries</p>
-                  <p className="text-xs text-stone-400 mt-0.5">Explore the Data Registry</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <span className="text-xxs font-mono text-stone-300 pt-1 shrink-0">03</span>
-                <div>
-                  <p className="text-xs text-stone-900">View trust metrics</p>
-                  <p className="text-xs text-stone-400 mt-0.5">Network scores &amp; snapshots</p>
-                </div>
-              </div>
-            </div>
-            <Link to="/dashboard" className="btn px-4 py-2 text-xs w-full justify-center">
-              Open Dashboard &rarr;
-            </Link>
-          </div>
-        </div>
+      {/* CTA */}
+      <section className="max-w-4xl mx-auto pb-24 text-center">
+        <Link to="/explore" className="btn px-6 py-3">
+          Explore Data &rarr;
+        </Link>
       </section>
     </div>
   );

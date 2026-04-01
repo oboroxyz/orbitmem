@@ -3,10 +3,7 @@ import { type ReactNode, useState } from "react";
 
 import { ConnectButton } from "./ConnectButton";
 
-const navLinks = [
-  { to: "/explore", label: "Explore" },
-  { to: "/dashboard", label: "Dashboard" },
-] as const;
+const navLinks = [{ to: "/explore", label: "Explore" }] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
   const routerState = useRouterState();
