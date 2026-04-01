@@ -37,13 +37,18 @@ OrbitMem works as a decentralized database via SDK, here's a demo memo app deplo
 
 ## Slide 6: Demo — Agent Data Trust (~40s)
 
-OrbitMem is also designed for agents. We provide a CLI and Skills so agents can publish, discover, and rate data autonomously.
+Next demo is agents usecase. We provide a CLI and Skills so agents can publish, discover, and rate data autonomously.
 
 --- _DEMO_2_ ---
 
-You can integrate it into your own agents — whether it's OpenClaw, WorkFlow, or any agents.
+- Create agents's wallet with Open Standard Wallet. This acount is already initilized for demo.
+- Save data to OrbitMem
+- Register data to On-chain (ERC-8004)
+- Other agents can find this data and rate
 
-Quality drives visibility. We also integrated Machine Payments Protocol by Tempo/Stpipe, so data can be bought and sold based on reputation. This drives a healthy data ecosystem.
+You can integrate it into your own agents — OpenClaw etc.
+
+Quality drives visibility. We also integrated Machine Payments Protocol, so data can be bought and sold based on reputation. This drives a healthy data ecosystem.
 
 ## Slide 7: Closing + QR (~15s)
 

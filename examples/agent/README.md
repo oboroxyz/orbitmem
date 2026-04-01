@@ -84,7 +84,7 @@ npx orbitmem rate 1 90 --tag accurate
 ├── orbitmem-discover/SKILL.md         # Search for data by tags/keywords
 └── orbitmem-rate/SKILL.md             # Rate data quality on-chain
 
-examples/agent-research/
+examples/agent/
 ├── package.json
 └── README.md
 ```

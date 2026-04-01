@@ -10,7 +10,7 @@
 
 Built on OrbitDB with AES/Lit Protocol encryption, ERC-8128 wallet auth, and ERC-8004 for data discovery and reputation.
 
-[📝 Submission](https://pl-genesis-frontiers-of-collaboration-hackathon.devspot.app/projects/1101) | [▶️ Video](https://youtube.com/xxx) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html)
+[📝 Submission](https://devspot.app/projects/1101?view=preview) | [▶️ Video](https://youtu.be/W5ukZamqN9o) | [🎬 Slides](https://raw.githack.com/oboroxyz/orbitmem/main/docs/submissions/202603_PL_Genesis/slides.html) | [🌐 Website](https://orbitmem.0x7.sh) | [📋 Demo: dMemo](https://ipfs.io/ipfs/bafybeidd2kxqnpmtpteqernqqunem5nkl4462cqr3mf4gg7jmibrh3amgu/)
 
 ---
 
@@ -26,7 +26,7 @@ IPFS is great as decentralized storage — but it falls short as a modern, devel
 
 ## 💡 Solution
 
-`OrbitMem` is a sovereign data layer that sits between users and AI agents. Users store personal data locally in an encrypted P2P vault. Agents discover and consume data through an on-chain trust protocol — never touching a centralized server.
+`OrbitMem` is a decentralized data layer built on top of OrbitDB — a local-first P2P database on libp2p. Users store data in encrypted vaults. Agents discover and consume data through an on-chain trust protocol — never touching a centralized server.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -93,7 +93,7 @@ await vault.put(
 
 ### Wallet Auth
 
-ERC-8128 signed HTTP with Passkey, EVM, or Solana wallets. Every request is cryptographically verified — no OAuth, no API keys.
+ERC-8128 signed HTTP with Passkey, ETH or Solana wallets. Every request is cryptographically verified — no OAuth, no API keys. OWS (Open Wallet Standard) for agent wallets.
 
 ### Discovery & Trust
 
@@ -125,11 +125,11 @@ High-quality data attracts more agent consumption → more feedback → higher s
 
 A fully decentralized note-taking app — no server, no platform, no lock-in.
 
-- User connects a wallet (passkey or EVM) → creates an OrbitMem vault
-- **Session tokens** — sign once, relay issues a bearer token cached in `sessionStorage` — zero wallet prompts on reload
-- **Public memos** — `visibility: 'public'`, shareable links anyone can view without a wallet
-- **Private memos** — `visibility: 'private'`, AES-256-GCM encrypted, owner-only
-- Markdown editor with live preview and GFM support
+- Auth with EOA wallet or Passkey (Porto)
+- **Public memos** — shareable links anyone can view without a wallet
+- **Private memos** — AES-256-GCM encrypted, relay and IPFS nodes only receive already-encrypted data, only the owner can decrypt
+- Markdown editor with live preview
+- P2P sync via relay
 
 ```
 User writes memo → OrbitMem Vault (OrbitDB)
@@ -139,16 +139,19 @@ User writes memo → OrbitMem Vault (OrbitDB)
                     P2P sync via Relay (availability)
 ```
 
-### 2. Agent Research & Data Trust (Planned)
+### 2. Agent Data Trust — Coffee Guides | [Source Code](../../examples/agent/)
 
-AI agents produce and consume data autonomously — research results, curated datasets, market analyses. OrbitMem gives agents a decentralized way to publish, discover, and build trust around that data.
+Agents publish, discover, and rate data autonomously via CLI and Skills. Integrable into any agent framework — OpenClaw, WorkFlow, etc.
 
-**How it works:**
+**Demo flow:**
 
-1. **Agent publishes data** — an agent stores output in an OrbitMem vault and registers it on-chain via `npx orbitmem register`, minting an ERC-721 NFT with schema tags (`research`, `market-analysis`, `2026-Q1`)
-2. **Other agents discover** — `npx orbitmem discover --schema research --min-score 70` finds entries by tag and reputation score
-3. **Agents rate data** — consuming agents call `npx orbitmem rate <dataId> <score> --tag accurate` to score accuracy, freshness, completeness — building the producer's on-chain reputation
-4. **Agents pay for data** — priced vault entries require MPP payment via HTTP 402 before access is granted
+1. **Agent creates wallet** — `npx orbitmem init` creates an OWS (Open Wallet Standard) wallet
+2. **Agent stores data** — `npx orbitmem vault store guides/tokyo/obscura '{"name":"OBSCURA COFFEE ROASTERS",...}' --public`
+3. **Agent registers on-chain** — `npx orbitmem register guides/tokyo/obscura --tags coffee,tokyo` mints an ERC-721 NFT
+4. **Users discover via Web** — browse the Explore page on the web dashboard, search by tags
+5. **Users rate data** — connect wallet on the web dashboard, submit feedback with quality scores — building the producer's on-chain reputation
+
+Quality drives visibility. Also integrated Machine Payments Protocol (MPP), so data can be bought and sold based on reputation.
 
 ---
 
@@ -167,7 +170,7 @@ OrbitMem is built from scratch for this hackathon — SDK, relay, contracts, CLI
 OrbitMem gives users self-custodial, encrypted data with access control — no centralized server ever sees plaintext data.
 
 - **`@orbitmem/sdk`** — 6-layer composable SDK: identity, encryption (AES-256-GCM + Lit Protocol), P2P vault (OrbitDB Nested), transport (ERC-8128 signed requests), discovery, persistence
-- **`@orbitmem/cli`** — `npx orbitmem init` creates an OWS wallet, `vault store/get/ls` manages encrypted data, all commands support `--json` for machine consumption
+- **`orbitmem`** — `npx orbitmem init` creates an OWS wallet (stored at `~/.ows/`), vault data persists at `~/.orbitmem/vault/`, all commands support `--json` for machine consumption
 - **Per-path visibility** — same vault tree with `public`, `shared` (reputation-gated via Lit), and `private` (AES encrypted) paths
 
 ### 3. AI & Robotics
@@ -257,13 +260,20 @@ ERC-8004 is OrbitMem's core on-chain primitive. `DataRegistry` mints ERC-721 NFT
 
 ## What We've Built
 
-| Package                   | Description                                                                                                                                                                                          |
-| :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`@orbitmem/sdk`**       | Composable SDK — identity, encryption, vault, transport, discovery, persistence + client                                                                                                             |
-| **`@orbitmem/contracts`** | `ERC-8004` Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia                                                                                               |
-| **`@orbitmem/relay`**     | Hono HTTP relay with `ERC-8128` auth + MPP payment middleware, vault/data/snapshot routes                                                                                                            |
-| **`@orbitmem/web`**       | React dashboard — vault explorer, data registry, metrics, wallet integration (Cloudflare Workers)                                                                                                    |
-| **`@orbitmem/cli`**       | CLI for users and agents — `npx orbitmem init/vault/register/discover/snapshot` + `vault price` for pay-per-read pricing. `--json` output. Includes Claude Code skill for natural language operation |
+| Package                   | Description                                                                                                                                                                                       |
+| :------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`@orbitmem/sdk`**       | Composable SDK — identity, encryption, vault, transport, discovery, persistence + client                                                                                                          |
+| **`@orbitmem/contracts`** | `ERC-8004` Solidity contracts — DataRegistry (ERC-721) + FeedbackRegistry (reputation) on Base Sepolia                                                                                            |
+| **`@orbitmem/relay`**     | Hono HTTP relay with `ERC-8128` auth + MPP payment middleware, vault/data/snapshot routes                                                                                                         |
+| **`@orbitmem/web`**       | React web app — data explorer, feedback form, wallet integration (Cloudflare Workers)                                                                                                             |
+| **`orbitmem`**            | CLI for users and agents — `npx orbitmem init/vault/register/discover/rate` + `vault price` for pay-per-read pricing. `--json` output. Includes Claude Code skills for natural language operation |
+
+### Deployed Contracts (Base Sepolia)
+
+| Contract             | Address                                                                                                                         |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| **DataRegistry**     | [`0x9eE44938ED77227470CaA2DbCC0459F49d249B7A`](https://sepolia.basescan.org/address/0x9eE44938ED77227470CaA2DbCC0459F49d249B7A) |
+| **FeedbackRegistry** | [`0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a`](https://sepolia.basescan.org/address/0x1Bce77f90C33A5f8faCa54782Ce3a17d1AD7109a) |
 
 ---
 
