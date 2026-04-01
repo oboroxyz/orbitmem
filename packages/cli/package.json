@@ -1,6 +1,6 @@
 {
   "name": "orbitmem",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "CLI for OrbitMem — manage vaults, discover data, and interact with on-chain registries",
   "keywords": [
     "agents",
@@ -37,7 +37,7 @@
     "@hono/node-server": "^1.13.0",
     "@open-wallet-standard/core": "^1.1.0",
     "@orbitmem/relay": "^0.1.0",
-    "@orbitmem/sdk": "^0.1.0",
+    "@orbitmem/sdk": "^0.1.3",
     "viem": "^2.0.0"
   },
   "devDependencies": {
