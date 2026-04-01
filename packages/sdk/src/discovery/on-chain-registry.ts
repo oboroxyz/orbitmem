@@ -72,7 +72,7 @@ export class OnChainRegistry {
 
   async findData(query: { activeOnly?: boolean }): Promise<DataRegistration[]> {
     const latestBlock = await this.pub.getBlockNumber();
-    const CHUNK = 1000n;
+    const CHUNK = 10000n;
     const logs: { args: { dataId: bigint; owner: string; dataURI: string } }[] = [];
     for (let from = this.deployBlock; from <= latestBlock; from += CHUNK) {
       const to = from + CHUNK - 1n > latestBlock ? latestBlock : from + CHUNK - 1n;
