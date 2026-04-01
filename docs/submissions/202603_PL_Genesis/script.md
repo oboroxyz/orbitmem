@@ -9,18 +9,19 @@ Hi, I'm building OrbitMem — a decentralized data layer for the agentic web, de
 IPFS is great as decentralized storage — but it's no modern usable database.
 
 - _No encryption_ — data is stored in the open.
-- _No authentication_ — anyone know a CID can access it. - _No discovery_ — you can't search for data, and there's no quality signal.
+- _No authentication_ — anyone know a CID can access it.
+- _No discovery_ — you can't search for data, and there's no quality signal.
 
 So I'm building OrbitMem to fill these gaps.
 
 ## Slide 3: Architecture (~30s)
 
-OrbitMem is built on top of OrbitDB — a local-first P2P database built on libp2p.
+OrbitMem is built on top of OrbitDB. That has 4 layers.
 
-- Auth uses Passkeys and wallets via ERC-8128(eighty-one twenty-eight) signed HTTP — no token or API keys.
-- Encryption pairs Lit Protocol with AES.
-- Discovery runs on ERC-8004(eighty-oh-four) — on-chain scoring where data entries are rated by humans and agents. we applied this to data not only agent.
-- Persistence is handled by P2P replication across relays — no single point of failure. And snapshots are archived to Filecoin via Storacha.
+- _Auth_: ERC-8128(eighty-one twenty-eight) signed HTTP — no token or API keys.
+- _Encryption_: pairs Lit Protocol with AES.
+- _Discovery_: ERC-8004(eighty-oh-four) — on-chain scoring where data entries are rated by humans and agents. we applied this to data not only agent.
+- _Persistence_: handled by P2P replication across relay server. Snapshots are archived to Filecoin via Storacha.
 
 ## Slide 4: Key Features
 
@@ -30,19 +31,24 @@ OrbitMem works as a decentralized database via SDK, here's a demo memo app deplo
 
 --- _DEMO_1_ ---
 
-- Auth with wallet or passkey(porto)
+- Auth with EOA wallet or passkey(porto)
 - Public memos are shareable.
 - Private memos are AES encrypted — the relay server and IPFS nodes only receive already-encrypted data, so only the owner can decrypt it.
 
 ## Slide 6: Demo — Agent Data Trust (~40s)
 
-OrbitMem is also designed for agents. We provide a CLI and Skills so agents can publish, discover, and rate data autonomously.
+Next demo is agents usecase. We provide a CLI and Skills so agents can publish, discover, and rate data autonomously.
 
 --- _DEMO_2_ ---
 
-You can integrate it into your own agents — whether it's OpenClaw, WorkFlow, or any agents.
+- Create agents's wallet with Open Standard Wallet. This acount is already initilized for demo.
+- Save data to OrbitMem
+- Register data to On-chain (ERC-8004)
+- Other agents can find this data and rate
 
-Quality drives visibility. We also integrated Machine Payments Protocol by Tempo/Stpipe, so data can be bought and sold based on reputation. This drives a healthy data ecosystem.
+You can integrate it into your own agents — OpenClaw etc.
+
+Quality drives visibility. We also integrated Machine Payments Protocol, so data can be bought and sold based on reputation. This drives a healthy data ecosystem.
 
 ## Slide 7: Closing + QR (~15s)
 

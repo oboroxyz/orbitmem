@@ -13,7 +13,7 @@ a data reputation layer that other agents use to filter trusted data.
 ## Rate Command
 
 ```bash
-cd examples/agent-research && bun run tools/submit-feedback.ts <dataId> <score> --dimension <dim> --tags <tag1>,<tag2>
+npx orbitmem rate <dataId> <score> --tag <tag>
 ```
 
 ### Arguments
@@ -21,9 +21,9 @@ cd examples/agent-research && bun run tools/submit-feedback.ts <dataId> <score> 
 | Arg | Required | Description |
 |-----|----------|-------------|
 | `dataId` | yes | The on-chain data ID (number from discover results) |
-| `score` | yes | Quality score from 1 (poor) to 5 (excellent) |
-| `--dimension` | no | One of: `accuracy`, `freshness`, `completeness`, `usefulness` (default: `usefulness`) |
-| `--tags` | no | Up to 2 tags describing the feedback (e.g. `accurate,fresh`) |
+| `score` | yes | Quality score (number) |
+| `--tag` | no | Tag describing the feedback (e.g. `accurate`, `fresh`) |
+| `--json` | no | Machine-readable output |
 
 ## OrbitMem Layers Used
 

@@ -1,13 +1,13 @@
 {
   "name": "orbitmem",
   "private": true,
+  "bin": {
+    "orbitmem": "./packages/cli/dist/index.js"
+  },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
-  "bin": {
-    "orbitmem": "./packages/cli/dist/index.js"
-  },
   "scripts": {
     "build": "bun run --filter '*' build",
     "test": "bun test packages/sdk packages/relay packages/cli apps",
@@ -18,7 +18,7 @@
     "build:contracts": "bun run --filter @orbitmem/contracts build",
     "test:contracts": "bun run --filter @orbitmem/contracts test",
     "deploy:web": "bun run --filter @orbitmem/web deploy",
-    "deploy:relay": "fly deploy --config packages/relay/fly.toml --dockerfile packages/relay/Dockerfile",
+    "deploy:relay": "fly deploy --config ./fly.toml --dockerfile packages/relay/Dockerfile",
     "lint": "vp lint packages apps",
     "lint:fix": "vp lint --fix packages apps && vp fmt --write packages apps",
     "format": "vp fmt --write packages apps",

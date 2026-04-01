@@ -3,10 +3,7 @@ import { type ReactNode, useState } from "react";
 
 import { ConnectButton } from "./ConnectButton";
 
-const navLinks = [
-  { to: "/explore", label: "Explore" },
-  { to: "/dashboard", label: "Dashboard" },
-] as const;
+const navLinks = [{ to: "/explore", label: "Explore" }] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
   const routerState = useRouterState();
@@ -138,6 +135,15 @@ export function Layout({ children }: { children: ReactNode }) {
             className="hover:text-stone-600 transition-colors"
           >
             ERC-8128
+          </a>
+          <span className="text-stone-300">&middot;</span>
+          <a
+            href="https://openwallet.sh/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-stone-600 transition-colors"
+          >
+            Open Wallet Standard
           </a>
         </div>
       </footer>

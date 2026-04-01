@@ -4,34 +4,37 @@ import { useCallback, useState } from "react";
 
 import { DataTable } from "../../components/DataTable";
 import { SearchBar } from "../../components/SearchBar";
-import { type DataRegistration, getDataStats, searchData } from "../../lib/api";
+import { type DataRegistration, searchData } from "../../lib/api";
 
 export const Route = createFileRoute("/explore/")({
   component: DataPage,
 });
 
 function DataPage() {
-  const [schema, setSchema] = useState("");
+  const [query, setQuery] = useState("");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 
-  const { data: stats, isLoading: statsLoading } = useQuery({
-    queryKey: ["dataStats"],
-    queryFn: getDataStats,
-    refetchInterval: 60_000,
-  });
-
   const { data: result, isLoading } = useQuery({
-    queryKey: ["dataSearch", schema, verifiedOnly],
+    queryKey: ["dataSearch", verifiedOnly],
     queryFn: () =>
       searchData({
-        schema: schema || undefined,
         verifiedOnly: verifiedOnly || undefined,
       }),
   });
 
-  const entries = result?.results ?? [];
+  // Client-side text search across name, description, tags, schema, key
+  const entries = (result?.results ?? []).filter((d) => {
+    if (!query) return true;
+    const q = query.toLowerCase();
+    return (
+      d.name?.toLowerCase().includes(q) ||
+      d.description?.toLowerCase().includes(q) ||
+      d.schema?.toLowerCase().includes(q) ||
+      d.tags?.some((t) => t.toLowerCase().includes(q))
+    );
+  });
 
-  const onSearch = useCallback((q: string) => setSchema(q), []);
+  const onSearch = useCallback((q: string) => setQuery(q), []);
 
   return (
     <div className="space-y-6">
@@ -40,6 +43,7 @@ function DataPage() {
         <p className="text-sm">Browse data entries with quality scores and tags</p>
       </div>
 
+      {/* TODO: re-enable stats when relay is live
       <div className="grid grid-cols-3 gap-4">
         <div className="rounded-xl bg-stone-100 p-5">
           <p className="text-xs text-stone-900 mb-1">Data Entries</p>
@@ -54,9 +58,10 @@ function DataPage() {
           <p className="text-2xl font-bold">{statsLoading ? "—" : (stats?.avgQuality ?? 0)}</p>
         </div>
       </div>
+      */}
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <SearchBar placeholder="Search by schema..." onSearch={onSearch} />
+        <SearchBar placeholder="Search by name, tags..." onSearch={onSearch} />
         <label className="flex items-center gap-2 text-sm cursor-pointer">
           <input
             type="checkbox"

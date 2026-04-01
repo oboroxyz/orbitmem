@@ -1,4 +1,6 @@
-const BASE = "/api";
+const BASE = import.meta.env.VITE_RELAY_URL
+  ? `${import.meta.env.VITE_RELAY_URL}/v1`
+  : "/api";
 
 async function fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

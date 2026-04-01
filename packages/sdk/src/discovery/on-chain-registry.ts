@@ -38,6 +38,20 @@ export class OnChainRegistry {
 
   async registerData(dataURI: string): Promise<number> {
     const wallet = this.requireWallet();
+    // Estimate gas first to catch errors before submitting
+    const gas = await this.pub.estimateContractGas({
+      address: this.dataReg,
+      abi: DataRegistryAbi,
+      functionName: "register",
+      args: [dataURI],
+      account: wallet.account!,
+    });
+    // Add global BigInt JSON serialization support for viem error handling
+    if (!(BigInt.prototype as any).toJSON) {
+      (BigInt.prototype as any).toJSON = function () {
+        return this.toString();
+      };
+    }
     const hash = await wallet.writeContract({
       address: this.dataReg,
       abi: DataRegistryAbi,
@@ -45,6 +59,7 @@ export class OnChainRegistry {
       args: [dataURI],
       chain: wallet.chain,
       account: wallet.account!,
+      gas,
     });
     const receipt = await this.pub.waitForTransactionReceipt({ hash });
     const logs = parseEventLogs({
@@ -57,7 +72,7 @@ export class OnChainRegistry {
 
   async findData(query: { activeOnly?: boolean }): Promise<DataRegistration[]> {
     const latestBlock = await this.pub.getBlockNumber();
-    const CHUNK = 1000n;
+    const CHUNK = 9999n;
     const logs: { args: { dataId: bigint; owner: string; dataURI: string } }[] = [];
     for (let from = this.deployBlock; from <= latestBlock; from += CHUNK) {
       const to = from + CHUNK - 1n > latestBlock ? latestBlock : from + CHUNK - 1n;
@@ -82,7 +97,7 @@ export class OnChainRegistry {
       })) as boolean;
       if (query.activeOnly && !active) continue;
 
-      const [owner] = await Promise.all([
+      const [owner, tokenURI] = await Promise.all([
         this.pub.readContract({
           address: this.dataReg,
           abi: DataRegistryAbi,
@@ -97,15 +112,24 @@ export class OnChainRegistry {
         }),
       ]);
 
+      // Parse metadata from tokenURI (JSON string stored on-chain)
+      let meta: { name?: string; description?: string; key?: string; schema?: string; tags?: string[] } = {};
+      try {
+        meta = JSON.parse(tokenURI as string);
+      } catch {
+        // malformed URI, keep defaults
+      }
+
       results.push({
         dataId,
         dataRegistry: this.dataReg,
         vaultAddress: "",
-        vaultKey: "",
-        name: "",
-        description: "",
+        vaultKey: meta.key ?? "",
+        name: meta.name ?? "",
+        description: meta.description ?? "",
         visibility: "public",
-        tags: [],
+        schema: meta.schema,
+        tags: meta.tags ?? [],
         active,
         owner: owner as WalletAddress,
         ownerChain: "evm",

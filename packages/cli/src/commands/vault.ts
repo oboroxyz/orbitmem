@@ -9,7 +9,13 @@ import type {
 
 import { loadConfig } from "../config.js";
 import { createClient, type LitNetwork } from "../utils/client.js";
+import { createRelayVaultClient } from "../utils/relay-client.js";
 import { error, output } from "../utils/output.js";
+
+/** True when the user passes --local or when no relay URL is configured */
+function useLocal(flags: Record<string, string>, relay: string): boolean {
+  return flags.local !== undefined || !relay;
+}
 
 export async function vault(args: string[], flags: Record<string, string>): Promise<void> {
   const sub = args[0];
@@ -38,9 +44,41 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
   if (flags.relay) config.relay = flags.relay;
 
   const engine = (flags.engine as EncryptionEngine) ?? "aes";
-  const litNetwork = (flags["lit-network"] as LitNetwork) ?? "cayenne";
   const useLit = engine === "lit";
 
+  // Lit encryption requires the full SDK client
+  if (!useLit && !useLocal(flags, config.relay)) {
+    const relay = await createRelayVaultClient(config);
+
+    let visibility: Visibility;
+    if (flags.public !== undefined) {
+      visibility = "public";
+    } else if (flags.shared !== undefined) {
+      visibility = "shared";
+    } else {
+      visibility = "private";
+    }
+
+    // Parse value as JSON if possible, otherwise store as string
+    // Normalize literal newlines from shell multiline input
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(value.replace(/[\n\r\t]/g, " "));
+    } catch {
+      parsed = value;
+    }
+
+    await relay.store(path, parsed, visibility);
+    if (flags.json !== undefined) {
+      output({ path, visibility, engine }, true);
+    } else {
+      process.stdout.write(`Stored "${path}" (${visibility})\n`);
+    }
+    return;
+  }
+
+  // Fallback: full SDK client (--local or Lit encryption)
+  const litNetwork = (flags["lit-network"] as LitNetwork) ?? "cayenne";
   const client = await createClient(config, useLit ? { litNetwork } : undefined);
 
   try {
@@ -113,6 +151,69 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
   }
 }
 
+async function vaultGet(args: string[], flags: Record<string, string>): Promise<void> {
+  const [path] = args;
+  if (!path) error("Usage: orbitmem vault get <path>");
+
+  const config = loadConfig();
+  if (flags.relay) config.relay = flags.relay;
+
+  if (!useLocal(flags, config.relay)) {
+    const relay = await createRelayVaultClient(config);
+    const entry = await relay.get(path);
+    if (!entry) error(`Not found: ${path}`);
+    output(flags.json !== undefined ? entry : entry.value, flags.json !== undefined);
+    return;
+  }
+
+  const client = await createClient(config);
+  try {
+    const entry = await client.vault.get(path);
+    if (!entry) error(`Not found: ${path}`);
+    output(flags.json !== undefined ? entry : entry.value, flags.json !== undefined);
+  } finally {
+    await client.destroy();
+  }
+}
+
+async function vaultLs(args: string[], flags: Record<string, string>): Promise<void> {
+  const [prefix] = args;
+
+  const config = loadConfig();
+  if (flags.relay) config.relay = flags.relay;
+
+  if (!useLocal(flags, config.relay)) {
+    const relay = await createRelayVaultClient(config);
+    const keys = await relay.keys(prefix);
+    if (flags.json !== undefined) {
+      output(keys, true);
+    } else if (keys.length === 0) {
+      process.stdout.write("(no entries)\n");
+    } else {
+      for (const key of keys) {
+        process.stdout.write(`${key}\n`);
+      }
+    }
+    return;
+  }
+
+  const client = await createClient(config);
+  try {
+    const keys = await client.vault.keys(prefix);
+    if (flags.json !== undefined) {
+      output(keys, true);
+    } else if (keys.length === 0) {
+      process.stdout.write("(no entries)\n");
+    } else {
+      for (const key of keys) {
+        process.stdout.write(`${key}\n`);
+      }
+    }
+  } finally {
+    await client.destroy();
+  }
+}
+
 async function vaultUpdateAccess(args: string[], flags: Record<string, string>): Promise<void> {
   const [path] = args;
   if (!path)
@@ -168,46 +269,6 @@ async function vaultUpdateAccess(args: string[], flags: Record<string, string>):
       output({ path, updated: true, timestamp: entry.timestamp }, true);
     } else {
       process.stdout.write(`Updated access for "${path}"\n`);
-    }
-  } finally {
-    await client.destroy();
-  }
-}
-
-async function vaultGet(args: string[], flags: Record<string, string>): Promise<void> {
-  const [path] = args;
-  if (!path) error("Usage: orbitmem vault get <path>");
-
-  const config = loadConfig();
-  if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config);
-
-  try {
-    const entry = await client.vault.get(path);
-    if (!entry) error(`Not found: ${path}`);
-    output(flags.json !== undefined ? entry : entry.value, flags.json !== undefined);
-  } finally {
-    await client.destroy();
-  }
-}
-
-async function vaultLs(args: string[], flags: Record<string, string>): Promise<void> {
-  const [prefix] = args;
-
-  const config = loadConfig();
-  if (flags.relay) config.relay = flags.relay;
-  const client = await createClient(config);
-
-  try {
-    const keys = await client.vault.keys(prefix);
-    if (flags.json !== undefined) {
-      output(keys, true);
-    } else if (keys.length === 0) {
-      process.stdout.write("(no entries)\n");
-    } else {
-      for (const key of keys) {
-        process.stdout.write(`${key}\n`);
-      }
     }
   } finally {
     await client.destroy();

@@ -7,6 +7,10 @@ export class LiveDiscoveryService implements IDiscoveryService {
   private registry: OnChainRegistry;
   private config: OnChainRegistryConfig;
 
+  /** Cached search results with TTL */
+  private searchCache: { data: unknown[]; expiry: number } | null = null;
+  private static CACHE_TTL = 60_000; // 60s
+
   constructor(config: OnChainRegistryConfig) {
     this.config = config;
     this.registry = new OnChainRegistry(config);
@@ -18,28 +22,38 @@ export class LiveDiscoveryService implements IDiscoveryService {
     verifiedOnly?: boolean;
     minQuality?: number;
   }): Promise<unknown[]> {
-    const results = await this.registry.findData({ activeOnly: query.verifiedOnly });
+    // Use cached results if available (full scan is expensive)
+    const now = Date.now();
+    let allEntries: unknown[];
 
-    // Enrich each entry with tokenURI metadata
-    const enriched = await Promise.all(
-      results.map(async (entry) => {
-        try {
-          const uri = (await this.config.publicClient.readContract({
-            address: this.config.dataRegistry,
-            abi: DataRegistryAbi,
-            functionName: "tokenURI",
-            args: [BigInt(entry.dataId)],
-          })) as string;
-          const meta = JSON.parse(uri);
-          return { ...entry, ...meta };
-        } catch {
-          return entry;
-        }
-      }),
-    );
+    if (this.searchCache && this.searchCache.expiry > now) {
+      allEntries = this.searchCache.data;
+    } else {
+      const results = await this.registry.findData({ activeOnly: query.verifiedOnly });
+
+      // Enrich each entry with tokenURI metadata
+      allEntries = await Promise.all(
+        results.map(async (entry) => {
+          try {
+            const uri = (await this.config.publicClient.readContract({
+              address: this.config.dataRegistry,
+              abi: DataRegistryAbi,
+              functionName: "tokenURI",
+              args: [BigInt(entry.dataId)],
+            })) as string;
+            const meta = JSON.parse(uri);
+            return { ...entry, ...meta };
+          } catch {
+            return entry;
+          }
+        }),
+      );
+
+      this.searchCache = { data: allEntries, expiry: now + LiveDiscoveryService.CACHE_TTL };
+    }
 
     // Client-side filtering by schema / tags
-    return enriched.filter((entry: any) => {
+    return allEntries.filter((entry: any) => {
       if (query.schema && entry.schema !== query.schema) return false;
       if (query.tags?.length && !query.tags.some((t: string) => entry.tags?.includes(t)))
         return false;

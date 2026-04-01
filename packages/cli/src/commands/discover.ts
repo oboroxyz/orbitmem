@@ -13,10 +13,17 @@ export async function discover(args: string[], flags: Record<string, string>): P
   try {
     const query: Record<string, unknown> = {};
     if (args[0]) query.schema = args[0];
-    if (flags.tags) query.tags = flags.tags.split(",");
     if (flags["min-quality"]) query.minQuality = Number(flags["min-quality"]);
 
-    const results = await client.discovery.findData(query);
+    let results = await client.discovery.findData(query);
+
+    // Client-side tag filtering
+    const filterTags = flags.tags?.split(",").map((t) => t.trim().toLowerCase());
+    if (filterTags?.length) {
+      results = results.filter((r: any) =>
+        filterTags.some((ft) => r.tags?.some((t: string) => t.toLowerCase().includes(ft))),
+      );
+    }
 
     if (flags.json !== undefined) {
       output(results, true);
@@ -25,9 +32,10 @@ export async function discover(args: string[], flags: Record<string, string>): P
     } else {
       const rows = results.map((r: any) => ({
         id: r.dataId,
-        name: r.name,
-        quality: r.quality,
-        vault: `${String(r.vaultAddress ?? "").slice(0, 10)}...`,
+        name: r.name || "(unnamed)",
+        tags: (r.tags ?? []).join(", "),
+        owner: `${String(r.owner ?? "").slice(0, 10)}...`,
+        active: r.active ? "yes" : "no",
       }));
       output(rows, false);
     }

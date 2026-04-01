@@ -20,11 +20,13 @@ export async function createOrbitMem(config: OrbitMemConfig): Promise<IOrbitMem>
   );
 
   // Initialize OrbitDB + vault
+  const vaultDir = config.vault?.dbName ?? "./orbitdb";
   const { orbitdb, cleanup: orbitdbCleanup } = await createOrbitDBInstance({
-    directory: config.vault?.dbName ? `./${config.vault.dbName}` : "./orbitdb",
+    id: "default",
+    directory: vaultDir,
   });
   const vault = await createVault(orbitdb, {
-    dbName: config.vault?.dbName,
+    dbName: "orbitmem-vault",
     aesEngine: encryption.aes,
     encryptionLayer: encryption,
   });

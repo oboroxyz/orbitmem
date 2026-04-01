@@ -55,6 +55,7 @@ Commands:
 Options:
   --relay <url>           Override relay URL
   --chain <name>          Override chain
+  --local                 Use local OrbitDB instead of relay
   --json                  Output as JSON
   --help                  Show this help
 
