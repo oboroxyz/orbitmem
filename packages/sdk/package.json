@@ -1,12 +1,22 @@
 {
   "name": "@orbitmem/sdk",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Sovereign data layer for AI agents — encrypted P2P vaults, multi-chain identity, and on-chain data trust",
   "type": "module",
   "license": "MIT",
   "author": "Oboro Inc. <dev@oboro.xyz> (https://oboro.xyz)",
   "homepage": "https://github.com/oboroxyz/orbitmem/tree/main/packages/sdk",
-  "keywords": ["ai", "agents", "data", "encryption", "p2p", "vault", "identity", "web3", "orbitmem"],
+  "keywords": [
+    "ai",
+    "agents",
+    "data",
+    "encryption",
+    "p2p",
+    "vault",
+    "identity",
+    "web3",
+    "orbitmem"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/oboroxyz/orbitmem",
