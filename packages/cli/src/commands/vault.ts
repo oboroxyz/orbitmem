@@ -60,9 +60,10 @@ async function vaultStore(args: string[], flags: Record<string, string>): Promis
     }
 
     // Parse value as JSON if possible, otherwise store as string
+    // Normalize literal newlines from shell multiline input
     let parsed: unknown;
     try {
-      parsed = JSON.parse(value);
+      parsed = JSON.parse(value.replace(/[\n\r\t]/g, " "));
     } catch {
       parsed = value;
     }

@@ -47,34 +47,13 @@ export function createOwsAdapter(walletName: string, chain: string): OwsAdapter 
     },
 
     async toViemAccount(): Promise<import("viem").Account> {
-      const address = await this.getAddress();
-      const { toAccount } = await import("viem/accounts");
-      return toAccount({
-        address: address as `0x${string}`,
-        async signMessage({ message }) {
-          const { signMessage: owsSign } = await ows();
-          const msg =
-            typeof message === "string"
-              ? message
-              : typeof message === "object" && "raw" in message
-                ? typeof message.raw === "string"
-                  ? message.raw
-                  : new TextDecoder().decode(message.raw)
-                : String(message);
-          const result = owsSign(walletName, chain, msg);
-          return result.signature as `0x${string}`;
-        },
-        async signTransaction(tx) {
-          const { signTransaction: owsSignTx } = await ows();
-          const result = owsSignTx(walletName, chain, JSON.stringify(tx));
-          return result.signature as `0x${string}`;
-        },
-        async signTypedData(typedData) {
-          const { signTypedData: owsSignTyped } = await ows();
-          const result = owsSignTyped(walletName, chain, JSON.stringify(typedData));
-          return result.signature as `0x${string}`;
-        },
-      });
+      // Export mnemonic from OWS and derive a full viem account that can
+      // natively sign transactions (OWS signTransaction expects RLP hex,
+      // but viem passes a JS object — so we use viem's own signer).
+      const { exportWallet } = await ows();
+      const mnemonic = exportWallet(walletName);
+      const { mnemonicToAccount } = await import("viem/accounts");
+      return mnemonicToAccount(mnemonic);
     },
   };
 }

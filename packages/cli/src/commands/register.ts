@@ -28,7 +28,17 @@ export async function register(args: string[], flags: Record<string, string>): P
     if (!entry) error(`Vault entry not found: ${path}`);
 
     // Auto-extract tags/name/description from stored data if available
-    const data = typeof entry.value === "object" && entry.value !== null ? entry.value as Record<string, unknown> : {};
+    // Relay may return value as a JSON string — parse it if needed
+    let parsed = entry.value;
+    if (typeof parsed === "string") {
+      try {
+        // Normalize literal newlines/tabs that may have leaked from shell input
+        parsed = JSON.parse(parsed.replace(/[\n\r\t]/g, " "));
+      } catch {
+        // not JSON, keep as string
+      }
+    }
+    const data = typeof parsed === "object" && parsed !== null ? parsed as Record<string, unknown> : {};
     const name = flags.name ?? (typeof data.name === "string" ? data.name : path);
     const description = flags.description ?? (typeof data.description === "string" ? data.description : "");
     const tags = flags.tags
