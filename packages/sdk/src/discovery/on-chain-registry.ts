@@ -97,7 +97,7 @@ export class OnChainRegistry {
       })) as boolean;
       if (query.activeOnly && !active) continue;
 
-      const [owner] = await Promise.all([
+      const [owner, tokenURI] = await Promise.all([
         this.pub.readContract({
           address: this.dataReg,
           abi: DataRegistryAbi,
@@ -112,15 +112,24 @@ export class OnChainRegistry {
         }),
       ]);
 
+      // Parse metadata from tokenURI (JSON string stored on-chain)
+      let meta: { name?: string; description?: string; key?: string; schema?: string; tags?: string[] } = {};
+      try {
+        meta = JSON.parse(tokenURI as string);
+      } catch {
+        // malformed URI, keep defaults
+      }
+
       results.push({
         dataId,
         dataRegistry: this.dataReg,
         vaultAddress: "",
-        vaultKey: "",
-        name: "",
-        description: "",
+        vaultKey: meta.key ?? "",
+        name: meta.name ?? "",
+        description: meta.description ?? "",
         visibility: "public",
-        tags: [],
+        schema: meta.schema,
+        tags: meta.tags ?? [],
         active,
         owner: owner as WalletAddress,
         ownerChain: "evm",
